@@ -18,7 +18,13 @@ def generate_scaffold(smiles: str) -> str:
     return MurckoScaffold.MurckoScaffoldSmiles(mol=mol, includeChirality=False)
 
 
-def add_random_split(df: pd.DataFrame, target_col: str, task_type: str) -> pd.DataFrame:
+def add_random_split(
+    df: pd.DataFrame,
+    target_col: str,
+    task_type: str,
+    random_state: int = 42,
+    test_size: float = 0.2,
+) -> pd.DataFrame:
     out = df.copy()
     idx = np.arange(len(out))
 
@@ -30,8 +36,8 @@ def add_random_split(df: pd.DataFrame, target_col: str, task_type: str) -> pd.Da
 
     train_idx, test_idx = train_test_split(
         idx,
-        test_size=0.2,
-        random_state=42,
+        test_size=test_size,
+        random_state=random_state,
         stratify=stratify,
     )
 
@@ -41,7 +47,11 @@ def add_random_split(df: pd.DataFrame, target_col: str, task_type: str) -> pd.Da
     return out
 
 
-def add_scaffold_split(df: pd.DataFrame, smiles_col: str = "canonical_smiles") -> pd.DataFrame:
+def add_scaffold_split(
+    df: pd.DataFrame,
+    smiles_col: str = "canonical_smiles",
+    test_size: float = 0.2,
+) -> pd.DataFrame:
     out = df.copy()
     out["scaffold"] = out[smiles_col].map(generate_scaffold)
 
@@ -50,7 +60,7 @@ def add_scaffold_split(df: pd.DataFrame, smiles_col: str = "canonical_smiles") -
         scaffold_groups[scaffold].append(i)
 
     groups = sorted(scaffold_groups.values(), key=len, reverse=True)
-    target_test_n = int(round(len(out) * 0.2))
+    target_test_n = int(round(len(out) * test_size))
 
     test_idx = []
     train_idx = []
