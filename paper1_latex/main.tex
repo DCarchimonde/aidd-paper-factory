@@ -3,7 +3,6 @@
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
-\usepackage{longtable}
 \usepackage{array}
 \usepackage{multirow}
 \usepackage{caption}
@@ -19,16 +18,16 @@
 \maketitle
 
 \begin{abstract}
-Molecular property prediction is a core task in AI-driven drug discovery, but benchmark conclusions can depend strongly on the train/test splitting protocol. Random splits may place chemically similar molecules in both training and test sets, while ordinary scaffold splits are often used to evaluate scaffold generalization. However, scaffold splitting itself can introduce target distribution shift and scaffold concentration, making performance drops difficult to interpret. Here, we present a reproducible split-diagnostic audit of six public molecular property datasets across random, ordinary scaffold, and target-balanced scaffold splitting protocols. Using Morgan fingerprints and classical machine-learning baselines across five seeds, we jointly quantify model performance gaps, target distribution shifts, scaffold statistics, test-to-train Tanimoto similarity, outlier cases, and model-ranking changes. The results show that random splits generally yield higher test-to-train chemical similarity and often more optimistic model performance. Ordinary scaffold splits remove train/test scaffold overlap but can induce substantial target shifts, particularly in small or scaffold-concentrated datasets. Target-balanced scaffold splitting reduces target shift in several datasets, but residual performance gaps and model-ranking changes remain dataset- and model-dependent. These findings support reporting split diagnostics alongside model scores in molecular property prediction benchmarks.
+Molecular property prediction is a core task in AI-driven drug discovery, but benchmark conclusions can depend strongly on the train/test splitting protocol. Random splits may place chemically similar molecules in both training and test sets, while ordinary scaffold splits are often used to evaluate scaffold generalization. However, scaffold splitting itself can introduce target distribution shift and scaffold concentration, making performance drops difficult to interpret. Here, we present a reproducible split-diagnostic audit of six public molecular property datasets across random, ordinary scaffold, and target-balanced scaffold splitting protocols. Using RDKit Morgan fingerprints and classical machine-learning baselines across five seeds, we jointly quantify model performance gaps, target distribution shifts, scaffold statistics, test-to-train Tanimoto similarity, outlier cases, and model-ranking changes. The results show that random splits generally yield higher test-to-train chemical similarity and often more optimistic model performance. Ordinary scaffold splits remove train/test scaffold overlap but can induce substantial target shifts, particularly in small or scaffold-concentrated datasets. Target-balanced scaffold splitting reduces target shift in several datasets, but residual performance gaps and model-ranking changes remain dataset- and model-dependent. These findings support reporting split diagnostics alongside model scores in molecular property prediction benchmarks.
 \end{abstract}
 
 \textbf{Keywords:} AI-driven drug discovery; molecular property prediction; scaffold split; data splitting; benchmark audit; Tanimoto similarity; target distribution shift.
 
 \section{Introduction}
 
-Molecular property prediction is a central component of AI-driven drug discovery (AIDD), supporting early-stage tasks such as absorption, distribution, metabolism, excretion and toxicity (ADMET) estimation, toxicity screening, blood--brain barrier permeability prediction, and lead prioritization. Public benchmarks have played a major role in accelerating method development by standardizing datasets, molecular representations, and evaluation metrics. MoleculeNet, for example, was introduced as a large-scale benchmark for molecular machine learning and curated multiple public datasets with standardized evaluation protocols \citep{wu2018moleculenet}. Therapeutics Data Commons (TDC) further broadened therapeutics machine learning by providing tasks, datasets, meaningful splits, evaluation strategies, and leaderboards across drug discovery and development \citep{huang2021tdc}.
+Molecular property prediction is a central component of AI-driven drug discovery (AIDD), supporting early-stage tasks such as absorption, distribution, metabolism, excretion and toxicity (ADMET) estimation, toxicity screening, blood--brain barrier permeability prediction, and lead prioritization. Public benchmarks have played a major role in accelerating method development by standardizing datasets, molecular representations, and evaluation metrics. MoleculeNet was introduced as a benchmark for molecular machine learning and curated multiple public datasets with standardized evaluation protocols \citep{wu2018moleculenet}. Therapeutics Data Commons (TDC) further broadened therapeutics machine learning by providing tasks, datasets, meaningful splits, evaluation strategies, and leaderboards across drug discovery and development \citep{huang2021tdc}.
 
-Despite these advances, evaluation in molecular property prediction remains sensitive to how molecules are split into training and test sets. Random splitting can produce optimistic estimates when chemically similar molecules appear in both sets. Scaffold splitting is therefore commonly used to evaluate chemical scaffold generalization by grouping molecules according to Bemis--Murcko scaffolds and separating scaffold groups between train and test. However, scaffold splitting is not automatically a complete solution. Recent work argues that scaffold splits may still overestimate virtual screening performance because molecules with different scaffolds can remain chemically similar \citep{guo2024scaffold}. In addition, scaffold splits can create statistical artifacts such as target distribution shift, especially when a small number of large scaffold groups dominate the test set.
+Despite these advances, evaluation in molecular property prediction remains sensitive to how molecules are split into training and test sets. Random splitting can produce optimistic estimates when chemically similar molecules appear in both sets. Scaffold splitting is therefore commonly used to evaluate chemical scaffold generalization by grouping molecules according to molecular frameworks related to Bemis--Murcko scaffolds \citep{bemis1996properties}. However, scaffold splitting is not automatically a complete solution. Recent work argues that scaffold splits can still overestimate virtual screening performance because molecules with different scaffolds can remain chemically similar \citep{guo2024scaffold}. In addition, scaffold splits can create statistical artifacts such as target distribution shift, especially when a small number of large scaffold groups dominate the test set.
 
 This study treats the split itself as an object of diagnosis. Rather than only reporting model performance under a predefined split, we audit the properties of random, ordinary scaffold, and target-balanced scaffold protocols. The target-balanced scaffold split is used as a diagnostic counterfactual: it preserves scaffold-level separation while attempting to reduce train/test target mean differences. We do not propose it as a universally superior benchmark split. Instead, we use it to separate, as far as possible, performance changes driven by chemical scaffold shift from those driven by target distribution shift.
 
@@ -42,9 +41,9 @@ Random versus scaffold splitting is a well-known issue in molecular machine lear
 
 \section{Materials and Methods}
 
-\subsection{Datasets}
+\subsection{Datasets and preprocessing}
 
-We used six public molecular property datasets: four classification datasets (BBBP, BACE, ClinTox, HIV) and two regression datasets (ESOL, FreeSolv). Dataset cleaning included missing-value removal, RDKit-valid SMILES filtering, canonicalization, and duplicate canonical SMILES removal. Table~\ref{tab:dataset-summary} summarizes the resulting datasets.
+We used six public molecular property datasets: four classification datasets (BBBP, BACE, ClinTox, HIV) and two regression datasets (ESOL, FreeSolv). Dataset cleaning included missing-value removal, RDKit-valid SMILES filtering, canonicalization, and duplicate canonical SMILES removal using RDKit \citep{rdkit}. Table~\ref{tab:dataset-summary} summarizes the resulting datasets.
 
 \begin{table}[H]
 \centering
@@ -68,7 +67,7 @@ FreeSolv & Regression & 642 & 642 & 642 & 642 & 0 & -3.8030 & -25.47--3.43 \\
 
 \subsection{Molecular representation}
 
-SMILES strings were canonicalized using RDKit. Each molecule was represented by a Morgan fingerprint with radius 2 and 2048 bits. The same representation was used for all models and split protocols to isolate the effect of data splitting rather than feature engineering.
+Each molecule was represented by an extended-connectivity/Morgan fingerprint with radius 2 and 2048 bits \citep{rogers2010extended}. The same representation was used for all models and split protocols to isolate the effect of data splitting rather than feature-engineering differences.
 
 \subsection{Splitting protocols}
 
@@ -76,19 +75,19 @@ We evaluated three splitting protocols.
 
 \textbf{Random split.} Molecules were split into training and test sets using random splits repeated over five seeds. Classification tasks were stratified when applicable.
 
-\textbf{Ordinary scaffold split.} Molecules were grouped by Bemis--Murcko scaffold. Scaffold groups were assigned to train or test sets so that no scaffold appeared in both sets.
+\textbf{Ordinary scaffold split.} Molecules were grouped by Bemis--Murcko scaffold \citep{bemis1996properties}. Scaffold groups were assigned to train or test sets so that no scaffold appeared in both sets.
 
 \textbf{Target-balanced scaffold split.} Scaffold groups were selected to reduce the train/test target mean difference while preserving scaffold-level separation. This split is used as a diagnostic counterfactual, not as a new universal benchmark standard.
 
 \subsection{Models and metrics}
 
-For classification tasks, we evaluated Logistic Regression, Random Forest, and XGBoost. ROC-AUC was used as the primary classification metric, with accuracy, F1, and average precision as supporting metrics. For regression tasks, we evaluated Ridge Regression, Random Forest, and XGBoost. RMSE was used as the primary regression metric, with MAE and $R^2$ as supporting metrics.
+For classification tasks, we evaluated Logistic Regression, Random Forest, and XGBoost. Logistic Regression and Random Forest were implemented using scikit-learn \citep{pedregosa2011scikit}, while XGBoost was implemented using the XGBoost library \citep{chen2016xgboost}. ROC-AUC was used as the primary classification metric, with accuracy, F1, and average precision as supporting metrics. For regression tasks, we evaluated Ridge Regression, Random Forest, and XGBoost. RMSE was used as the primary regression metric, with MAE and $R^2$ as supporting metrics.
 
 For classification, the generalization gap was defined as random ROC-AUC minus scaffold ROC-AUC. For regression, the gap was defined as scaffold RMSE minus random RMSE. Positive gaps therefore indicate that the scaffold-based split is more difficult than the random split under the primary metric.
 
 \subsection{Split diagnostics}
 
-We report target mean gaps, number of scaffolds, largest scaffold fraction, singleton scaffold fraction, train/test shared scaffold count, and maximum test-to-train Tanimoto similarity. For each test molecule, the maximum Tanimoto similarity to any training molecule was calculated using Morgan fingerprints. We also report model-ranking changes and outlier cases in appendix tables.
+We report target mean gaps, number of scaffolds, largest scaffold fraction, singleton scaffold fraction, train/test shared scaffold count, and maximum test-to-train Tanimoto similarity. For each test molecule, the maximum Tanimoto similarity to any training molecule was calculated using Morgan fingerprints. We also report model-ranking changes and outlier cases in the appendix.
 
 \section{Results}
 
@@ -173,7 +172,7 @@ HIV & Classification & XGBoost & ROC-AUC & 0.018 & 0.100 & -0.082 \\
 
 \subsection{Random splits have higher test-to-train chemical similarity}
 
-Figure~\ref{fig:tanimoto} and Table~\ref{tab:similarity} show that random split test molecules generally have higher maximum Tanimoto similarity to the training set. For example, mean maximum Tanimoto similarity under random splitting is 0.791 for BACE, 0.564 for BBBP, 0.556 for ESOL, 0.544 for FreeSolv, and 0.616 for HIV. Ordinary scaffold splitting reduces this similarity in all datasets. Balanced scaffold splitting often lies between random and ordinary scaffold splits, consistent with its role as a diagnostic counterfactual rather than a maximally difficult split.
+Figure~\ref{fig:tanimoto} and Table~\ref{tab:similarity} show that random split test molecules generally have higher maximum Tanimoto similarity to the training set. Ordinary scaffold splitting reduces this similarity in all datasets. Balanced scaffold splitting often lies between random and ordinary scaffold splits, consistent with its role as a diagnostic counterfactual rather than a maximally difficult split.
 
 \begin{figure}[H]
 \centering
@@ -233,6 +232,8 @@ This study uses classical fingerprint-based models rather than graph neural netw
 \section{Conclusion}
 
 Molecular property prediction benchmarks should treat data splitting as an object of diagnosis. Random splits, ordinary scaffold splits, and target-balanced scaffold splits can lead to different performance estimates, target shifts, chemical similarity patterns, and model rankings. A split-diagnostic audit that reports model performance together with target distribution shift, scaffold statistics, and test-to-train similarity provides a more transparent basis for evaluating generalization in AI-driven drug discovery.
+
+\input{appendix}
 
 \bibliographystyle{plainnat}
 \bibliography{references}
