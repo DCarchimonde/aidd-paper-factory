@@ -118,14 +118,32 @@ for dataset, spec in DATASETS.items():
 raw = pd.DataFrame(rows)
 raw_path = TABLE_DIR / "paper1_balanced_scaffold_stats.csv"
 raw.to_csv(raw_path, index=False)
-summary = raw.groupby(["dataset", "task_type", "split"], as_index=False).mean(numeric_only=True)
+
+numeric_cols = [
+    "n_total",
+    "n_train",
+    "n_test",
+    "n_scaffolds_total",
+    "largest_scaffold_fraction",
+    "singleton_scaffold_fraction",
+    "n_train_scaffolds",
+    "n_test_scaffolds",
+    "n_shared_scaffolds",
+    "shared_scaffold_fraction_test",
+    "train_target_mean",
+    "test_target_mean",
+    "target_mean_gap_test_minus_train",
+]
+summary = raw.groupby(["dataset", "task_type", "split"], as_index=False)[numeric_cols].mean()
 summary_path = TABLE_DIR / "paper1_balanced_scaffold_stats_summary.csv"
 summary.to_csv(summary_path, index=False)
+
 rounded = summary.copy()
 for col in ["largest_scaffold_fraction", "singleton_scaffold_fraction", "shared_scaffold_fraction_test", "target_mean_gap_test_minus_train"]:
     rounded[col] = rounded[col].round(4)
 rounded_path = TABLE_DIR / "paper1_balanced_scaffold_stats_summary_rounded.csv"
 rounded.to_csv(rounded_path, index=False)
+
 print("saved", raw_path)
 print("saved", summary_path)
 print("saved", rounded_path)
