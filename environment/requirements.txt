@@ -1,0 +1,11 @@
+rdkit
+pandas
+numpy
+scikit-learn
+matplotlib
+tqdm
+joblib
+openpyxl
+xgboost
+shap
+requests
