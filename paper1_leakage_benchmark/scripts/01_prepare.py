@@ -27,11 +27,17 @@ summary_rows = []
 
 for name, spec in DATASETS.items():
     raw_path = RAW_DIR / f"{name.lower()}_raw.csv"
-    if not raw_path.exists():
-        raise FileNotFoundError(f"Please put raw CSV here first: {raw_path}")
+
+    if raw_path.exists():
+        print("loading local raw file", raw_path)
+        df = pd.read_csv(raw_path)
+    else:
+        print("downloading public dataset", name)
+        df = pd.read_csv(spec.url)
+        df.to_csv(raw_path, index=False)
+        print("saved raw file", raw_path)
 
     print("preparing", name)
-    df = pd.read_csv(raw_path)
     clean = df[[spec.smiles_col, spec.target_col]].copy()
     clean.columns = ["smiles", "target"]
     clean["dataset"] = name
