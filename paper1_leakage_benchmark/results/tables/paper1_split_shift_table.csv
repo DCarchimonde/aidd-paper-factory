@@ -11,3 +11,5 @@ BACE,balanced_scaffold,0.0006528877705518589
 BBBP,balanced_scaffold,0.00242944101753836
 ClinTox,balanced_scaffold,0.0021512182657866
 ESOL,balanced_scaffold,0.05348653666074042
+FreeSolv,balanced_scaffold,1.226015306122449
+HIV,balanced_scaffold,0.00293708592063516
