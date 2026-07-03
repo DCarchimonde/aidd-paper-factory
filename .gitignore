@@ -36,12 +36,14 @@ Thumbs.db
 *.gz
 *.7z
 
-# Paper-generated data and outputs
+# Raw and processed molecule data should stay local
 paper1_leakage_benchmark/data/raw/*
 paper1_leakage_benchmark/data/processed/*
 paper1_leakage_benchmark/results/models/*
-paper1_leakage_benchmark/results/tables/*
-paper1_leakage_benchmark/figures/*
+
+# Small reproducibility outputs can be versioned
+!paper1_leakage_benchmark/results/tables/*.csv
+!paper1_leakage_benchmark/figures/*.png
 
 # Keep directory placeholders
 !**/.gitkeep
