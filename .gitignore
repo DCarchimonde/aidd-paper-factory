@@ -36,6 +36,13 @@ Thumbs.db
 *.gz
 *.7z
 
+# Paper-generated data and outputs
+paper1_leakage_benchmark/data/raw/*
+paper1_leakage_benchmark/data/processed/*
+paper1_leakage_benchmark/results/models/*
+paper1_leakage_benchmark/results/tables/*
+paper1_leakage_benchmark/figures/*
+
 # Keep directory placeholders
 !**/.gitkeep
 
