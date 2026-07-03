@@ -1,0 +1,7 @@
+dataset,task_type
+BBBP,classification
+BACE,classification
+ClinTox,classification
+HIV,classification
+ESOL,regression
+FreeSolv,regression
