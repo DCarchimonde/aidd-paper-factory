@@ -1,7 +1,7 @@
 """Dataset registry for Paper 1: leakage-aware AIDD benchmark.
 
-This first version uses small classic MoleculeNet datasets so the full pipeline
-can run on a normal laptop before expanding to larger AIDD tasks.
+This version uses classic MoleculeNet / DeepChem public datasets so the full
+pipeline can run on a normal laptop before expanding to larger AIDD tasks.
 """
 
 from __future__ import annotations
@@ -48,11 +48,26 @@ DATASETS: dict[str, DatasetSpec] = {
         task_type="classification",
         positive_label=1,
     ),
+    "HIV": DatasetSpec(
+        name="HIV",
+        url="https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/HIV.csv",
+        smiles_col="smiles",
+        target_col="HIV_active",
+        task_type="classification",
+        positive_label=1,
+    ),
     "ESOL": DatasetSpec(
         name="ESOL",
         url="https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/delaney-processed.csv",
         smiles_col="smiles",
         target_col="measured log solubility in mols per litre",
+        task_type="regression",
+    ),
+    "FreeSolv": DatasetSpec(
+        name="FreeSolv",
+        url="https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/SAMPL.csv",
+        smiles_col="smiles",
+        target_col="expt",
         task_type="regression",
     ),
 }
