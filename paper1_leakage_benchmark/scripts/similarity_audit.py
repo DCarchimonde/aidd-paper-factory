@@ -41,6 +41,83 @@ def max_tanimoto_to_train(test_fp, train_fps: list) -> float:
     return float(max(sims))
 
 
+def add_balanced_scaffold_split(df: pd.DataFrame, seed: int, test_size: float = 0.2) -> pd.DataFrame:
+    out = df.copy()
+    if "scaffold" not in out.columns:
+        out["scaffold"] = out["canonical_smiles"].map(generate_scaffold)
+
+    target_n = int(round(len(out) * test_size))
+    global_mean = float(out["target"].mean())
+    target_std = float(out["target"].std(ddof=0))
+    if target_std == 0 or np.isnan(target_std):
+        target_std = 1.0
+
+    groups = []
+    for scaffold, sub in out.groupby("scaffold"):
+        groups.append({
+            "scaffold": scaffold,
+            "indices": sub.index.to_numpy(),
+            "n": int(len(sub)),
+            "target_sum": float(sub["target"].sum()),
+        })
+
+    best = None
+    best_score = float("inf")
+
+    for trial in range(300):
+        remaining = list(range(len(groups)))
+        selected = []
+        selected_n = 0
+        selected_sum = 0.0
+        local_rng = np.random.default_rng(seed * 1000 + trial)
+
+        while selected_n < max(1, int(target_n * 0.95)) and remaining:
+            sample_size = min(len(remaining), 80)
+            candidates = local_rng.choice(remaining, size=sample_size, replace=False)
+            best_candidate = None
+            best_candidate_score = float("inf")
+
+            for cand in candidates:
+                g = groups[int(cand)]
+                new_n = selected_n + g["n"]
+                if new_n > max(target_n * 1.25, target_n + 1) and selected_n > 0:
+                    continue
+                new_sum = selected_sum + g["target_sum"]
+                new_mean = new_sum / max(new_n, 1)
+                size_score = abs(new_n - target_n) / max(target_n, 1)
+                mean_score = abs(new_mean - global_mean) / target_std
+                score = size_score + mean_score
+                if score < best_candidate_score:
+                    best_candidate_score = score
+                    best_candidate = int(cand)
+
+            if best_candidate is None:
+                break
+
+            g = groups[best_candidate]
+            selected.append(best_candidate)
+            selected_n += g["n"]
+            selected_sum += g["target_sum"]
+            remaining.remove(best_candidate)
+
+        if selected_n == 0:
+            continue
+
+        selected_mean = selected_sum / selected_n
+        score = abs(selected_n - target_n) / max(target_n, 1) + abs(selected_mean - global_mean) / target_std
+        if score < best_score:
+            best_score = score
+            best = selected
+
+    if best is None:
+        raise RuntimeError("Could not create balanced scaffold split")
+
+    test_indices = np.concatenate([groups[i]["indices"] for i in best])
+    out["split_balanced_scaffold"] = "train"
+    out.loc[test_indices, "split_balanced_scaffold"] = "test"
+    return out
+
+
 def audit_split(df: pd.DataFrame, split_col: str, split_name: str, dataset: str, task_type: str, seed: int | str) -> tuple[list[dict], dict]:
     train = df[df[split_col] == "train"].copy()
     test = df[df[split_col] == "test"].copy()
@@ -80,12 +157,6 @@ def audit_split(df: pd.DataFrame, split_col: str, split_name: str, dataset: str,
     return rows, summary
 
 
-def add_balanced_from_file(base: pd.DataFrame, dataset: str, seed: int) -> pd.DataFrame | None:
-    # Balanced assignments are generated in train_balanced_scaffold.py but not stored per molecule.
-    # To avoid hidden mismatch, this script currently audits random and ordinary scaffold only.
-    return None
-
-
 all_detail_rows = []
 summary_rows = []
 
@@ -111,6 +182,11 @@ for dataset, spec in DATASETS.items():
         all_detail_rows.extend(detail)
         summary_rows.append(summary)
 
+        balanced_df = add_balanced_scaffold_split(base, seed=seed)
+        detail, summary = audit_split(balanced_df, "split_balanced_scaffold", "balanced_scaffold", dataset, spec.task_type, seed)
+        all_detail_rows.extend(detail)
+        summary_rows.append(summary)
+
 summary_df = pd.DataFrame(summary_rows)
 detail_df = pd.DataFrame(all_detail_rows)
 
@@ -131,6 +207,13 @@ compact = summary_df.groupby(["dataset", "task_type", "split"], as_index=False).
 compact_path = TABLE_DIR / "paper1_similarity_audit_compact.csv"
 compact.to_csv(compact_path, index=False)
 
+rounded = compact.copy()
+for col in ["mean_max_tanimoto", "median_max_tanimoto", "p90_max_tanimoto", "p95_max_tanimoto", "frac_test_ge_0_7", "frac_test_ge_0_8", "frac_test_ge_0_9"]:
+    rounded[col] = rounded[col].round(3)
+rounded_path = TABLE_DIR / "paper1_similarity_audit_compact_rounded.csv"
+rounded.to_csv(rounded_path, index=False)
+
 print("saved", summary_path)
 print("saved", detail_path)
 print("saved", compact_path)
+print("saved", rounded_path)
