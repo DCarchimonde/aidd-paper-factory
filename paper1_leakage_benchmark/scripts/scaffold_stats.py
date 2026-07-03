@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+from rdkit import RDLogger
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
@@ -11,19 +12,14 @@ sys.path.insert(0, str(ROOT))
 from shared_utils.dataset_registry import DATASETS
 from shared_utils.splitting import add_random_split, add_scaffold_split, generate_scaffold
 
+RDLogger.DisableLog("rdApp.warning")
+
 PAPER_DIR = ROOT / "paper1_leakage_benchmark"
 PROCESSED_DIR = PAPER_DIR / "data" / "processed"
 TABLE_DIR = PAPER_DIR / "results" / "tables"
 TABLE_DIR.mkdir(parents=True, exist_ok=True)
 
 SEEDS = [42, 2024, 2026, 3407, 123]
-
-
-def load_balanced_splits() -> pd.DataFrame:
-    path = TABLE_DIR / "paper1_balanced_split_diagnostics.csv"
-    if not path.exists():
-        return pd.DataFrame()
-    return pd.read_csv(path)
 
 
 def split_stats(df: pd.DataFrame, split_col: str, split_name: str, dataset: str, task_type: str, seed: int | None) -> dict:
