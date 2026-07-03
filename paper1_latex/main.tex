@@ -1,0 +1,240 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{float}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\title{A Diagnostic Audit of Split-Induced Generalization Gaps in Molecular Property Prediction for AI-Driven Drug Discovery}
+\author{Author Name\\Department / Institution\\\texttt{email@example.com}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Molecular property prediction is a core task in AI-driven drug discovery, but benchmark conclusions can depend strongly on the train/test splitting protocol. Random splits may place chemically similar molecules in both training and test sets, while ordinary scaffold splits are often used to evaluate scaffold generalization. However, scaffold splitting itself can introduce target distribution shift and scaffold concentration, making performance drops difficult to interpret. Here, we present a reproducible split-diagnostic audit of six public molecular property datasets across random, ordinary scaffold, and target-balanced scaffold splitting protocols. Using Morgan fingerprints and classical machine-learning baselines across five seeds, we jointly quantify model performance gaps, target distribution shifts, scaffold statistics, test-to-train Tanimoto similarity, outlier cases, and model-ranking changes. The results show that random splits generally yield higher test-to-train chemical similarity and often more optimistic model performance. Ordinary scaffold splits remove train/test scaffold overlap but can induce substantial target shifts, particularly in small or scaffold-concentrated datasets. Target-balanced scaffold splitting reduces target shift in several datasets, but residual performance gaps and model-ranking changes remain dataset- and model-dependent. These findings support reporting split diagnostics alongside model scores in molecular property prediction benchmarks.
+\end{abstract}
+
+\textbf{Keywords:} AI-driven drug discovery; molecular property prediction; scaffold split; data splitting; benchmark audit; Tanimoto similarity; target distribution shift.
+
+\section{Introduction}
+
+Molecular property prediction is a central component of AI-driven drug discovery (AIDD), supporting early-stage tasks such as absorption, distribution, metabolism, excretion and toxicity (ADMET) estimation, toxicity screening, blood--brain barrier permeability prediction, and lead prioritization. Public benchmarks have played a major role in accelerating method development by standardizing datasets, molecular representations, and evaluation metrics. MoleculeNet, for example, was introduced as a large-scale benchmark for molecular machine learning and curated multiple public datasets with standardized evaluation protocols \citep{wu2018moleculenet}. Therapeutics Data Commons (TDC) further broadened therapeutics machine learning by providing tasks, datasets, meaningful splits, evaluation strategies, and leaderboards across drug discovery and development \citep{huang2021tdc}.
+
+Despite these advances, evaluation in molecular property prediction remains sensitive to how molecules are split into training and test sets. Random splitting can produce optimistic estimates when chemically similar molecules appear in both sets. Scaffold splitting is therefore commonly used to evaluate chemical scaffold generalization by grouping molecules according to Bemis--Murcko scaffolds and separating scaffold groups between train and test. However, scaffold splitting is not automatically a complete solution. Recent work argues that scaffold splits may still overestimate virtual screening performance because molecules with different scaffolds can remain chemically similar \citep{guo2024scaffold}. In addition, scaffold splits can create statistical artifacts such as target distribution shift, especially when a small number of large scaffold groups dominate the test set.
+
+This study treats the split itself as an object of diagnosis. Rather than only reporting model performance under a predefined split, we audit the properties of random, ordinary scaffold, and target-balanced scaffold protocols. The target-balanced scaffold split is used as a diagnostic counterfactual: it preserves scaffold-level separation while attempting to reduce train/test target mean differences. We do not propose it as a universally superior benchmark split. Instead, we use it to separate, as far as possible, performance changes driven by chemical scaffold shift from those driven by target distribution shift.
+
+Our contributions are as follows. First, we build a reproducible split-diagnostic audit pipeline for molecular property prediction across six public datasets. Second, we compare random, ordinary scaffold, and target-balanced scaffold splits using identical molecular features, models, and seeds. Third, we report performance gaps jointly with target-shift diagnostics, scaffold statistics, and test-to-train Tanimoto similarity. Fourth, we examine outlier cases and model-ranking changes to show that split effects are dataset- and model-dependent. The overall goal is not to introduce a new state-of-the-art molecular predictor, but to provide a transparent evaluation protocol for interpreting benchmark results in AIDD.
+
+\section{Related Work}
+
+Molecular machine-learning benchmarks such as MoleculeNet established public datasets, metrics, and baseline comparisons for molecular property prediction \citep{wu2018moleculenet}. TDC extended this benchmark culture to broader therapeutics tasks, emphasizing meaningful splits, systematic evaluation, and robust generalization under realistic distribution shifts \citep{huang2021tdc}. These resources make benchmark studies more comparable, but they also highlight that benchmark conclusions depend on task formulation, data curation, and splitting protocols.
+
+Random versus scaffold splitting is a well-known issue in molecular machine learning. Random splits often create chemically similar train and test molecules, while scaffold splits aim to better test generalization to new chemotypes. However, scaffold splits are not necessarily realistic in all settings. Guo et al. argued that scaffold splits can still overestimate virtual screening performance because different scaffolds can remain chemically similar, motivating additional split diagnostics based on chemical similarity \citep{guo2024scaffold}. Separately, imbalanced learning benchmarks such as ImDrug show that real-world AIDD datasets often have severe class imbalance, which can distort metrics and model interpretation \citep{li2022imdrug}. Our work is positioned at the intersection of these concerns: we audit not only model performance, but also target distribution shift, scaffold structure, and chemical similarity induced by the split.
+
+\section{Materials and Methods}
+
+\subsection{Datasets}
+
+We used six public molecular property datasets: four classification datasets (BBBP, BACE, ClinTox, HIV) and two regression datasets (ESOL, FreeSolv). Dataset cleaning included missing-value removal, RDKit-valid SMILES filtering, canonicalization, and duplicate canonical SMILES removal. Table~\ref{tab:dataset-summary} summarizes the resulting datasets.
+
+\begin{table}[H]
+\centering
+\caption{Dataset summary after preprocessing. For classification datasets, target mean corresponds to the positive-label fraction.}
+\label{tab:dataset-summary}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrrr}
+\toprule
+Dataset & Task & Raw & DropNA & Valid SMILES & Dedup & Duplicates & Target mean & Target range \\
+\midrule
+BBBP & Classification & 2050 & 2050 & 2039 & 1975 & 64 & 0.7600 & 0.00--1.00 \\
+BACE & Classification & 1513 & 1513 & 1513 & 1513 & 0 & 0.4567 & 0.00--1.00 \\
+ClinTox & Classification & 1484 & 1484 & 1480 & 1461 & 19 & 0.0705 & 0.00--1.00 \\
+HIV & Classification & 41127 & 41127 & 41120 & 41120 & 0 & 0.0351 & 0.00--1.00 \\
+ESOL & Regression & 1128 & 1128 & 1128 & 1117 & 11 & -3.0503 & -11.60--1.58 \\
+FreeSolv & Regression & 642 & 642 & 642 & 642 & 0 & -3.8030 & -25.47--3.43 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Molecular representation}
+
+SMILES strings were canonicalized using RDKit. Each molecule was represented by a Morgan fingerprint with radius 2 and 2048 bits. The same representation was used for all models and split protocols to isolate the effect of data splitting rather than feature engineering.
+
+\subsection{Splitting protocols}
+
+We evaluated three splitting protocols.
+
+\textbf{Random split.} Molecules were split into training and test sets using random splits repeated over five seeds. Classification tasks were stratified when applicable.
+
+\textbf{Ordinary scaffold split.} Molecules were grouped by Bemis--Murcko scaffold. Scaffold groups were assigned to train or test sets so that no scaffold appeared in both sets.
+
+\textbf{Target-balanced scaffold split.} Scaffold groups were selected to reduce the train/test target mean difference while preserving scaffold-level separation. This split is used as a diagnostic counterfactual, not as a new universal benchmark standard.
+
+\subsection{Models and metrics}
+
+For classification tasks, we evaluated Logistic Regression, Random Forest, and XGBoost. ROC-AUC was used as the primary classification metric, with accuracy, F1, and average precision as supporting metrics. For regression tasks, we evaluated Ridge Regression, Random Forest, and XGBoost. RMSE was used as the primary regression metric, with MAE and $R^2$ as supporting metrics.
+
+For classification, the generalization gap was defined as random ROC-AUC minus scaffold ROC-AUC. For regression, the gap was defined as scaffold RMSE minus random RMSE. Positive gaps therefore indicate that the scaffold-based split is more difficult than the random split under the primary metric.
+
+\subsection{Split diagnostics}
+
+We report target mean gaps, number of scaffolds, largest scaffold fraction, singleton scaffold fraction, train/test shared scaffold count, and maximum test-to-train Tanimoto similarity. For each test molecule, the maximum Tanimoto similarity to any training molecule was calculated using Morgan fingerprints. We also report model-ranking changes and outlier cases in appendix tables.
+
+\section{Results}
+
+\subsection{Scaffold splitting removes scaffold overlap but can induce target shift}
+
+Table~\ref{tab:split-diagnostics} summarizes scaffold and target-shift diagnostics. Ordinary scaffold splits remove train/test scaffold overlap across all datasets. However, target distribution shifts can be substantial. For example, ordinary scaffold splitting produces target mean gaps of 0.1854 in BACE, 0.1274 in BBBP, 1.5734 in ESOL, and 2.8410 in FreeSolv. Balanced scaffold splitting reduces target gaps in several datasets, including BACE, BBBP, ClinTox, and HIV. However, FreeSolv remains difficult, with a balanced scaffold target gap of -1.2260, reflecting the constraint imposed by small dataset size and strong scaffold concentration.
+
+\begin{table}[H]
+\centering
+\caption{Split diagnostics and scaffold statistics. Shared scaffold fraction is calculated relative to the test scaffold set.}
+\label{tab:split-diagnostics}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrrrrr}
+\toprule
+Dataset & Task & Split & Scaffolds & Largest frac. & Singleton frac. & Test scaffolds & Shared scaffolds & Target gap \\
+\midrule
+BACE & Classification & Ordinary scaffold & 671.0 & 0.0364 & 0.7094 & 10.0 & 0.0 & 0.1854 \\
+BACE & Classification & Random & 670.0 & 0.0364 & 0.7104 & 199.6 & 100.0 & -0.0016 \\
+BACE & Classification & Balanced scaffold & 671.0 & 0.0364 & 0.7094 & 22.6 & 0.0 & -0.0014 \\
+BBBP & Classification & Ordinary scaffold & 1025.0 & 0.0658 & 0.7620 & 8.0 & 0.0 & 0.1274 \\
+BBBP & Classification & Random & 1024.0 & 0.0658 & 0.7627 & 271.6 & 111.0 & -0.0006 \\
+BBBP & Classification & Balanced scaffold & 1025.0 & 0.0658 & 0.7620 & 22.4 & 0.0 & 0.0016 \\
+ClinTox & Classification & Ordinary scaffold & 784.0 & 0.0992 & 0.7793 & 3.0 & 0.0 & -0.0595 \\
+ClinTox & Classification & Random & 783.0 & 0.0992 & 0.7803 & 204.2 & 82.2 & 0.0015 \\
+ClinTox & Classification & Balanced scaffold & 784.0 & 0.0992 & 0.7793 & 24.8 & 0.0 & -0.0006 \\
+ESOL & Regression & Ordinary scaffold & 269.0 & 0.2829 & 0.7323 & 1.0 & 0.0 & 1.5734 \\
+ESOL & Regression & Random & 268.0 & 0.2265 & 0.7351 & 78.6 & 36.0 & 0.0686 \\
+ESOL & Regression & Balanced scaffold & 269.0 & 0.2829 & 0.7323 & 31.6 & 0.0 & 0.1062 \\
+FreeSolv & Regression & Ordinary scaffold & 63.0 & 0.4984 & 0.5714 & 1.0 & 0.0 & 2.8410 \\
+FreeSolv & Regression & Random & 62.0 & 0.2368 & 0.5806 & 23.2 & 15.0 & 0.2318 \\
+FreeSolv & Regression & Balanced scaffold & 63.0 & 0.4984 & 0.5714 & 1.0 & 0.0 & -1.2260 \\
+HIV & Classification & Ordinary scaffold & 19082.0 & 0.0508 & 0.7493 & 81.0 & 0.0 & -0.0039 \\
+HIV & Classification & Random & 19081.0 & 0.0508 & 0.7494 & 5286.4 & 2363.6 & 0.0001 \\
+HIV & Classification & Balanced scaffold & 19082.0 & 0.0508 & 0.7493 & 307.8 & 0.0 & -0.0037 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Split choice changes performance estimates}
+
+Figure~\ref{fig:gap} and Table~\ref{tab:gap} summarize generalization gaps. In BBBP, BACE, ClinTox, HIV, and ESOL, random splits often produce more optimistic estimates than scaffold-based splits. However, gap reduction after target balancing is not uniform. For ESOL, Random Forest and XGBoost gaps decrease substantially after balancing, suggesting that a large part of the ordinary scaffold gap is explained by target shift. In contrast, HIV shows larger balanced gaps than ordinary gaps across models. FreeSolv also shows dataset-specific behavior, including a negative balanced gap for Random Forest.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{../paper1_leakage_benchmark/figures/figure1_gap_ordinary_vs_balanced.png}
+\caption{Generalization gap under ordinary scaffold and target-balanced scaffold splitting. Classification gaps are random ROC-AUC minus scaffold ROC-AUC. Regression gaps are scaffold RMSE minus random RMSE.}
+\label{fig:gap}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Generalization gap summary. Positive classification gaps indicate lower ROC-AUC under scaffold-based splitting. Positive regression gaps indicate higher RMSE under scaffold-based splitting.}
+\label{tab:gap}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llllrrr}
+\toprule
+Dataset & Task & Model & Metric & Ordinary gap & Balanced gap & Gap reduction \\
+\midrule
+BACE & Classification & LogisticRegression & ROC-AUC & 0.098 & 0.058 & 0.040 \\
+BACE & Classification & RandomForest & ROC-AUC & 0.065 & 0.069 & -0.004 \\
+BACE & Classification & XGBoost & ROC-AUC & 0.074 & 0.084 & -0.010 \\
+BBBP & Classification & LogisticRegression & ROC-AUC & 0.143 & 0.074 & 0.068 \\
+BBBP & Classification & RandomForest & ROC-AUC & 0.114 & 0.082 & 0.031 \\
+BBBP & Classification & XGBoost & ROC-AUC & 0.100 & 0.109 & -0.009 \\
+ClinTox & Classification & LogisticRegression & ROC-AUC & 0.119 & 0.054 & 0.065 \\
+ClinTox & Classification & RandomForest & ROC-AUC & 0.094 & 0.046 & 0.048 \\
+ClinTox & Classification & XGBoost & ROC-AUC & 0.033 & 0.057 & -0.024 \\
+ESOL & Regression & RandomForest & RMSE & 1.038 & 0.340 & 0.698 \\
+ESOL & Regression & Ridge & RMSE & -0.082 & 0.793 & -0.875 \\
+ESOL & Regression & XGBoost & RMSE & 0.974 & 0.207 & 0.767 \\
+FreeSolv & Regression & RandomForest & RMSE & 0.737 & -0.323 & 1.060 \\
+FreeSolv & Regression & Ridge & RMSE & 0.577 & 0.487 & 0.091 \\
+FreeSolv & Regression & XGBoost & RMSE & 1.029 & 0.069 & 0.959 \\
+HIV & Classification & LogisticRegression & ROC-AUC & 0.033 & 0.103 & -0.070 \\
+HIV & Classification & RandomForest & ROC-AUC & 0.053 & 0.110 & -0.057 \\
+HIV & Classification & XGBoost & ROC-AUC & 0.018 & 0.100 & -0.082 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Random splits have higher test-to-train chemical similarity}
+
+Figure~\ref{fig:tanimoto} and Table~\ref{tab:similarity} show that random split test molecules generally have higher maximum Tanimoto similarity to the training set. For example, mean maximum Tanimoto similarity under random splitting is 0.791 for BACE, 0.564 for BBBP, 0.556 for ESOL, 0.544 for FreeSolv, and 0.616 for HIV. Ordinary scaffold splitting reduces this similarity in all datasets. Balanced scaffold splitting often lies between random and ordinary scaffold splits, consistent with its role as a diagnostic counterfactual rather than a maximally difficult split.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{../paper1_leakage_benchmark/figures/figure3_tanimoto_similarity.png}
+\caption{Mean maximum test-to-train Tanimoto similarity by split strategy. Random splits generally create more chemically similar train/test pairs than scaffold-based splits.}
+\label{fig:tanimoto}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Test-to-train Tanimoto similarity audit. Values are based on maximum similarity from each test molecule to the training set.}
+\label{tab:similarity}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrrr}
+\toprule
+Dataset & Task & Split & Mean max & Median max & P90 max & Fraction $\geq 0.8$ \\
+\midrule
+BACE & Classification & Balanced scaffold & 0.730 & 0.735 & 0.824 & 0.181 \\
+BACE & Classification & Ordinary scaffold & 0.733 & 0.740 & 0.834 & 0.199 \\
+BACE & Classification & Random & 0.791 & 0.807 & 0.911 & 0.538 \\
+BBBP & Classification & Balanced scaffold & 0.458 & 0.436 & 0.677 & 0.009 \\
+BBBP & Classification & Ordinary scaffold & 0.409 & 0.403 & 0.660 & 0.000 \\
+BBBP & Classification & Random & 0.564 & 0.570 & 0.793 & 0.096 \\
+ClinTox & Classification & Balanced scaffold & 0.433 & 0.409 & 0.640 & 0.008 \\
+ClinTox & Classification & Ordinary scaffold & 0.330 & 0.305 & 0.556 & 0.007 \\
+ClinTox & Classification & Random & 0.516 & 0.493 & 0.797 & 0.098 \\
+ESOL & Regression & Balanced scaffold & 0.422 & 0.388 & 0.630 & 0.033 \\
+ESOL & Regression & Ordinary scaffold & 0.251 & 0.240 & 0.359 & 0.000 \\
+ESOL & Regression & Random & 0.556 & 0.548 & 0.817 & 0.110 \\
+FreeSolv & Regression & Balanced scaffold & 0.384 & 0.370 & 0.500 & 0.000 \\
+FreeSolv & Regression & Ordinary scaffold & 0.228 & 0.222 & 0.320 & 0.000 \\
+FreeSolv & Regression & Random & 0.544 & 0.522 & 0.827 & 0.113 \\
+HIV & Classification & Balanced scaffold & 0.535 & 0.519 & 0.722 & 0.040 \\
+HIV & Classification & Ordinary scaffold & 0.478 & 0.466 & 0.680 & 0.022 \\
+HIV & Classification & Random & 0.616 & 0.630 & 0.833 & 0.155 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\subsection{Target shift and similarity diagnostics change result interpretation}
+
+Taken together, the split diagnostics show that performance gaps cannot be interpreted from model scores alone. Ordinary scaffold splitting often removes scaffold overlap but can also concentrate the test set into few scaffold groups and induce target shifts. Balanced scaffold splitting reduces target shift in several datasets, but can also increase chemical similarity relative to ordinary scaffold splitting. Therefore, ordinary scaffold and target-balanced scaffold splits answer different diagnostic questions: the former emphasizes scaffold separation, while the latter helps assess whether performance gaps remain after reducing target distribution shift.
+
+\section{Discussion}
+
+The results support a split-diagnostic view of molecular property prediction benchmarks. Random splitting tends to produce chemically more similar train/test sets and often yields more optimistic performance. Ordinary scaffold splitting removes scaffold overlap, but this does not guarantee an unbiased or uniformly interpretable benchmark because target distribution shift and scaffold concentration can occur. Target-balanced scaffold splitting provides a useful diagnostic counterfactual: if gaps shrink after balancing, part of the ordinary scaffold gap is likely attributable to target shift; if gaps remain, the model may still struggle with scaffold-level chemical generalization or other distributional changes.
+
+The study also shows that split effects are dataset- and model-dependent. ESOL exhibits large ordinary scaffold gaps for tree-based models that are reduced after balancing, while Ridge behaves differently. ClinTox and HIV are highly imbalanced classification datasets, requiring caution when interpreting accuracy or F1. FreeSolv illustrates a small-dataset limitation: strong scaffold concentration constrains the ability to construct a simultaneously scaffold-separated and target-balanced test set.
+
+Practically, benchmark reports should include model scores, split type, target distribution diagnostics, scaffold statistics, chemical similarity diagnostics, and model-ranking stability. Reporting only aggregate model performance can lead to overconfident conclusions about molecular generalization.
+
+\section{Limitations}
+
+This study uses classical fingerprint-based models rather than graph neural networks or transformer-based molecular encoders. This choice isolates split effects under a lightweight and reproducible setting, but future work should test whether the same diagnostic patterns hold for deep molecular representations. The target-balanced scaffold split is heuristic and diagnostic; it should not be treated as a new universal benchmark standard. The analysis covers six public datasets and does not include prospective or time-based validation. Finally, small datasets such as FreeSolv may be strongly constrained by scaffold concentration, limiting the feasibility of perfectly balanced scaffold-separated splits.
+
+\section{Conclusion}
+
+Molecular property prediction benchmarks should treat data splitting as an object of diagnosis. Random splits, ordinary scaffold splits, and target-balanced scaffold splits can lead to different performance estimates, target shifts, chemical similarity patterns, and model rankings. A split-diagnostic audit that reports model performance together with target distribution shift, scaffold statistics, and test-to-train similarity provides a more transparent basis for evaluating generalization in AI-driven drug discovery.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
