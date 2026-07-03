@@ -19,23 +19,60 @@ def require_csv(name: str) -> pd.DataFrame:
 
 # Table 1: dataset summary.
 dataset = require_csv("dataset_summary.csv")
-table1_cols = [c for c in ["dataset", "task_type", "n_raw", "n_after_dropna", "n_valid_smiles", "n_unique_canonical_smiles", "n_duplicate_canonical_smiles"] if c in dataset.columns]
-table1 = dataset[table1_cols].copy()
+table1_cols = [
+    "dataset",
+    "task_type",
+    "raw_rows",
+    "after_dropna",
+    "after_valid_smiles",
+    "after_dedup",
+    "duplicates_removed",
+    "target_mean",
+    "target_min",
+    "target_max",
+]
+table1 = dataset[[c for c in table1_cols if c in dataset.columns]].copy()
+for col in ["target_mean", "target_min", "target_max"]:
+    if col in table1.columns:
+        table1[col] = table1[col].round(4)
 table1.to_csv(TABLE_DIR / "manuscript_table1_dataset_summary.csv", index=False)
 
 # Table 2: split target shift and scaffold statistics.
-shift = require_csv("paper1_split_shift_table_rounded.csv")
 scaffold = require_csv("paper1_scaffold_stats_summary.csv")
 balanced_scaffold_path = TABLE_DIR / "paper1_balanced_scaffold_stats_summary.csv"
 if balanced_scaffold_path.exists():
-    balanced_scaffold = pd.read_csv(balanced_scaffold_path)
-    scaffold = pd.concat([scaffold, balanced_scaffold], ignore_index=True, sort=False)
+    scaffold = pd.concat([scaffold, pd.read_csv(balanced_scaffold_path)], ignore_index=True, sort=False)
 
-scaffold_simple = scaffold[[
-    "dataset", "task_type", "split", "largest_scaffold_fraction", "singleton_scaffold_fraction", "n_shared_scaffolds", "shared_scaffold_fraction_test", "target_mean_gap_test_minus_train"
-]].copy()
-for col in ["largest_scaffold_fraction", "singleton_scaffold_fraction", "shared_scaffold_fraction_test", "target_mean_gap_test_minus_train"]:
-    scaffold_simple[col] = scaffold_simple[col].round(4)
+keep = [
+    "dataset",
+    "task_type",
+    "split",
+    "n_scaffolds_total",
+    "largest_scaffold_fraction",
+    "singleton_scaffold_fraction",
+    "n_train_scaffolds",
+    "n_test_scaffolds",
+    "n_shared_scaffolds",
+    "shared_scaffold_fraction_test",
+    "target_mean_gap_test_minus_train",
+]
+scaffold_simple = scaffold[[c for c in keep if c in scaffold.columns]].copy()
+for col in [
+    "n_scaffolds_total",
+    "n_train_scaffolds",
+    "n_test_scaffolds",
+    "n_shared_scaffolds",
+]:
+    if col in scaffold_simple.columns:
+        scaffold_simple[col] = scaffold_simple[col].round(1)
+for col in [
+    "largest_scaffold_fraction",
+    "singleton_scaffold_fraction",
+    "shared_scaffold_fraction_test",
+    "target_mean_gap_test_minus_train",
+]:
+    if col in scaffold_simple.columns:
+        scaffold_simple[col] = scaffold_simple[col].round(4)
 scaffold_simple.to_csv(TABLE_DIR / "manuscript_table2_split_diagnostics.csv", index=False)
 
 # Table 3: generalization gap.
