@@ -51,3 +51,11 @@ paper1_leakage_benchmark/results/models/*
 # Manuscript temporary files
 ~$*
 *.tmp
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+paper1_latex/main.pdf
