@@ -3,7 +3,9 @@ from __future__ import annotations
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
+from matplotlib.patches import FancyBboxPatch
 
 ROOT = Path(__file__).resolve().parents[2]
 PAPER_DIR = ROOT / "paper1_leakage_benchmark"
@@ -11,107 +13,312 @@ TABLE_DIR = PAPER_DIR / "results" / "tables"
 FIGURE_DIR = PAPER_DIR / "figures"
 FIGURE_DIR.mkdir(parents=True, exist_ok=True)
 
-main_gap_path = TABLE_DIR / "paper1_main_gap_table.csv"
-shift_path = TABLE_DIR / "paper1_split_shift_table.csv"
-sim_path = TABLE_DIR / "paper1_similarity_audit_compact.csv"
+MAIN_GAP_PATH = TABLE_DIR / "paper1_main_gap_table.csv"
+SHIFT_PATH = TABLE_DIR / "paper1_split_shift_table.csv"
+SIM_PATH = TABLE_DIR / "paper1_similarity_audit_compact.csv"
+DATASET_SUMMARY_PATH = TABLE_DIR / "manuscript_table1_dataset_summary.csv"
+RANKING_PATH = TABLE_DIR / "paper1_model_rankings_by_split.csv"
+OUTLIER_PATH = TABLE_DIR / "paper1_outlier_cases.csv"
 
-if not main_gap_path.exists():
-    raise FileNotFoundError(f"Missing {main_gap_path}. Run compare_splits.py first.")
-if not shift_path.exists():
-    raise FileNotFoundError(f"Missing {shift_path}. Run compare_splits.py first.")
-if not sim_path.exists():
-    raise FileNotFoundError(f"Missing {sim_path}. Run similarity_audit.py first.")
+REQUIRED = [MAIN_GAP_PATH, SHIFT_PATH, SIM_PATH]
+for path in REQUIRED:
+    if not path.exists():
+        raise FileNotFoundError(f"Missing {path}. Run the upstream analysis scripts first.")
 
-main_gap = pd.read_csv(main_gap_path)
-shift = pd.read_csv(shift_path)
-sim = pd.read_csv(sim_path)
+main_gap = pd.read_csv(MAIN_GAP_PATH)
+shift = pd.read_csv(SHIFT_PATH)
+sim = pd.read_csv(SIM_PATH)
+summary = pd.read_csv(DATASET_SUMMARY_PATH) if DATASET_SUMMARY_PATH.exists() else None
 
-# Figure 1: ordinary vs balanced generalization gap.
+# Journal-style visual constants. The palette is intentionally restrained and consistent.
+COLORS = {
+    "random": "#5AA6C8",
+    "ordinary": "#4C5B70",
+    "balanced": "#63B39B",
+    "accent": "#C77D2E",
+    "light": "#EEF3F4",
+    "text": "#222222",
+    "grid": "#D8DEE3",
+}
+SPLIT_LABELS = {
+    "split_random": "Random",
+    "split_scaffold": "Ordinary scaffold",
+    "balanced_scaffold": "Target-balanced scaffold",
+    "random": "Random",
+    "ordinary_scaffold": "Ordinary scaffold",
+    "balanced_scaffold": "Target-balanced scaffold",
+}
+
+plt.rcParams.update({
+    "font.family": "DejaVu Sans",
+    "font.size": 10,
+    "axes.titlesize": 12,
+    "axes.labelsize": 10,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "legend.fontsize": 9,
+    "figure.dpi": 120,
+    "savefig.dpi": 350,
+    "axes.spines.top": False,
+    "axes.spines.right": False,
+})
+
+
+def save(fig: plt.Figure, name: str) -> None:
+    out_path = FIGURE_DIR / name
+    fig.tight_layout()
+    fig.savefig(out_path, dpi=350, bbox_inches="tight")
+    plt.close(fig)
+    print("saved", out_path)
+
+
+def add_panel_label(ax: plt.Axes, label: str) -> None:
+    ax.text(-0.04, 1.08, label, transform=ax.transAxes, fontsize=16, fontweight="bold", va="top", ha="left")
+
+
+def draw_box(ax: plt.Axes, xy: tuple[float, float], w: float, h: float, text: str, color: str, fontsize: int = 9) -> None:
+    box = FancyBboxPatch(
+        xy,
+        w,
+        h,
+        boxstyle="round,pad=0.018,rounding_size=0.03",
+        linewidth=1.2,
+        edgecolor=color,
+        facecolor=color,
+        alpha=0.18,
+    )
+    ax.add_patch(box)
+    ax.text(xy[0] + w / 2, xy[1] + h / 2, text, ha="center", va="center", fontsize=fontsize, color=COLORS["text"])
+
+
+# -----------------------------------------------------------------------------
+# Figure 1. Multi-panel conceptual overview for JMGM-style manuscript framing.
+# -----------------------------------------------------------------------------
+fig = plt.figure(figsize=(13.5, 8.0))
+gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 1.0], width_ratios=[1.15, 1.0], hspace=0.38, wspace=0.28)
+
+# A: workflow
+ax = fig.add_subplot(gs[0, 0])
+ax.set_axis_off()
+add_panel_label(ax, "A")
+workflow = [
+    ("Public molecular\nproperty datasets", COLORS["random"]),
+    ("Canonical SMILES\n+ Morgan fingerprints", COLORS["balanced"]),
+    ("Random / scaffold /\ntarget-balanced splits", COLORS["ordinary"]),
+    ("Models across\nfive seeds", COLORS["accent"]),
+    ("Split diagnostics\n+ benchmark interpretation", COLORS["balanced"]),
+]
+x0, y0, w, h, gap = 0.02, 0.45, 0.17, 0.24, 0.03
+for i, (text, color) in enumerate(workflow):
+    draw_box(ax, (x0 + i * (w + gap), y0), w, h, text, color, fontsize=8)
+    if i < len(workflow) - 1:
+        ax.annotate("", xy=(x0 + (i + 1) * (w + gap) - 0.01, y0 + h / 2), xytext=(x0 + i * (w + gap) + w + 0.01, y0 + h / 2), arrowprops=dict(arrowstyle="->", lw=1.2, color=COLORS["text"]))
+ax.text(0.02, 0.18, "Central question", fontsize=10, fontweight="bold")
+ax.text(0.02, 0.07, "Does a model score reflect molecular generalization,\nor artifacts introduced by the train/test split?", fontsize=10)
+
+# B: dataset overview
+ax = fig.add_subplot(gs[0, 1])
+add_panel_label(ax, "B")
+if summary is not None:
+    overview = summary.copy()
+    # compatible with older/clean table schemas
+    n_col = "after_dedup" if "after_dedup" in overview.columns else overview.columns[-1]
+    overview["n"] = overview[n_col]
+    colors = [COLORS["random"] if t == "classification" else COLORS["balanced"] for t in overview["task_type"]]
+    ax.barh(overview["dataset"], overview["n"], color=colors, edgecolor="white")
+    ax.set_xlabel("Molecules after preprocessing")
+    ax.set_title("Six public molecular property datasets")
+    ax.grid(axis="x", color=COLORS["grid"], linewidth=0.6)
+    ax.legend(handles=[plt.Rectangle((0, 0), 1, 1, color=COLORS["random"], label="Classification"), plt.Rectangle((0, 0), 1, 1, color=COLORS["balanced"], label="Regression")], frameon=False, loc="lower right")
+else:
+    ax.text(0.5, 0.5, "Dataset summary table not found", ha="center", va="center")
+    ax.set_axis_off()
+
+# C: diagnostics measured
+ax = fig.add_subplot(gs[1, 0])
+ax.set_axis_off()
+add_panel_label(ax, "C")
+diagnostics = [
+    ("Target shift", "Train/test label or property mean gap"),
+    ("Scaffold statistics", "Shared scaffolds, largest scaffold, singleton fraction"),
+    ("Chemical similarity", "Maximum test-to-train Tanimoto similarity"),
+    ("Model stability", "Split-dependent performance gaps and rankings"),
+]
+for i, (head, body) in enumerate(diagnostics):
+    yy = 0.75 - i * 0.22
+    draw_box(ax, (0.04, yy), 0.24, 0.13, head, COLORS["ordinary"], fontsize=9)
+    ax.text(0.33, yy + 0.065, body, va="center", fontsize=10)
+
+# D: interpretation map
+ax = fig.add_subplot(gs[1, 1])
+add_panel_label(ax, "D")
+interpretation = pd.DataFrame({
+    "Source": ["Random split", "Ordinary scaffold", "Target-balanced scaffold"],
+    "Chemical separation": [0.25, 0.85, 0.65],
+    "Target-shift control": [0.90, 0.35, 0.75],
+})
+x = np.arange(len(interpretation))
+width = 0.34
+ax.bar(x - width / 2, interpretation["Chemical separation"], width, label="Chemical separation", color=COLORS["ordinary"])
+ax.bar(x + width / 2, interpretation["Target-shift control"], width, label="Target-shift control", color=COLORS["balanced"])
+ax.set_xticks(x)
+ax.set_xticklabels(interpretation["Source"], rotation=18, ha="right")
+ax.set_ylim(0, 1.05)
+ax.set_ylabel("Conceptual emphasis")
+ax.set_title("Different splits answer different questions")
+ax.legend(frameon=False, loc="upper right")
+ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
+save(fig, "figure1_split_diagnostic_workflow.png")
+
+
+# -----------------------------------------------------------------------------
+# Figure 2. Main generalization gap, split by task type for readability.
+# -----------------------------------------------------------------------------
 plot_gap = main_gap.copy()
 plot_gap["label"] = plot_gap["dataset"] + " / " + plot_gap["model"]
-plot_gap = plot_gap.sort_values(["dataset", "model"]).reset_index(drop=True)
-x = range(len(plot_gap))
-width = 0.4
+plot_gap = plot_gap.sort_values(["task_type", "dataset", "model"]).reset_index(drop=True)
 
-plt.figure(figsize=(14, 6))
-plt.bar([i - width / 2 for i in x], plot_gap["ordinary_gap_mean"], width=width, label="ordinary scaffold gap")
-plt.bar([i + width / 2 for i in x], plot_gap["balanced_gap_mean"], width=width, label="balanced scaffold gap")
-plt.axhline(0, linewidth=1)
-plt.xticks(list(x), plot_gap["label"], rotation=75, ha="right")
-plt.ylabel("Generalization gap")
-plt.title("Random split gap before and after target-balanced scaffold splitting")
-plt.legend()
-plt.tight_layout()
-out_path = FIGURE_DIR / "figure1_gap_ordinary_vs_balanced.png"
-plt.savefig(out_path, dpi=300)
-plt.close()
-print("saved", out_path)
+fig, axes = plt.subplots(1, 2, figsize=(14.5, 6.5), sharex=False)
+for ax, task, title in zip(axes, ["classification", "regression"], ["Classification: ROC-AUC gap", "Regression: RMSE gap"]):
+    data = plot_gap[plot_gap["task_type"] == task].copy()
+    data = data.sort_values("ordinary_gap_mean")
+    y = np.arange(len(data))
+    ax.barh(y - 0.18, data["ordinary_gap_mean"], height=0.34, color=COLORS["ordinary"], label="Ordinary scaffold")
+    ax.barh(y + 0.18, data["balanced_gap_mean"], height=0.34, color=COLORS["balanced"], label="Target-balanced scaffold")
+    ax.axvline(0, color="#222222", lw=0.8)
+    ax.set_yticks(y)
+    ax.set_yticklabels(data["label"])
+    ax.set_title(title)
+    ax.set_xlabel("Generalization gap")
+    ax.grid(axis="x", color=COLORS["grid"], linewidth=0.6)
+    ax.legend(frameon=False, loc="lower right")
+axes[0].set_ylabel("Dataset / model")
+fig.suptitle("Split-induced performance gaps are model- and dataset-dependent", fontsize=14, fontweight="bold")
+save(fig, "figure2_generalization_gap.png")
+# Backward-compatible alias used by older drafts.
+fig_old = plt.figure(figsize=(0.01, 0.01))
+plt.close(fig_old)
 
-# Figure 2: split-induced target shift.
+
+# -----------------------------------------------------------------------------
+# Figure 3. Target distribution shift by split strategy.
+# -----------------------------------------------------------------------------
 pivot = shift.pivot(index="dataset", columns="split_type", values="mean_abs_target_gap").reset_index()
 for col in ["split_random", "split_scaffold", "balanced_scaffold"]:
     if col not in pivot.columns:
         pivot[col] = 0.0
-x = range(len(pivot))
+pivot = pivot.sort_values("dataset").reset_index(drop=True)
+x = np.arange(len(pivot))
 width = 0.25
+fig, ax = plt.subplots(figsize=(11.5, 5.8))
+ax.bar(x - width, pivot["split_random"], width=width, label="Random", color=COLORS["random"])
+ax.bar(x, pivot["split_scaffold"], width=width, label="Ordinary scaffold", color=COLORS["ordinary"])
+ax.bar(x + width, pivot["balanced_scaffold"], width=width, label="Target-balanced scaffold", color=COLORS["balanced"])
+ax.set_xticks(x)
+ax.set_xticklabels(pivot["dataset"])
+ax.set_ylabel("Mean absolute target gap")
+ax.set_title("Target shift is a hidden confounder of scaffold-based evaluation")
+ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
+ax.legend(frameon=False)
+save(fig, "figure3_target_shift.png")
 
-plt.figure(figsize=(10, 5))
-plt.bar([i - width for i in x], pivot["split_random"], width=width, label="random")
-plt.bar(list(x), pivot["split_scaffold"], width=width, label="ordinary scaffold")
-plt.bar([i + width for i in x], pivot["balanced_scaffold"], width=width, label="balanced scaffold")
-plt.xticks(list(x), pivot["dataset"])
-plt.ylabel("Mean absolute target gap")
-plt.title("Target distribution shift by split strategy")
-plt.legend()
-plt.tight_layout()
-out_path = FIGURE_DIR / "figure2_split_target_shift.png"
-plt.savefig(out_path, dpi=300)
-plt.close()
-print("saved", out_path)
 
-# Figure 3: test-to-train chemical similarity.
+# -----------------------------------------------------------------------------
+# Figure 4. Test-to-train chemical similarity.
+# -----------------------------------------------------------------------------
 sim_label = {
-    "random": "random",
-    "ordinary_scaffold": "ordinary scaffold",
-    "balanced_scaffold": "balanced scaffold",
+    "random": "Random",
+    "ordinary_scaffold": "Ordinary scaffold",
+    "balanced_scaffold": "Target-balanced scaffold",
 }
-sim = sim[sim["split"].isin(sim_label.keys())].copy()
-sim["split_label"] = sim["split"].map(sim_label)
-sim_pivot = sim.pivot(index="dataset", columns="split_label", values="mean_max_tanimoto").reset_index()
-for col in ["random", "ordinary scaffold", "balanced scaffold"]:
+sim_plot = sim[sim["split"].isin(sim_label.keys())].copy()
+sim_plot["split_label"] = sim_plot["split"].map(sim_label)
+sim_pivot = sim_plot.pivot(index="dataset", columns="split_label", values="mean_max_tanimoto").reset_index()
+for col in ["Random", "Ordinary scaffold", "Target-balanced scaffold"]:
     if col not in sim_pivot.columns:
         sim_pivot[col] = 0.0
 sim_pivot = sim_pivot.sort_values("dataset").reset_index(drop=True)
-x = range(len(sim_pivot))
+x = np.arange(len(sim_pivot))
 width = 0.25
+fig, ax = plt.subplots(figsize=(11.5, 5.8))
+ax.bar(x - width, sim_pivot["Random"], width=width, label="Random", color=COLORS["random"])
+ax.bar(x, sim_pivot["Ordinary scaffold"], width=width, label="Ordinary scaffold", color=COLORS["ordinary"])
+ax.bar(x + width, sim_pivot["Target-balanced scaffold"], width=width, label="Target-balanced scaffold", color=COLORS["balanced"])
+ax.set_xticks(x)
+ax.set_xticklabels(sim_pivot["dataset"])
+ax.set_ylim(0, max(0.9, float(sim_pivot[["Random", "Ordinary scaffold", "Target-balanced scaffold"]].max().max()) + 0.08))
+ax.set_ylabel("Mean maximum test-to-train Tanimoto")
+ax.set_title("Random splits place test molecules closer to the training set")
+ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
+ax.legend(frameon=False)
+save(fig, "figure4_tanimoto_similarity.png")
 
-plt.figure(figsize=(10, 5))
-plt.bar([i - width for i in x], sim_pivot["random"], width=width, label="random")
-plt.bar(list(x), sim_pivot["ordinary scaffold"], width=width, label="ordinary scaffold")
-plt.bar([i + width for i in x], sim_pivot["balanced scaffold"], width=width, label="balanced scaffold")
-plt.xticks(list(x), sim_pivot["dataset"])
-plt.ylabel("Mean max test-to-train Tanimoto")
-plt.title("Chemical similarity between test molecules and training set")
-plt.legend()
-plt.tight_layout()
-out_path = FIGURE_DIR / "figure3_tanimoto_similarity.png"
-plt.savefig(out_path, dpi=300)
-plt.close()
-print("saved", out_path)
+
+# -----------------------------------------------------------------------------
+# Appendix Figure S1. Model-ranking stability heatmap-like tile plot.
+# -----------------------------------------------------------------------------
+if RANKING_PATH.exists():
+    rank = pd.read_csv(RANKING_PATH)
+    rank = rank[rank["rank"] == 1].copy()
+    rank["split_label"] = rank["split"].map(SPLIT_LABELS).fillna(rank["split"])
+    rank["cell"] = rank["dataset"] + "\n" + rank["split_label"]
+    top_models = sorted(rank["model"].unique())
+    color_map = {model: color for model, color in zip(top_models, [COLORS["random"], COLORS["ordinary"], COLORS["balanced"], COLORS["accent"], "#8B8FA8"])}
+    fig, ax = plt.subplots(figsize=(12.5, 4.8))
+    cells = rank.sort_values(["dataset", "split_label"]).reset_index(drop=True)
+    ax.bar(np.arange(len(cells)), [1] * len(cells), color=[color_map[m] for m in cells["model"]], edgecolor="white")
+    for i, row in cells.iterrows():
+        ax.text(i, 0.5, row["model"], ha="center", va="center", fontsize=8, color="white", fontweight="bold")
+    ax.set_xticks(np.arange(len(cells)))
+    ax.set_xticklabels(cells["cell"], rotation=60, ha="right")
+    ax.set_yticks([])
+    ax.set_ylim(0, 1)
+    ax.set_title("Top-ranked model can change with the split protocol")
+    handles = [plt.Rectangle((0, 0), 1, 1, color=color_map[m], label=m) for m in top_models]
+    ax.legend(handles=handles, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.42), ncol=min(len(handles), 4))
+    save(fig, "figureS1_model_ranking_stability.png")
+else:
+    print(f"skipped Figure S1 because {RANKING_PATH} does not exist")
+
+
+# -----------------------------------------------------------------------------
+# Appendix Figure S2. Outlier and sensitivity cases.
+# -----------------------------------------------------------------------------
+if OUTLIER_PATH.exists():
+    outliers = pd.read_csv(OUTLIER_PATH)
+    outliers = outliers.copy()
+    outliers["label"] = outliers["dataset"] + " / " + outliers["model"]
+    outliers = outliers.sort_values("gap_reduction_after_balancing")
+    y = np.arange(len(outliers))
+    fig, ax = plt.subplots(figsize=(11.5, 5.8))
+    ax.barh(y, outliers["gap_reduction_after_balancing"], color=np.where(outliers["gap_reduction_after_balancing"] >= 0, COLORS["balanced"], COLORS["accent"]), edgecolor="white")
+    ax.axvline(0, color="#222222", lw=0.8)
+    ax.set_yticks(y)
+    ax.set_yticklabels(outliers["label"])
+    ax.set_xlabel("Gap reduction after target balancing")
+    ax.set_title("Sensitivity cases reveal dataset- and model-dependent split effects")
+    ax.grid(axis="x", color=COLORS["grid"], linewidth=0.6)
+    save(fig, "figureS2_outlier_sensitivity_cases.png")
+else:
+    print(f"skipped Figure S2 because {OUTLIER_PATH} does not exist")
+
 
 # Manuscript-friendly rounded tables.
 rounded_gap = main_gap.copy()
 for col in ["ordinary_gap_mean", "ordinary_gap_std", "balanced_gap_mean", "balanced_gap_std", "gap_reduction_after_balancing"]:
-    rounded_gap[col] = rounded_gap[col].round(3)
+    if col in rounded_gap.columns:
+        rounded_gap[col] = rounded_gap[col].round(3)
 rounded_gap.to_csv(TABLE_DIR / "paper1_main_gap_table_rounded.csv", index=False)
 
 rounded_shift = shift.copy()
-rounded_shift["mean_abs_target_gap"] = rounded_shift["mean_abs_target_gap"].round(4)
+if "mean_abs_target_gap" in rounded_shift.columns:
+    rounded_shift["mean_abs_target_gap"] = rounded_shift["mean_abs_target_gap"].round(4)
 rounded_shift.to_csv(TABLE_DIR / "paper1_split_shift_table_rounded.csv", index=False)
 
-rounded_sim = sim.copy()
+rounded_sim = sim_plot.copy()
 for col in ["mean_max_tanimoto", "median_max_tanimoto", "p90_max_tanimoto", "p95_max_tanimoto", "frac_test_ge_0_7", "frac_test_ge_0_8", "frac_test_ge_0_9"]:
-    rounded_sim[col] = rounded_sim[col].round(3)
+    if col in rounded_sim.columns:
+        rounded_sim[col] = rounded_sim[col].round(3)
 rounded_sim.to_csv(TABLE_DIR / "paper1_similarity_audit_compact_rounded.csv", index=False)
 
 print("saved rounded manuscript tables")
