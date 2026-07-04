@@ -64,9 +64,11 @@ plt.rcParams.update({
 })
 
 
-def save(fig: plt.Figure, name: str) -> None:
+def save(fig: plt.Figure, name: str, use_tight_layout: bool = True) -> None:
+    """Save a figure without producing layout warnings for complex panel figures."""
     out_path = FIGURE_DIR / name
-    fig.tight_layout()
+    if use_tight_layout:
+        fig.tight_layout()
     fig.savefig(out_path, dpi=350, bbox_inches="tight")
     plt.close(fig)
     print("saved", out_path)
@@ -197,7 +199,8 @@ ax.set_ylabel("Conceptual emphasis")
 ax.set_title("Different splits answer different questions")
 ax.legend(frameon=False, loc="upper right")
 ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
-save(fig, "figure1_split_diagnostic_workflow.png")
+fig.subplots_adjust(left=0.05, right=0.98, bottom=0.06, top=0.94, hspace=0.42, wspace=0.30)
+save(fig, "figure1_split_diagnostic_workflow.png", use_tight_layout=False)
 
 # -----------------------------------------------------------------------------
 # Figure 2. Main generalization gap, split by task type for readability.
@@ -277,29 +280,65 @@ ax.legend(frameon=False)
 save(fig, "figure4_tanimoto_similarity.png")
 
 # -----------------------------------------------------------------------------
-# Appendix Figure S1. Model-ranking stability heatmap-like tile plot.
+# Appendix Figure S1. Model-ranking stability matrix.
 # -----------------------------------------------------------------------------
 if RANKING_PATH.exists():
     rank = pd.read_csv(RANKING_PATH)
     rank = rank[rank["rank"] == 1].copy()
     rank["split_label"] = rank["split"].map(SPLIT_LABELS).fillna(rank["split"])
-    rank["cell"] = rank["dataset"] + "\n" + rank["split_label"]
+    short_split = {
+        "Random": "Random",
+        "Ordinary scaffold": "Ord. scaffold",
+        "Target-balanced scaffold": "Balanced scaffold",
+    }
+    rank["split_label"] = rank["split_label"].map(short_split).fillna(rank["split_label"])
+
+    model_short = {
+        "RandomForest": "RF",
+        "LogisticRegression": "LR",
+        "XGBoost": "XGB",
+        "Ridge": "Ridge",
+    }
+    rank["model_short"] = rank["model"].map(model_short).fillna(rank["model"])
+
+    datasets = sorted(rank["dataset"].unique())
+    split_cols = ["Random", "Ord. scaffold", "Balanced scaffold"]
     top_models = sorted(rank["model"].unique())
     palette = [COLORS["random"], COLORS["ordinary"], COLORS["balanced"], COLORS["accent"], "#8B8FA8"]
     color_map = {model: color for model, color in zip(top_models, palette)}
-    fig, ax = plt.subplots(figsize=(12.5, 4.8))
-    cells = rank.sort_values(["dataset", "split_label"]).reset_index(drop=True)
-    ax.bar(np.arange(len(cells)), [1] * len(cells), color=[color_map[m] for m in cells["model"]], edgecolor="white")
-    for i, row in cells.iterrows():
-        ax.text(i, 0.5, row["model"], ha="center", va="center", fontsize=8, color="white", fontweight="bold")
-    ax.set_xticks(np.arange(len(cells)))
-    ax.set_xticklabels(cells["cell"], rotation=60, ha="right")
-    ax.set_yticks([])
-    ax.set_ylim(0, 1)
+
+    fig, ax = plt.subplots(figsize=(7.8, 4.8))
+    for yi, dataset in enumerate(datasets):
+        for xi, split_name in enumerate(split_cols):
+            row = rank[(rank["dataset"] == dataset) & (rank["split_label"] == split_name)]
+            if row.empty:
+                facecolor = "#F2F4F5"
+                text = "NA"
+                text_color = "#666666"
+            else:
+                model = row.iloc[0]["model"]
+                facecolor = color_map.get(model, "#8B8FA8")
+                text = row.iloc[0]["model_short"]
+                text_color = "white"
+            ax.add_patch(plt.Rectangle((xi, yi), 1, 1, facecolor=facecolor, edgecolor="white", linewidth=2.0))
+            ax.text(xi + 0.5, yi + 0.5, text, ha="center", va="center", fontsize=10, color=text_color, fontweight="bold")
+
+    ax.set_xlim(0, len(split_cols))
+    ax.set_ylim(0, len(datasets))
+    ax.invert_yaxis()
+    ax.set_xticks(np.arange(len(split_cols)) + 0.5)
+    ax.set_xticklabels(split_cols, rotation=0, ha="center")
+    ax.set_yticks(np.arange(len(datasets)) + 0.5)
+    ax.set_yticklabels(datasets)
+    ax.tick_params(axis="both", length=0)
     ax.set_title("Top-ranked model can change with the split protocol")
-    handles = [plt.Rectangle((0, 0), 1, 1, color=color_map[m], label=m) for m in top_models]
-    ax.legend(handles=handles, frameon=False, loc="upper center", bbox_to_anchor=(0.5, -0.42), ncol=min(len(handles), 4))
-    save(fig, "figureS1_model_ranking_stability.png")
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    handles = [plt.Rectangle((0, 0), 1, 1, color=color_map[m], label=model_short.get(m, m)) for m in top_models]
+    ax.legend(handles=handles, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.16), ncol=min(len(handles), 4))
+    fig.subplots_adjust(left=0.18, right=0.98, bottom=0.12, top=0.82)
+    save(fig, "figureS1_model_ranking_stability.png", use_tight_layout=False)
 else:
     print(f"skipped Figure S1 because {RANKING_PATH} does not exist")
 
