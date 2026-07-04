@@ -76,52 +76,74 @@ def add_panel_label(ax: plt.Axes, label: str) -> None:
     ax.text(-0.04, 1.08, label, transform=ax.transAxes, fontsize=16, fontweight="bold", va="top", ha="left")
 
 
-def draw_box(ax: plt.Axes, xy: tuple[float, float], w: float, h: float, text: str, color: str, fontsize: int = 9) -> None:
+def draw_box(ax: plt.Axes, xy: tuple[float, float], w: float, h: float, text: str, color: str, fontsize: int = 8) -> None:
     box = FancyBboxPatch(
         xy,
         w,
         h,
-        boxstyle="round,pad=0.018,rounding_size=0.03",
+        boxstyle="round,pad=0.018,rounding_size=0.025",
         linewidth=1.2,
         edgecolor=color,
         facecolor=color,
         alpha=0.18,
     )
     ax.add_patch(box)
-    ax.text(xy[0] + w / 2, xy[1] + h / 2, text, ha="center", va="center", fontsize=fontsize, color=COLORS["text"])
+    ax.text(
+        xy[0] + w / 2,
+        xy[1] + h / 2,
+        text,
+        ha="center",
+        va="center",
+        fontsize=fontsize,
+        color=COLORS["text"],
+        linespacing=1.2,
+    )
 
 
 # -----------------------------------------------------------------------------
 # Figure 1. Multi-panel conceptual overview for JMGM-style manuscript framing.
 # -----------------------------------------------------------------------------
-fig = plt.figure(figsize=(13.5, 8.0))
-gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 1.0], width_ratios=[1.15, 1.0], hspace=0.38, wspace=0.28)
+fig = plt.figure(figsize=(14.2, 8.2))
+gs = fig.add_gridspec(2, 2, height_ratios=[1.05, 1.0], width_ratios=[1.25, 1.0], hspace=0.40, wspace=0.30)
 
-# A: workflow
+# A: workflow. Two-row layout avoids text overlap in the manuscript PDF.
 ax = fig.add_subplot(gs[0, 0])
 ax.set_axis_off()
 add_panel_label(ax, "A")
-workflow = [
-    ("Public molecular\nproperty datasets", COLORS["random"]),
-    ("Canonical SMILES\n+ Morgan fingerprints", COLORS["balanced"]),
-    ("Random / scaffold /\ntarget-balanced splits", COLORS["ordinary"]),
-    ("Models across\nfive seeds", COLORS["accent"]),
-    ("Split diagnostics\n+ benchmark interpretation", COLORS["balanced"]),
+workflow_boxes = [
+    (0.04, 0.68, "Public molecular\nproperty datasets", COLORS["random"]),
+    (0.36, 0.68, "Canonical SMILES\nMorgan fingerprints", COLORS["balanced"]),
+    (0.68, 0.68, "Random, scaffold,\nand balanced splits", COLORS["ordinary"]),
+    (0.20, 0.36, "Models evaluated\nacross five seeds", COLORS["accent"]),
+    (0.52, 0.36, "Split diagnostics\nand interpretation", COLORS["balanced"]),
 ]
-x0, y0, w, h, gap = 0.02, 0.45, 0.17, 0.24, 0.03
-for i, (text, color) in enumerate(workflow):
-    draw_box(ax, (x0 + i * (w + gap), y0), w, h, text, color, fontsize=8)
-    if i < len(workflow) - 1:
-        ax.annotate("", xy=(x0 + (i + 1) * (w + gap) - 0.01, y0 + h / 2), xytext=(x0 + i * (w + gap) + w + 0.01, y0 + h / 2), arrowprops=dict(arrowstyle="->", lw=1.2, color=COLORS["text"]))
-ax.text(0.02, 0.18, "Central question", fontsize=10, fontweight="bold")
-ax.text(0.02, 0.07, "Does a model score reflect molecular generalization,\nor artifacts introduced by the train/test split?", fontsize=10)
+box_w, box_h = 0.24, 0.17
+for x0, y0, text, color in workflow_boxes:
+    draw_box(ax, (x0, y0), box_w, box_h, text, color, fontsize=8)
+
+arrow_pairs = [
+    ((0.28, 0.765), (0.36, 0.765)),
+    ((0.60, 0.765), (0.68, 0.765)),
+    ((0.80, 0.68), (0.38, 0.53)),
+    ((0.44, 0.445), (0.52, 0.445)),
+]
+for start, end in arrow_pairs:
+    ax.annotate("", xy=end, xytext=start, arrowprops=dict(arrowstyle="->", lw=1.2, color=COLORS["text"], shrinkA=2, shrinkB=2))
+
+ax.text(0.04, 0.17, "Central question", fontsize=10, fontweight="bold")
+ax.text(
+    0.04,
+    0.055,
+    "Does a benchmark score reflect molecular generalization,\nor artifacts introduced by the train/test split?",
+    fontsize=9.5,
+    linespacing=1.25,
+)
 
 # B: dataset overview
 ax = fig.add_subplot(gs[0, 1])
 add_panel_label(ax, "B")
 if summary is not None:
     overview = summary.copy()
-    # compatible with older/clean table schemas
     n_col = "after_dedup" if "after_dedup" in overview.columns else overview.columns[-1]
     overview["n"] = overview[n_col]
     colors = [COLORS["random"] if t == "classification" else COLORS["balanced"] for t in overview["task_type"]]
@@ -129,7 +151,14 @@ if summary is not None:
     ax.set_xlabel("Molecules after preprocessing")
     ax.set_title("Six public molecular property datasets")
     ax.grid(axis="x", color=COLORS["grid"], linewidth=0.6)
-    ax.legend(handles=[plt.Rectangle((0, 0), 1, 1, color=COLORS["random"], label="Classification"), plt.Rectangle((0, 0), 1, 1, color=COLORS["balanced"], label="Regression")], frameon=False, loc="lower right")
+    ax.legend(
+        handles=[
+            plt.Rectangle((0, 0), 1, 1, color=COLORS["random"], label="Classification"),
+            plt.Rectangle((0, 0), 1, 1, color=COLORS["balanced"], label="Regression"),
+        ],
+        frameon=False,
+        loc="lower right",
+    )
 else:
     ax.text(0.5, 0.5, "Dataset summary table not found", ha="center", va="center")
     ax.set_axis_off()
@@ -170,7 +199,6 @@ ax.legend(frameon=False, loc="upper right")
 ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
 save(fig, "figure1_split_diagnostic_workflow.png")
 
-
 # -----------------------------------------------------------------------------
 # Figure 2. Main generalization gap, split by task type for readability.
 # -----------------------------------------------------------------------------
@@ -195,10 +223,6 @@ for ax, task, title in zip(axes, ["classification", "regression"], ["Classificat
 axes[0].set_ylabel("Dataset / model")
 fig.suptitle("Split-induced performance gaps are model- and dataset-dependent", fontsize=14, fontweight="bold")
 save(fig, "figure2_generalization_gap.png")
-# Backward-compatible alias used by older drafts.
-fig_old = plt.figure(figsize=(0.01, 0.01))
-plt.close(fig_old)
-
 
 # -----------------------------------------------------------------------------
 # Figure 3. Target distribution shift by split strategy.
@@ -221,7 +245,6 @@ ax.set_title("Target shift is a hidden confounder of scaffold-based evaluation")
 ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
 ax.legend(frameon=False)
 save(fig, "figure3_target_shift.png")
-
 
 # -----------------------------------------------------------------------------
 # Figure 4. Test-to-train chemical similarity.
@@ -253,7 +276,6 @@ ax.grid(axis="y", color=COLORS["grid"], linewidth=0.6)
 ax.legend(frameon=False)
 save(fig, "figure4_tanimoto_similarity.png")
 
-
 # -----------------------------------------------------------------------------
 # Appendix Figure S1. Model-ranking stability heatmap-like tile plot.
 # -----------------------------------------------------------------------------
@@ -263,7 +285,8 @@ if RANKING_PATH.exists():
     rank["split_label"] = rank["split"].map(SPLIT_LABELS).fillna(rank["split"])
     rank["cell"] = rank["dataset"] + "\n" + rank["split_label"]
     top_models = sorted(rank["model"].unique())
-    color_map = {model: color for model, color in zip(top_models, [COLORS["random"], COLORS["ordinary"], COLORS["balanced"], COLORS["accent"], "#8B8FA8"])}
+    palette = [COLORS["random"], COLORS["ordinary"], COLORS["balanced"], COLORS["accent"], "#8B8FA8"]
+    color_map = {model: color for model, color in zip(top_models, palette)}
     fig, ax = plt.subplots(figsize=(12.5, 4.8))
     cells = rank.sort_values(["dataset", "split_label"]).reset_index(drop=True)
     ax.bar(np.arange(len(cells)), [1] * len(cells), color=[color_map[m] for m in cells["model"]], edgecolor="white")
@@ -280,7 +303,6 @@ if RANKING_PATH.exists():
 else:
     print(f"skipped Figure S1 because {RANKING_PATH} does not exist")
 
-
 # -----------------------------------------------------------------------------
 # Appendix Figure S2. Outlier and sensitivity cases.
 # -----------------------------------------------------------------------------
@@ -291,7 +313,12 @@ if OUTLIER_PATH.exists():
     outliers = outliers.sort_values("gap_reduction_after_balancing")
     y = np.arange(len(outliers))
     fig, ax = plt.subplots(figsize=(11.5, 5.8))
-    ax.barh(y, outliers["gap_reduction_after_balancing"], color=np.where(outliers["gap_reduction_after_balancing"] >= 0, COLORS["balanced"], COLORS["accent"]), edgecolor="white")
+    ax.barh(
+        y,
+        outliers["gap_reduction_after_balancing"],
+        color=np.where(outliers["gap_reduction_after_balancing"] >= 0, COLORS["balanced"], COLORS["accent"]),
+        edgecolor="white",
+    )
     ax.axvline(0, color="#222222", lw=0.8)
     ax.set_yticks(y)
     ax.set_yticklabels(outliers["label"])
@@ -301,7 +328,6 @@ if OUTLIER_PATH.exists():
     save(fig, "figureS2_outlier_sensitivity_cases.png")
 else:
     print(f"skipped Figure S2 because {OUTLIER_PATH} does not exist")
-
 
 # Manuscript-friendly rounded tables.
 rounded_gap = main_gap.copy()
