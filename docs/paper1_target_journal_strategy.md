@@ -25,78 +25,134 @@ Core story:
 
 > Molecular property prediction benchmarks should report split diagnostics together with model scores, because train/test splitting can change test difficulty, target distribution, chemical similarity, and model ranking.
 
-## First-choice journal
+## Updated journal conclusion
 
-### Journal of Computer-Aided Molecular Design
+The first-pass target should not be locked to a single AIDD journal. Paper 1 should use a **three-journal main target pool**:
 
-Decision: **First submission target**
+1. Journal of Molecular Graphics and Modelling
+2. Chemometrics and Intelligent Laboratory Systems
+3. Journal of Computer-Aided Molecular Design
+
+The reason is that Paper 1 is an evaluation/benchmark-diagnostic paper, not a drug-design validation paper. Journals that welcome computational molecular modelling, structure-property relationships, database mining, chemometrics, and reproducible computational insight may be more suitable than journals that strongly prefer experimental validation of predictive drug-discovery models.
+
+## Candidate 1: Journal of Molecular Graphics and Modelling
+
+Decision: **New first-choice candidate / strongest balance of fit, speed, and no mandatory APC route**
+
+Why it fits:
+
+- Elsevier journal with subscription publication option and no publication fee for subscription publication.
+- Scope includes computer use in theoretical investigations of molecular structure, function, interaction, and design.
+- Scope includes molecular modelling, computational chemistry, drug design, structure-activity and structure-property relationships, database mining, and compound library design.
+- Fast journal insights are compatible with the high-output roadmap.
+- The journal emphasizes conclusions and implications, which matches our split-diagnostic story.
+
+Main risk:
+
+- Routine applications of standard modelling approaches are not considered.
+- Our paper must be framed as producing new benchmark interpretation and split-diagnostic insight, not as a routine QSAR/model comparison paper.
+
+Required framing:
+
+- Title should emphasize “split-diagnostic audit” and “molecular property prediction benchmarks”.
+- Cover letter should say the contribution is benchmark reliability and molecular generalization interpretation.
+- Avoid presenting RF/XGBoost/Ridge as the contribution.
+
+## Candidate 2: Chemometrics and Intelligent Laboratory Systems
+
+Decision: **Co-first or very strong backup**
+
+Why it fits:
+
+- Elsevier journal with subscription publication option and no publication fee for subscription publication.
+- Scope includes development of statistical, mathematical, and computer techniques in chemistry and related disciplines.
+- Scope includes well-characterized datasets to test performance of new methods and software.
+- The paper can be framed as a chemometric/computational evaluation methodology for molecular ML benchmarks.
+
+Main risk:
+
+- Routine applications of established chemometric methods are not considered.
+- Our paper must emphasize diagnostic methodology, not just application of existing ML models.
+
+Required framing:
+
+- Use “diagnostic evaluation methodology for chemical machine-learning benchmarks”.
+- Highlight target shift, scaffold concentration, Tanimoto similarity, and ranking stability as audit dimensions.
+- Avoid making the paper look like an application-only QSAR benchmark.
+
+## Candidate 3: Journal of Computer-Aided Molecular Design
+
+Decision: **Still suitable, but no longer automatically first**
 
 Why it fits:
 
 - SCIE-indexed according to the journal page.
-- Hybrid journal with subscription route available.
-- Subscription route has no APC.
+- Hybrid journal.
 - Scope includes chemoinformatics, bioinformatics, computational drug design, machine learning methods, structure-property relationships, and chemical database development/usage.
-- Median submission-to-first-decision is currently short enough to support the high-output roadmap.
 - Recent articles include computational drug design and machine-learning/QSAR-style topics.
 
 Main risk:
 
 - The journal states that predictive methods using traditional approaches should generally have compelling experimental evidence.
-- Our paper must therefore be framed as a benchmark/evaluation methodology audit, not as a routine predictive model study.
-- The manuscript should emphasize retrospective validation, reproducibility, split diagnostics, and benchmark interpretation.
+- Paper 1 has retrospective benchmark/audit evidence, not experimental validation.
+- It may desk-reject if the editor interprets the paper as a traditional predictive method paper rather than a benchmark audit.
 
-Required framing before submission:
+Required framing:
 
-- Put “split-diagnostic audit” in title, abstract, and cover letter.
-- Avoid “new predictor”, “SOTA”, or “drug discovery validation” claims.
-- Emphasize chemoinformatics benchmark reliability and molecular generalization.
+- Emphasize “benchmark audit”, “split diagnostics”, and “retrospective validation”.
+- Avoid “new predictor”, “SOTA”, or direct drug-discovery efficacy claims.
 
-## Strong backup journal
+## Candidate 4: Computational Biology and Chemistry
 
-### Chemometrics and Intelligent Laboratory Systems
-
-Decision: **Backup 1 / possibly co-first if JCAMD fit becomes questionable**
+Decision: **Practical backup**
 
 Why it fits:
 
-- Elsevier journal with subscription option and no publication fee for subscription publication.
-- Scope includes development of statistical, mathematical, and computer techniques in chemistry and related disciplines.
-- Scope also includes well-characterized datasets to test performance of new methods and software.
-- The paper's split-diagnostic audit can be framed as a chemometric/computational evaluation methodology for molecular property prediction.
+- Elsevier journal with subscription publication option and no publication fee for subscription publication.
+- Scope includes computational pharmacology, chemical-biology-specific modelling, bioinformatics, and innovative AI methodologies for biological data and machine-learning models.
+- The journal insights show fast first decision and acceptance timelines compatible with the high-output route.
 
 Main risk:
 
-- The journal does not consider routine applications of established chemometric methods.
-- The paper must be framed as an evaluation methodology/benchmark diagnostic contribution, not just applying RF/XGBoost/Ridge to public datasets.
+- It may expect more biological insight or validation.
+- A purely molecular benchmark audit may feel less central unless framed as computational pharmacology / molecular ML benchmark reliability.
 
-Required framing before submission:
+Required framing:
 
-- Emphasize “diagnostic evaluation methodology for chemical ML benchmarks”.
-- Highlight target shift, scaffold concentration, and Tanimoto similarity as audit dimensions.
-- Avoid making the paper look like an application-only QSAR benchmark.
+- Emphasize computational pharmacology and AI benchmark reliability.
+- Avoid presenting it as a chemistry-only QSAR split comparison.
 
-## Broad AI backup journal
+## Candidate 5: Molecular Informatics
 
-### Applied Intelligence
+Decision: **Topic-fit candidate, but needs manual verification before being placed first**
 
-Decision: **Backup 2, not first choice**
+Why it fits:
+
+- Strong topical fit: cheminformatics, QSAR, molecular informatics.
+- The journal identity matches molecular ML and structure-property prediction well.
+
+Main uncertainty:
+
+- Current official author-fee and speed information needs to be manually verified from the Wiley page before using it as the first target.
+- If it has a no-mandatory-APC route and reasonable first-decision speed, it may move into the top three.
+
+## Broad AI backup: Applied Intelligence
+
+Decision: **Do not use as first target for Paper 1**
 
 Why it may fit:
 
-- SCIE-indexed according to the journal page.
-- Hybrid journal with subscription route available.
 - Broad AI scope includes intelligent systems, learning methodologies, classification/clustering, pattern recognition, data mining, bioinformatics, and real-life complex problems.
+- Hybrid/subscription route may avoid mandatory APC.
 
 Main risk:
 
-- The journal emphasizes new and innovative intelligent systems and technological developments rather than applying existing technologies to new datasets.
-- Our current paper is stronger as a domain-specific benchmark audit than as a general AI method paper.
+- The paper is stronger as a domain-specific molecular benchmark audit than as a general AI method paper.
+- Applied Intelligence may expect stronger algorithmic novelty.
 
 Use only if:
 
-- We broaden the framing from AIDD-specific molecular benchmark to general AI benchmark evaluation under distribution shift.
-- We strengthen the methodological novelty language without overclaiming.
+- The manuscript is reframed toward general AI benchmark reliability under distribution shift.
 
 ## Journals to avoid for Paper 1 right now
 
@@ -105,14 +161,21 @@ Use only if:
 - Pure biomedical informatics journals requiring direct clinical translation or healthcare professional involvement.
 - AIDD journals that require experimental validation when the manuscript is only retrospective benchmark/audit.
 
-## Final decision
+## Updated final target sequence
 
 Current target sequence:
 
-1. Journal of Computer-Aided Molecular Design
+1. Journal of Molecular Graphics and Modelling
 2. Chemometrics and Intelligent Laboratory Systems
-3. Applied Intelligence
+3. Journal of Computer-Aided Molecular Design
+4. Computational Biology and Chemistry
+5. Molecular Informatics, pending manual fee/speed verification
+6. Applied Intelligence
 
-The manuscript should now be formatted and cover-lettered for Journal of Computer-Aided Molecular Design first.
+## Immediate action
 
-If JCAMD desk-rejects for lack of experimental validation or insufficient drug-design application, immediately retarget to Chemometrics and Intelligent Laboratory Systems with a revised title and cover letter emphasizing chemical data-analysis methodology.
+The next manuscript version should be formatted first for **Journal of Molecular Graphics and Modelling**.
+
+If JMGM desk-rejects as not sufficiently molecular-modelling focused, immediately retarget to **Chemometrics and Intelligent Laboratory Systems** with stronger chemometric/evaluation-methodology framing.
+
+If CILS desk-rejects as too molecular-ML specific or not sufficiently chemometric, retarget to **Journal of Computer-Aided Molecular Design** with stronger chemoinformatics/computer-aided molecular design framing.
