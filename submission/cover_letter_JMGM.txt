@@ -1,0 +1,24 @@
+Dear Editors,
+
+We are pleased to submit our manuscript entitled "Split-Diagnostic Evaluation of Molecular Property Prediction Benchmarks: Scaffold Effects, Target Shift, and Chemical Similarity in Structure-Property Modelling" for consideration as a research article in the Journal of Molecular Graphics and Modelling.
+
+This manuscript addresses a practical issue in molecular property prediction and structure-property modelling: benchmark scores are often interpreted as model properties, although they can be strongly shaped by the train/test split. Random splits may place chemically similar molecules in both training and test sets, while scaffold splits are intended to assess generalization to new molecular frameworks. However, scaffold splits can also introduce target distribution shift and scaffold concentration, making their interpretation less straightforward.
+
+The study presents a reproducible split-diagnostic audit across six public molecular property datasets. Random, ordinary scaffold, and target-balanced scaffold protocols are compared using shared Morgan fingerprint representations and classical baseline models. Instead of focusing on leaderboard performance, the manuscript jointly reports target distribution shifts, scaffold statistics, test-to-train Tanimoto similarity, generalization gaps, model-ranking stability, and sensitivity cases.
+
+The results show that random splits generally produce chemically closer test molecules, ordinary scaffold splits remove direct scaffold overlap but can introduce target shift, and target-balanced scaffold splitting can help diagnose whether performance gaps persist after reducing one major confounder. These findings support a practical recommendation: molecular property prediction benchmarks should report split diagnostics alongside model scores before drawing conclusions about chemical generalization.
+
+We believe the manuscript fits the scope of the Journal of Molecular Graphics and Modelling because it concerns computational structure-property modelling, molecular similarity, scaffold effects, database-based molecular property benchmarks, and reproducible computational evaluation. The work is not a routine application of existing models; rather, it examines how benchmark design affects the interpretation of molecular modelling results.
+
+All authors have approved the submitted version of the manuscript. The work has not been published previously and is not under consideration elsewhere. The authors declare no competing interests. The code, result tables, manuscript figures, and LaTeX source files are available in the public reproducibility repository: https://github.com/DCarchimonde/split-diagnostic-molecular-benchmark.
+
+Thank you for considering our manuscript. We look forward to your response.
+
+Sincerely,
+
+S. Tong
+Department of Artificial Intelligence
+Faculty of Computer Science and Information Technology
+University of Malaya
+Kuala Lumpur, Malaysia
+Corresponding author: 25064241@siswa.um.edu.my
