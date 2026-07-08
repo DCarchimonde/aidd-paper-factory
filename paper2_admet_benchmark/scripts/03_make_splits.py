@@ -10,6 +10,13 @@ Outputs:
 - paper2_admet_benchmark/data/processed/<endpoint>_splits.csv
 - paper2_admet_benchmark/data/manifests/split_manifest.csv
 - paper2_admet_benchmark/results/tables/split_summary.csv
+
+Important:
+- Random splits are stratified for classification where feasible.
+- Scaffold splits keep each scaffold in a single role.
+- For classification endpoints, scaffold assignment is class-balance aware so that
+  train/calibration/test splits remain usable for ROC-AUC, PR-AUC, calibration,
+  and conformal analyses whenever the endpoint distribution permits it.
 """
 
 import sys
@@ -36,6 +43,12 @@ SEEDS = [0, 1, 2, 3, 4]
 TRAIN_FRAC = 0.60
 CALIBRATION_FRAC = 0.20
 TEST_FRAC = 0.20
+ROLE_FRACTIONS = {
+    "train": TRAIN_FRAC,
+    "calibration": CALIBRATION_FRAC,
+    "test": TEST_FRAC,
+}
+ROLES = ["train", "calibration", "test"]
 
 
 def generate_scaffold(smiles: str) -> str:
@@ -89,48 +102,111 @@ def add_random_train_cal_test_split(
     return split
 
 
-def add_scaffold_train_cal_test_split(df: pd.DataFrame) -> pd.Series:
+def make_scaffold_groups(df: pd.DataFrame) -> list[dict]:
     scaffold_groups: dict[str, list[int]] = defaultdict(list)
     for idx, scaffold in enumerate(df["scaffold"].tolist()):
         scaffold_groups[scaffold].append(idx)
 
-    groups = sorted(scaffold_groups.values(), key=len, reverse=True)
+    groups = []
+    task_type = str(df["task_type"].iloc[0])
+    for scaffold, indices in scaffold_groups.items():
+        target_values = df.iloc[indices]["target"]
+        positive_count = int(target_values.sum()) if task_type == "classification" else 0
+        groups.append(
+            {
+                "scaffold": scaffold,
+                "indices": indices,
+                "n": int(len(indices)),
+                "positive_count": positive_count,
+            }
+        )
+
+    # Sort large and label-pure scaffolds first because they are hardest to place.
+    return sorted(
+        groups,
+        key=lambda g: (g["n"], abs(g["positive_count"] - (g["n"] - g["positive_count"]))),
+        reverse=True,
+    )
+
+
+def scaffold_assignment_score(
+    role_counts: dict[str, int],
+    role_pos_counts: dict[str, int],
+    candidate_group: dict,
+    candidate_role: str,
+    n_total: int,
+    n_pos_total: int,
+    task_type: str,
+) -> float:
+    projected_counts = role_counts.copy()
+    projected_pos_counts = role_pos_counts.copy()
+    projected_counts[candidate_role] += int(candidate_group["n"])
+    projected_pos_counts[candidate_role] += int(candidate_group["positive_count"])
+
+    score = 0.0
+    for role, fraction in ROLE_FRACTIONS.items():
+        target_n = n_total * fraction
+        size_error = abs(projected_counts[role] - target_n) / max(target_n, 1.0)
+        score += size_error
+
+        if task_type == "classification":
+            target_pos = n_pos_total * fraction
+            target_neg = (n_total - n_pos_total) * fraction
+            projected_neg = projected_counts[role] - projected_pos_counts[role]
+            pos_error = abs(projected_pos_counts[role] - target_pos) / max(target_pos, 1.0)
+            neg_error = abs(projected_neg - target_neg) / max(target_neg, 1.0)
+            score += 2.0 * (pos_error + neg_error)
+
+    # Soft penalty for making any classification role single-class after enough samples exist.
+    if task_type == "classification":
+        for role in ROLES:
+            n_role = projected_counts[role]
+            pos_role = projected_pos_counts[role]
+            neg_role = n_role - pos_role
+            expected_min_size = max(10, int(0.05 * n_total))
+            if n_role >= expected_min_size and (pos_role == 0 or neg_role == 0):
+                score += 100.0
+
+    return score
+
+
+def add_scaffold_train_cal_test_split(df: pd.DataFrame, task_type: str) -> pd.Series:
+    groups = make_scaffold_groups(df)
     n_total = len(df)
-    target_train_n = int(round(n_total * TRAIN_FRAC))
-    target_cal_n = int(round(n_total * CALIBRATION_FRAC))
+    n_pos_total = int(df["target"].sum()) if task_type == "classification" else 0
 
-    train_idx: list[int] = []
-    calibration_idx: list[int] = []
-    test_idx: list[int] = []
+    role_indices: dict[str, list[int]] = {role: [] for role in ROLES}
+    role_counts: dict[str, int] = {role: 0 for role in ROLES}
+    role_pos_counts: dict[str, int] = {role: 0 for role in ROLES}
 
-    # Greedy assignment by current fraction deficit. This keeps scaffolds intact.
     for group in groups:
-        train_deficit = target_train_n - len(train_idx)
-        cal_deficit = target_cal_n - len(calibration_idx)
-        if train_deficit >= cal_deficit and train_deficit > 0:
-            train_idx.extend(group)
-        elif cal_deficit > 0:
-            calibration_idx.extend(group)
-        else:
-            test_idx.extend(group)
-
-    # If large early scaffolds overfilled train/calibration, remaining groups go to test.
-    assigned = set(train_idx) | set(calibration_idx) | set(test_idx)
-    for idx in range(n_total):
-        if idx not in assigned:
-            test_idx.append(idx)
+        scores = {
+            role: scaffold_assignment_score(
+                role_counts=role_counts,
+                role_pos_counts=role_pos_counts,
+                candidate_group=group,
+                candidate_role=role,
+                n_total=n_total,
+                n_pos_total=n_pos_total,
+                task_type=task_type,
+            )
+            for role in ROLES
+        }
+        chosen_role = min(scores, key=scores.get)
+        role_indices[chosen_role].extend(group["indices"])
+        role_counts[chosen_role] += int(group["n"])
+        role_pos_counts[chosen_role] += int(group["positive_count"])
 
     split = pd.Series("unused", index=df.index, dtype="object")
-    split.iloc[train_idx] = "train"
-    split.iloc[calibration_idx] = "calibration"
-    split.iloc[test_idx] = "test"
+    for role, indices in role_indices.items():
+        split.iloc[indices] = role
     return split
 
 
 def summarize_role(df: pd.DataFrame, split_col: str, endpoint: str, setting: str, seed: int | str) -> list[dict]:
     rows = []
     task_type = str(df["task_type"].iloc[0])
-    for role in ["train", "calibration", "test"]:
+    for role in ROLES:
         part = df[df[split_col] == role]
         row = {
             "endpoint": endpoint,
@@ -147,9 +223,10 @@ def summarize_role(df: pd.DataFrame, split_col: str, endpoint: str, setting: str
             "n_scaffolds": int(part["scaffold"].nunique()) if "scaffold" in part.columns else np.nan,
         }
         if task_type == "classification" and len(part):
-            row["positive_ratio"] = float(part["target"].mean())
-            row["positive_count"] = int(part["target"].sum())
-            row["negative_count"] = int(len(part) - part["target"].sum())
+            positives = int(part["target"].sum())
+            row["positive_ratio"] = float(positives / len(part))
+            row["positive_count"] = positives
+            row["negative_count"] = int(len(part) - positives)
         else:
             row["positive_ratio"] = np.nan
             row["positive_count"] = np.nan
@@ -209,14 +286,14 @@ def main() -> None:
             )
 
         scaffold_col = split_col_name("scaffold")
-        df[scaffold_col] = add_scaffold_train_cal_test_split(df)
+        df[scaffold_col] = add_scaffold_train_cal_test_split(df, task_type=task_type)
         split_columns.append(scaffold_col)
-        summary_rows.extend(summarize_role(df, scaffold_col, endpoint, "scaffold", "deterministic"))
+        summary_rows.extend(summarize_role(df, scaffold_col, endpoint, "scaffold", "deterministic_class_balance_aware"))
         manifest_rows.append(
             {
                 "endpoint": endpoint,
                 "split_setting": "scaffold",
-                "seed": "deterministic",
+                "seed": "deterministic_class_balance_aware",
                 "split_col": scaffold_col,
                 "train_fraction_target": TRAIN_FRAC,
                 "calibration_fraction_target": CALIBRATION_FRAC,
@@ -241,7 +318,7 @@ def main() -> None:
     print("\nsaved", manifest_path)
     print("saved", summary_path)
     print("Split generation complete.")
-    print("Next: implement 04_train_models.py.")
+    print("Next: run 04_validate_splits.py, then implement 05_train_models.py.")
 
 
 if __name__ == "__main__":
