@@ -1,0 +1,69 @@
+# Paper 2 split configuration
+#
+# Critical rule:
+# The test set must never be used for model fitting, hyperparameter choice,
+# calibration, conformal threshold selection, AD-bin tuning, or threshold tuning.
+
+protocol_version: v1.0
+
+seeds:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+
+split_fractions:
+  train: 0.60
+  calibration: 0.20
+  test: 0.20
+
+validation_settings:
+  - name: random
+    description: Stratified random train/calibration/test split for classification where feasible; random split for regression.
+    required: true
+
+  - name: scaffold
+    description: Murcko-scaffold train/calibration/test split used as a chemical-distribution-shift stress test.
+    required: true
+
+classification_stratification:
+  enabled: true
+  min_class_count_per_split: 5
+  fallback: unstratified_random_split
+
+scaffold_split:
+  scaffold_type: bemis_murcko
+  include_chirality: false
+  assignment_strategy: greedy_large_scaffolds_first
+  target_fractions:
+    train: 0.60
+    calibration: 0.20
+    test: 0.20
+  notes:
+    - Scaffold split is used as a stress-test setting, not as the main novelty claim.
+    - Scaffold statistics must be reported for each endpoint.
+
+applicability_domain_bins:
+  primary_metric: max_tanimoto_to_train
+  bins:
+    high_domain:
+      min_inclusive: 0.70
+      max_exclusive: 1.01
+    medium_domain:
+      min_inclusive: 0.40
+      max_exclusive: 0.70
+    low_domain:
+      min_inclusive: 0.00
+      max_exclusive: 0.40
+  sensitivity_thresholds:
+    - 0.60
+    - 0.70
+    - 0.80
+
+leakage_controls:
+  canonicalize_smiles_before_split: true
+  deduplicate_before_split: true
+  group_identical_canonical_smiles: true
+  no_test_use_for_calibration: true
+  no_test_use_for_threshold_selection: true

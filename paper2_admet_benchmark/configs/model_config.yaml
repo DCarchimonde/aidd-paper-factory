@@ -1,0 +1,102 @@
+# Paper 2 model configuration
+#
+# The study is reliability-oriented, not SOTA-oriented.
+# Models should be lightweight, reproducible, and runnable on normal hardware.
+
+fingerprint:
+  type: morgan
+  radius: 2
+  n_bits: 2048
+  name: ECFP4_2048
+
+models:
+  classification:
+    - name: logistic_regression
+      family: linear
+      required: true
+      sklearn_class: sklearn.linear_model.LogisticRegression
+      default_parameters:
+        max_iter: 2000
+        solver: liblinear
+        class_weight: balanced
+
+    - name: random_forest
+      family: ensemble
+      required: true
+      sklearn_class: sklearn.ensemble.RandomForestClassifier
+      default_parameters:
+        n_estimators: 500
+        class_weight: balanced_subsample
+        n_jobs: -1
+
+    - name: xgboost
+      family: gradient_boosting
+      required: true
+      sklearn_class: xgboost.XGBClassifier
+      default_parameters:
+        n_estimators: 500
+        max_depth: 4
+        learning_rate: 0.05
+        subsample: 0.9
+        colsample_bytree: 0.9
+        eval_metric: logloss
+        n_jobs: -1
+
+    - name: mlp_ecfp
+      family: lightweight_neural_baseline
+      required: true
+      sklearn_class: sklearn.neural_network.MLPClassifier
+      default_parameters:
+        hidden_layer_sizes: [256, 128]
+        activation: relu
+        alpha: 0.0001
+        max_iter: 300
+        early_stopping: true
+
+  regression:
+    - name: ridge
+      family: linear
+      required: true
+      sklearn_class: sklearn.linear_model.Ridge
+      default_parameters:
+        alpha: 1.0
+
+    - name: random_forest
+      family: ensemble
+      required: true
+      sklearn_class: sklearn.ensemble.RandomForestRegressor
+      default_parameters:
+        n_estimators: 500
+        n_jobs: -1
+
+    - name: xgboost
+      family: gradient_boosting
+      required: true
+      sklearn_class: xgboost.XGBRegressor
+      default_parameters:
+        n_estimators: 500
+        max_depth: 4
+        learning_rate: 0.05
+        subsample: 0.9
+        colsample_bytree: 0.9
+        objective: reg:squarederror
+        n_jobs: -1
+
+    - name: mlp_ecfp
+      family: lightweight_neural_baseline
+      required: true
+      sklearn_class: sklearn.neural_network.MLPRegressor
+      default_parameters:
+        hidden_layer_sizes: [256, 128]
+        activation: relu
+        alpha: 0.0001
+        max_iter: 300
+        early_stopping: true
+
+training_rules:
+  fixed_hyperparameters_for_mvp: true
+  hyperparameter_tuning: disabled_for_mvp
+  scale_features_for_linear_and_mlp: true
+  train_only_on_train_split: true
+  use_calibration_split_only_for_calibration_and_conformal: true
+  use_test_split_only_for_final_evaluation: true

@@ -40,10 +40,20 @@ Thumbs.db
 paper1_leakage_benchmark/data/raw/*
 paper1_leakage_benchmark/data/processed/*
 paper1_leakage_benchmark/results/models/*
+paper2_admet_benchmark/data/raw/*
+paper2_admet_benchmark/data/processed/*
+paper2_admet_benchmark/results/models/*
+paper2_admet_benchmark/results/logs/*
 
 # Small reproducibility outputs can be versioned
 !paper1_leakage_benchmark/results/tables/*.csv
 !paper1_leakage_benchmark/figures/*.png
+!paper2_admet_benchmark/data/manifests/*.csv
+!paper2_admet_benchmark/results/tables/*.csv
+!paper2_admet_benchmark/results/metrics/*.csv
+!paper2_admet_benchmark/results/calibration/*.csv
+!paper2_admet_benchmark/results/conformal/*.csv
+!paper2_admet_benchmark/figures/*.png
 
 # Keep directory placeholders
 !**/.gitkeep
@@ -59,3 +69,4 @@ paper1_leakage_benchmark/results/models/*
 *.out
 *.synctex.gz
 paper1_latex/main.pdf
+paper2_admet_benchmark/manuscript/main.pdf

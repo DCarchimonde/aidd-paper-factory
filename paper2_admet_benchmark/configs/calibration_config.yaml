@@ -1,0 +1,90 @@
+# Paper 2 calibration and conformal configuration
+
+classification_calibration:
+  methods:
+    - name: raw
+      description: Uncalibrated model probability.
+      required: true
+
+    - name: sigmoid
+      description: Platt/sigmoid calibration fitted only on the calibration set.
+      required: true
+
+    - name: isotonic
+      description: Isotonic calibration fitted only on the calibration set; may overfit small calibration sets.
+      required: optional
+
+  metrics:
+    - roc_auc
+    - pr_auc
+    - brier_score
+    - negative_log_likelihood
+    - expected_calibration_error
+
+  ece:
+    primary_n_bins: 10
+    sensitivity_n_bins:
+      - 5
+      - 15
+
+regression_reliability:
+  metrics:
+    - rmse
+    - mae
+    - r2
+    - absolute_error_by_domain_bin
+
+conformal_prediction:
+  alpha_levels:
+    - 0.10
+    - 0.20
+
+  classification:
+    enabled: true
+    method: split_conformal
+    nonconformity_score: one_minus_probability_of_true_label
+    fitted_on: calibration_split_only
+    evaluated_on: test_split_only
+    metrics:
+      - empirical_coverage
+      - average_prediction_set_size
+      - singleton_rate
+      - empty_set_rate
+
+  regression:
+    enabled: true
+    method: absolute_residual_split_conformal
+    fitted_on: calibration_split_only
+    evaluated_on: test_split_only
+    metrics:
+      - empirical_coverage
+      - mean_interval_width
+      - median_interval_width
+      - coverage_width_tradeoff
+
+critical_claim_control:
+  allowed_claim: We empirically evaluate conformal coverage under random and scaffold validation settings.
+  forbidden_claim: Conformal prediction is theoretically guaranteed under chemical distribution shift.
+
+selective_prediction:
+  enabled: true
+  retained_fractions:
+    - 1.00
+    - 0.90
+    - 0.80
+    - 0.70
+    - 0.60
+    - 0.50
+    - 0.40
+  uncertainty_scores_classification:
+    - one_minus_max_probability
+    - entropy
+    - conformal_set_size
+    - one_minus_max_tanimoto_to_train
+  uncertainty_scores_regression:
+    - conformal_interval_width
+    - one_minus_max_tanimoto_to_train
+  outputs:
+    - risk_coverage_table
+    - risk_coverage_curve
+    - error_reduction_summary
