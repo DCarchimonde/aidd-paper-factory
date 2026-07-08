@@ -1,0 +1,79 @@
+# Paper 2 MVP endpoint configuration
+#
+# Status: draft v1.0
+# Goal: start with a small but defensible ADMET/property endpoint set.
+# Notes:
+# - Exact column names and download functions will be finalized in 01_prepare_endpoints.py.
+# - Source-specific citations and license notes must be recorded in data/manifests/endpoint_registry.csv.
+
+endpoints:
+  - name: BBBP
+    source: MoleculeNet/DeepChem
+    task_type: classification
+    admet_category: permeability
+    priority: required
+    rationale: Blood-brain barrier penetration is a classic molecular property endpoint relevant to ADMET.
+
+  - name: ClinTox
+    source: MoleculeNet/DeepChem
+    task_type: classification
+    admet_category: toxicity
+    priority: required
+    rationale: Clinical toxicity is directly relevant to drug-safety screening.
+
+  - name: Ames
+    source: TDC
+    task_type: classification
+    admet_category: toxicity
+    priority: required
+    rationale: Mutagenicity is a standard toxicity endpoint and strengthens the ADMET focus.
+
+  - name: hERG
+    source: TDC
+    task_type: classification
+    admet_category: cardiotoxicity
+    priority: required
+    rationale: hERG liability is a high-impact safety endpoint in drug discovery.
+
+  - name: ESOL
+    source: MoleculeNet/DeepChem
+    task_type: regression
+    admet_category: solubility
+    priority: required
+    rationale: A classic aqueous solubility regression endpoint.
+
+  - name: Lipophilicity
+    source: MoleculeNet/DeepChem or TDC
+    task_type: regression
+    admet_category: physicochemical_property
+    priority: required
+    rationale: Lipophilicity is an important drug-like property related to absorption and distribution.
+
+optional_endpoints:
+  - name: CYP2C9_inhibition
+    source: TDC
+    task_type: classification
+    admet_category: metabolism
+    priority: optional
+    rationale: Adds a metabolism endpoint if the MVP pipeline is stable.
+
+  - name: CYP3A4_inhibition
+    source: TDC
+    task_type: classification
+    admet_category: metabolism
+    priority: optional
+    rationale: Adds a clinically important metabolism endpoint if time permits.
+
+  - name: HIA
+    source: TDC
+    task_type: classification
+    admet_category: absorption
+    priority: optional
+    rationale: Adds an absorption endpoint if sample size and label balance are acceptable.
+
+endpoint_exclusion_rules:
+  min_clean_samples: 300
+  min_positive_class_count: 30
+  max_missing_target_fraction: 0.20
+  exclude_if_duplicate_conflict_fraction_above: 0.10
+  exclude_if_no_valid_smiles: true
