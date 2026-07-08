@@ -108,14 +108,16 @@ def make_scaffold_groups(df: pd.DataFrame) -> list[dict]:
         scaffold_groups[scaffold].append(idx)
 
     groups = []
+    task_type = str(df["task_type"].iloc[0])
     for scaffold, indices in scaffold_groups.items():
         target_values = df.iloc[indices]["target"]
+        positive_count = int(target_values.sum()) if task_type == "classification" else 0
         groups.append(
             {
                 "scaffold": scaffold,
                 "indices": indices,
                 "n": int(len(indices)),
-                "positive_count": int(target_values.sum()) if str(df["task_type"].iloc[0]) == "classification" else 0,
+                "positive_count": positive_count,
             }
         )
 
@@ -316,7 +318,7 @@ def main() -> None:
     print("\nsaved", manifest_path)
     print("saved", summary_path)
     print("Split generation complete.")
-    print("Next: run 03b_validate_splits.py, then implement 04_train_models.py.")
+    print("Next: run 04_validate_splits.py, then implement 05_train_models.py.")
 
 
 if __name__ == "__main__":
