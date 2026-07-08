@@ -1,0 +1,10 @@
+endpoint,source,task_type,admet_category,smiles_col,target_col,n_raw,n_clean,positive_ratio,target_mean,target_min,target_max,duplicate_conflict_count,license_or_source_note,citation_key,include_in_mvp,exclusion_reason
+BBBP,MoleculeNet/DeepChem,classification,permeability,,,,,,,,,,,true,
+ClinTox,MoleculeNet/DeepChem,classification,toxicity,,,,,,,,,,,true,
+Ames,TDC,classification,toxicity,,,,,,,,,,,true,
+hERG,TDC,classification,cardiotoxicity,,,,,,,,,,,true,
+ESOL,MoleculeNet/DeepChem,regression,solubility,,,,,,,,,,,true,
+Lipophilicity,MoleculeNet/DeepChem or TDC,regression,physicochemical_property,,,,,,,,,,,true,
+CYP2C9_inhibition,TDC,classification,metabolism,,,,,,,,,,,false,optional endpoint
+CYP3A4_inhibition,TDC,classification,metabolism,,,,,,,,,,,false,optional endpoint
+HIA,TDC,classification,absorption,,,,,,,,,,,false,optional endpoint
