@@ -9,3 +9,9 @@ openpyxl
 xgboost
 shap
 requests
+pyyaml
+
+# Optional only. Do not install in the main Windows environment unless needed.
+# Newer PyTDC releases may pull heavy biomedical dependencies on Windows.
+# Paper 2 will use direct CSV/source loaders for the MVP where possible.
+# pytdc
