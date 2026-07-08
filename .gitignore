@@ -44,6 +44,7 @@ paper2_admet_benchmark/data/raw/*
 paper2_admet_benchmark/data/processed/*
 paper2_admet_benchmark/results/models/*
 paper2_admet_benchmark/results/logs/*
+paper2_admet_benchmark/results/predictions/*
 
 # Small reproducibility outputs can be versioned
 !paper1_leakage_benchmark/results/tables/*.csv
