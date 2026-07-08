@@ -1,0 +1,5 @@
+Split choice changes molecular benchmark interpretation.
+Random splits yield chemically closer test molecules.
+Scaffold splits can introduce target distribution shift.
+Target-balanced scaffold splits diagnose confounding.
+Split diagnostics improve benchmark reproducibility.
