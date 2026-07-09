@@ -13,9 +13,11 @@ Outputs:
 - results/tables/table2_baseline_test_performance_mvp.csv
 - results/tables/table3_calibration_test_summary_mvp.csv
 - results/tables/table4_conformal_test_summary_mvp.csv
+- results/tables/table5_random_vs_scaffold_delta_mvp.csv
 - results/tables/key_findings_mvp.md
 """
 
+import math
 import sys
 from pathlib import Path
 
@@ -43,6 +45,44 @@ def require_file(path: Path) -> Path:
 
 def normalize_endpoint(value: str) -> str:
     return str(value).lower()
+
+
+def format_cell(value: object) -> str:
+    """Format a value for a lightweight Markdown table without requiring tabulate."""
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        if math.isnan(value):
+            return ""
+        return f"{value:.4g}"
+    if isinstance(value, (np.floating,)):
+        value = float(value)
+        if math.isnan(value):
+            return ""
+        return f"{value:.4g}"
+    if isinstance(value, (np.integer,)):
+        return str(int(value))
+    text = str(value)
+    if text.lower() == "nan":
+        return ""
+    return text.replace("|", "\\|")
+
+
+def dataframe_to_markdown(df: pd.DataFrame) -> str:
+    """Convert a DataFrame to a simple GitHub-flavored Markdown table.
+
+    This avoids pandas.to_markdown so the script does not require the optional
+    `tabulate` dependency in the user's main environment.
+    """
+    if df.empty:
+        return "No rows found."
+    columns = list(df.columns)
+    lines = []
+    lines.append("| " + " | ".join(columns) + " |")
+    lines.append("| " + " | ".join(["---"] * len(columns)) + " |")
+    for _, row in df.iterrows():
+        lines.append("| " + " | ".join(format_cell(row[col]) for col in columns) + " |")
+    return "\n".join(lines)
 
 
 def load_inputs() -> dict[str, pd.DataFrame]:
@@ -224,19 +264,19 @@ def write_key_findings(metrics: pd.DataFrame, conformal: pd.DataFrame, out_path:
         "",
     ]
     if not best_cls.empty:
-        lines.append(best_cls.to_markdown(index=False))
+        lines.append(dataframe_to_markdown(best_cls))
     else:
         lines.append("No classification rows found.")
 
     lines.extend(["", "### Regression: best RMSE", ""])
     if not best_reg.empty:
-        lines.append(best_reg.to_markdown(index=False))
+        lines.append(dataframe_to_markdown(best_reg))
     else:
         lines.append("No regression rows found.")
 
     lines.extend(["", "## Random vs scaffold shift summary", ""])
     if not delta.empty:
-        lines.append(delta.to_markdown(index=False))
+        lines.append(dataframe_to_markdown(delta))
     else:
         lines.append("No paired random/scaffold rows found.")
 
