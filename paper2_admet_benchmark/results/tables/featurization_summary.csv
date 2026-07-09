@@ -1,0 +1,8 @@
+endpoint,task_type,admet_category,n_input_clean,n_valid_features,n_invalid_after_cleaning,fingerprint,radius,n_bits,feature_file
+bace,classification,bioactivity_comparator,1513,1513,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\bace_features.npz
+bbbp,classification,permeability,1965,1965,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\bbbp_features.npz
+clintox,classification,toxicity,1442,1442,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\clintox_features.npz
+esol,regression,solubility,1117,1117,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\esol_features.npz
+freesolv,regression,hydration_free_energy,642,642,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\freesolv_features.npz
+hiv,classification,bioactivity_comparator,41120,41120,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\hiv_features.npz
+lipophilicity,regression,lipophilicity,4200,4200,0,ECFP4_Morgan,2,2048,paper2_admet_benchmark\data\processed\lipophilicity_features.npz
