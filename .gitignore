@@ -46,6 +46,7 @@ paper2_admet_benchmark/results/models/*
 paper2_admet_benchmark/results/logs/*
 paper2_admet_benchmark/results/predictions/*
 paper2_admet_benchmark/results/conformal/conformal_predictions_*.csv
+paper2_admet_benchmark/results/conformal/mondrian_conformal_predictions_*.csv
 paper2_admet_benchmark/results/applicability/applicability_details_*.csv
 
 # Small reproducibility outputs can be versioned
@@ -56,6 +57,7 @@ paper2_admet_benchmark/results/applicability/applicability_details_*.csv
 !paper2_admet_benchmark/results/metrics/*.csv
 !paper2_admet_benchmark/results/calibration/*.csv
 !paper2_admet_benchmark/results/conformal/conformal_summary_*.csv
+!paper2_admet_benchmark/results/conformal/mondrian_conformal_summary_*.csv
 !paper2_admet_benchmark/results/applicability/applicability_summary_*.csv
 !paper2_admet_benchmark/results/selective/*.csv
 !paper2_admet_benchmark/figures/*.png
