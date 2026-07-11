@@ -20,6 +20,8 @@ Important:
 - The canonical selective-prediction risk is classification error rate or regression
   RMSE. ROC-AUC/PR-AUC are supplementary because retained subsets can change class
   composition, especially for imbalanced endpoints such as ClinTox.
+- Positive/negative retention rates are reported so apparent risk improvements cannot
+  be mistaken for genuine reliability gains when minority-class samples are rejected.
 - Symmetric split-conformal intervals have constant width within each
   endpoint/model/split, so interval width cannot meaningfully rank individual test
   samples in the current MVP protocol.
@@ -59,6 +61,7 @@ MVP_ENDPOINTS = ["bbbp", "clintox", "esol", "lipophilicity"]
 MVP_SPLITS = ["split_random_seed0", "split_scaffold"]
 ALL_RANDOM_SPLITS = [f"split_random_seed{i}" for i in range(5)]
 RETAINED_FRACTIONS = [1.00, 0.90, 0.80, 0.70, 0.60, 0.50, 0.40]
+MIN_CLASS_COUNT_WARNING = 5
 
 
 def parse_args() -> argparse.Namespace:
@@ -101,14 +104,14 @@ def load_test_predictions() -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def classification_metrics(group: pd.DataFrame) -> dict[str, float | int]:
+def classification_metrics(group: pd.DataFrame) -> dict[str, float | int | bool]:
     y_true = group["y_true"].astype(int).to_numpy()
     y_score = np.clip(group["y_output"].astype(float).to_numpy(), 1e-7, 1 - 1e-7)
     y_pred = (y_score >= 0.5).astype(int)
     positives = int(y_true.sum())
     negatives = int(len(y_true) - positives)
     error_rate = float(np.mean(y_pred != y_true))
-    out: dict[str, float | int] = {
+    out: dict[str, float | int | bool] = {
         "risk": error_rate,
         "error_rate": error_rate,
         "positive_count": positives,
@@ -117,6 +120,8 @@ def classification_metrics(group: pd.DataFrame) -> dict[str, float | int]:
         "brier_score": float(brier_score_loss(y_true, y_score)),
         "roc_auc": math.nan,
         "pr_auc": math.nan,
+        "single_class_subset": positives == 0 or negatives == 0,
+        "low_class_count_warning": min(positives, negatives) < MIN_CLASS_COUNT_WARNING,
     }
     if len(np.unique(y_true)) >= 2:
         out["roc_auc"] = float(roc_auc_score(y_true, y_score))
@@ -163,6 +168,16 @@ def evaluate_curve(group: pd.DataFrame, uncertainty_col: str) -> list[dict]:
     task_type = str(group["task_type"].iloc[0])
     rows = []
 
+    if task_type == "classification":
+        full_positive_count = int(ranked["y_true"].astype(int).sum())
+        full_negative_count = int(len(ranked) - full_positive_count)
+        full_metrics = classification_metrics(ranked)
+    else:
+        full_positive_count = 0
+        full_negative_count = 0
+        full_metrics = regression_metrics(ranked)
+    full_risk = float(full_metrics["risk"])
+
     for retained_fraction in RETAINED_FRACTIONS:
         n_retain = max(1, int(math.ceil(len(ranked) * retained_fraction)))
         retained = ranked.iloc[:n_retain]
@@ -171,22 +186,50 @@ def evaluate_curve(group: pd.DataFrame, uncertainty_col: str) -> list[dict]:
             if task_type == "classification"
             else regression_metrics(retained)
         )
-        rows.append(
-            {
-                "endpoint": str(group["endpoint"].iloc[0]),
-                "task_type": task_type,
-                "split_col": str(group["split_col"].iloc[0]),
-                "model": str(group["model"].iloc[0]),
-                "uncertainty_measure": uncertainty_col,
-                "target_retained_fraction": retained_fraction,
-                "n_total": int(len(ranked)),
-                "n_retained": int(n_retain),
-                "actual_retained_fraction": float(n_retain / len(ranked)),
-                "mean_uncertainty_retained": float(retained[uncertainty_col].mean()),
-                "max_uncertainty_retained": float(retained[uncertainty_col].max()),
-                **metrics,
-            }
-        )
+        risk = float(metrics["risk"])
+        row = {
+            "endpoint": str(group["endpoint"].iloc[0]),
+            "task_type": task_type,
+            "split_col": str(group["split_col"].iloc[0]),
+            "model": str(group["model"].iloc[0]),
+            "uncertainty_measure": uncertainty_col,
+            "target_retained_fraction": retained_fraction,
+            "n_total": int(len(ranked)),
+            "n_retained": int(n_retain),
+            "actual_retained_fraction": float(n_retain / len(ranked)),
+            "mean_uncertainty_retained": float(retained[uncertainty_col].mean()),
+            "max_uncertainty_retained": float(retained[uncertainty_col].max()),
+            "full_risk": full_risk,
+            "risk_reduction_vs_full": full_risk - risk,
+            "relative_risk_reduction_vs_full": (
+                (full_risk - risk) / full_risk if full_risk > 0 else math.nan
+            ),
+            **metrics,
+        }
+        if task_type == "classification":
+            retained_positive_count = int(metrics["positive_count"])
+            retained_negative_count = int(metrics["negative_count"])
+            row.update(
+                {
+                    "full_positive_count": full_positive_count,
+                    "full_negative_count": full_negative_count,
+                    "positive_retention_rate": (
+                        retained_positive_count / full_positive_count
+                        if full_positive_count > 0
+                        else math.nan
+                    ),
+                    "negative_retention_rate": (
+                        retained_negative_count / full_negative_count
+                        if full_negative_count > 0
+                        else math.nan
+                    ),
+                    "class_balance_shift": (
+                        float(metrics["positive_ratio"])
+                        - float(full_metrics["positive_ratio"])
+                    ),
+                }
+            )
+        rows.append(row)
     return rows
 
 
@@ -236,8 +279,9 @@ def main() -> None:
     out_path = OUTPUT_DIR / f"selective_prediction_summary_{args.mode}.csv"
     summary.to_csv(out_path, index=False)
 
+    warning_count = int(summary.get("low_class_count_warning", pd.Series(dtype=bool)).fillna(False).sum())
     print("\nsaved", out_path)
-    print("Selective-prediction analysis complete.")
+    print(f"Selective-prediction analysis complete. Low-class-count rows: {warning_count}.")
 
 
 if __name__ == "__main__":
