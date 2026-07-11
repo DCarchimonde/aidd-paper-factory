@@ -13,9 +13,16 @@ Classification uncertainty rankings:
 Regression uncertainty ranking:
 - one_minus_max_tanimoto_to_train
 
-Note: symmetric split-conformal intervals have constant width within each
-endpoint/model/split, so interval width cannot meaningfully rank individual test
-samples in the current MVP protocol.
+Important:
+- For binary classification, predictive entropy and one-minus-maximum probability
+  are monotonic transformations of the same probability confidence. They therefore
+  produce the same ranking; both are retained only as a documented sensitivity view.
+- The canonical selective-prediction risk is classification error rate or regression
+  RMSE. ROC-AUC/PR-AUC are supplementary because retained subsets can change class
+  composition, especially for imbalanced endpoints such as ClinTox.
+- Symmetric split-conformal intervals have constant width within each
+  endpoint/model/split, so interval width cannot meaningfully rank individual test
+  samples in the current MVP protocol.
 
 Inputs:
 - results/predictions/*_test_predictions.csv
@@ -94,12 +101,19 @@ def load_test_predictions() -> pd.DataFrame:
     return pd.concat(frames, ignore_index=True)
 
 
-def classification_metrics(group: pd.DataFrame) -> dict[str, float]:
+def classification_metrics(group: pd.DataFrame) -> dict[str, float | int]:
     y_true = group["y_true"].astype(int).to_numpy()
     y_score = np.clip(group["y_output"].astype(float).to_numpy(), 1e-7, 1 - 1e-7)
     y_pred = (y_score >= 0.5).astype(int)
-    out = {
-        "error_rate": float(np.mean(y_pred != y_true)),
+    positives = int(y_true.sum())
+    negatives = int(len(y_true) - positives)
+    error_rate = float(np.mean(y_pred != y_true))
+    out: dict[str, float | int] = {
+        "risk": error_rate,
+        "error_rate": error_rate,
+        "positive_count": positives,
+        "negative_count": negatives,
+        "positive_ratio": float(positives / len(y_true)) if len(y_true) else math.nan,
         "brier_score": float(brier_score_loss(y_true, y_score)),
         "roc_auc": math.nan,
         "pr_auc": math.nan,
@@ -113,8 +127,10 @@ def classification_metrics(group: pd.DataFrame) -> dict[str, float]:
 def regression_metrics(group: pd.DataFrame) -> dict[str, float]:
     y_true = group["y_true"].astype(float).to_numpy()
     y_pred = group["y_output"].astype(float).to_numpy()
+    rmse = float(np.sqrt(mean_squared_error(y_true, y_pred)))
     return {
-        "rmse": float(np.sqrt(mean_squared_error(y_true, y_pred))),
+        "risk": rmse,
+        "rmse": rmse,
         "mae": float(mean_absolute_error(y_true, y_pred)),
     }
 
