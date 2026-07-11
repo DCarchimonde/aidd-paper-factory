@@ -1,0 +1,5 @@
+endpoint,task_type,admet_category,n_raw,n_clean,duplicates_removed,duplicate_conflict_count,positive_ratio,target_mean,target_min,target_max,url
+BBBP,classification,permeability,2050,1965,74,10,0.7633587786259542,0.7633587786259542,0.0,1.0,https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/BBBP.csv
+ClinTox,classification,toxicity,1484,1442,38,19,0.0644937586685159,0.0644937586685159,0.0,1.0,https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/clintox.csv.gz
+ESOL,regression,solubility,1128,1117,11,6,,-3.050058191584601,-11.6,1.58,https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/delaney-processed.csv
+Lipophilicity,regression,lipophilicity,4200,4200,0,0,,2.1863357142857143,-1.5,4.5,https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/Lipophilicity.csv
