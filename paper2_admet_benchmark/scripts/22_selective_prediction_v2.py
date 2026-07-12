@@ -220,7 +220,12 @@ def integrate_aurc(curve: pd.DataFrame, value_col: str) -> float:
     valid = curve[["actual_coverage", value_col]].dropna().sort_values("actual_coverage")
     if len(valid) < 2:
         return math.nan
-    return float(np.trapz(valid[value_col].to_numpy(float), valid["actual_coverage"].to_numpy(float)))
+    return float(
+        np.trapezoid(
+            valid[value_col].to_numpy(float),
+            valid["actual_coverage"].to_numpy(float),
+        )
+    )
 
 
 def summarize_aurc(curves: pd.DataFrame) -> pd.DataFrame:
