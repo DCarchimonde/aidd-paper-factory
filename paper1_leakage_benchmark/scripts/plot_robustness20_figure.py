@@ -61,28 +61,36 @@ def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
     ax.axvline(0.0, color=REFERENCE_COLOR, linewidth=1.0, linestyle="--")
     ax.set_yticks(y)
     ax.set_yticklabels(frame["label"])
-    ax.set_xlabel("Generalization-gap reduction (ordinary − target-balanced)")
-    ax.set_title(title, loc="left", fontweight="bold", pad=8)
+    ax.set_xlabel("Gap reduction (ordinary − target-balanced)", labelpad=7)
+    ax.set_title(title, loc="left", fontweight="bold", pad=9)
     ax.grid(axis="x", alpha=0.22)
-    ax.margins(x=0.08, y=0.08)
+    ax.margins(x=0.12, y=0.10)
 
+    note_box = {
+        "facecolor": "white",
+        "edgecolor": "none",
+        "alpha": 0.92,
+        "pad": 1.0,
+    }
     ax.text(
-        0.01,
-        0.985,
+        0.015,
+        0.982,
         "← Larger target-balanced gap",
         transform=ax.transAxes,
         ha="left",
         va="top",
-        fontsize=8,
+        fontsize=7.8,
+        bbox=note_box,
     )
     ax.text(
-        0.99,
         0.985,
+        0.982,
         "Smaller target-balanced gap →",
         transform=ax.transAxes,
         ha="right",
         va="top",
-        fontsize=8,
+        fontsize=7.8,
+        bbox=note_box,
     )
 
 
@@ -93,8 +101,14 @@ def main() -> None:
     classification = robustness[robustness["task_type"] == "classification"].copy()
     regression = robustness[robustness["task_type"] == "regression"].copy()
 
-    fig = plt.figure(figsize=(12.2, 9.2), constrained_layout=True)
-    grid = fig.add_gridspec(2, 2, height_ratios=[0.82, 1.18], hspace=0.10, wspace=0.12)
+    fig = plt.figure(figsize=(13.4, 9.8), constrained_layout=True)
+    grid = fig.add_gridspec(
+        3,
+        2,
+        height_ratios=[0.82, 1.18, 0.10],
+        hspace=0.16,
+        wspace=0.16,
+    )
 
     ax_a = fig.add_subplot(grid[0, :])
     ordered = null_summary.sort_values("balanced_improvement_percentile_mean", ascending=True)
@@ -108,12 +122,12 @@ def main() -> None:
     ax_a.set_yticks(y)
     ax_a.set_yticklabels(ordered["dataset"])
     ax_a.set_xlim(0, 102)
-    ax_a.set_xlabel("Random scaffold assignments with worse target balance (%)")
+    ax_a.set_xlabel("Random scaffold assignments with worse target balance (%)", labelpad=7)
     ax_a.set_title(
         "A  Target-balanced scaffold assignments relative to the random-scaffold null",
         loc="left",
         fontweight="bold",
-        pad=8,
+        pad=9,
     )
     ax_a.grid(axis="x", alpha=0.22)
 
@@ -122,7 +136,7 @@ def main() -> None:
 
     ax_a.text(
         0.995,
-        0.03,
+        0.025,
         "Bars: mean across 20 seeds; vertical marks: minimum across seeds",
         transform=ax_a.transAxes,
         ha="right",
@@ -159,19 +173,23 @@ def main() -> None:
             label="Not significant after Holm correction",
         ),
     ]
-    fig.legend(
+
+    ax_legend = fig.add_subplot(grid[2, :])
+    ax_legend.axis("off")
+    ax_legend.legend(
         handles=legend_handles,
-        loc="lower center",
-        bbox_to_anchor=(0.5, -0.01),
+        loc="center",
         ncol=2,
         frameon=False,
-        fontsize=8,
+        fontsize=8.5,
+        columnspacing=2.0,
+        handletextpad=0.7,
     )
 
     png_path = FIGURE_DIR / "figure_robustness20_split_effects.png"
     pdf_path = FIGURE_DIR / "figure_robustness20_split_effects.pdf"
-    fig.savefig(png_path, dpi=400, bbox_inches="tight")
-    fig.savefig(pdf_path, bbox_inches="tight")
+    fig.savefig(png_path, dpi=400, bbox_inches="tight", pad_inches=0.15)
+    fig.savefig(pdf_path, bbox_inches="tight", pad_inches=0.15)
     plt.close(fig)
 
     print("saved", png_path)
