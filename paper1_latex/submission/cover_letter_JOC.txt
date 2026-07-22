@@ -1,0 +1,30 @@
+Dear Editor-in-Chief and Editors,
+
+Please consider our Original Research Article entitled “Chemometric Diagnosis of Data-Splitting Effects in Molecular Property Prediction Benchmarks” for publication in the Journal of Chemometrics.
+
+Reliable model validation depends on the relation between training and test observations, yet molecular property benchmarks are often interpreted primarily through aggregate predictive scores. Random splitting can retain chemically close train/test neighbours, whereas scaffold splitting removes framework overlap but can simultaneously introduce response-distribution shift and scaffold concentration. Our manuscript treats the partition itself as an object of chemometric diagnosis.
+
+The study makes four main contributions. First, it formalizes a target-balanced scaffold procedure as an explicit constrained objective that preserves scaffold disjointness while minimizing normalized test-size and target-mean deviations. Second, it compares the achieved target balance with 5,000 target-blind random scaffold assignments per dataset. Third, it evaluates predictive effects over 20 fixed seeds using paired effect estimates, bootstrap 95% confidence intervals, Wilcoxon signed-rank tests, and Holm correction. Fourth, it interprets predictive scores jointly with target shift, scaffold composition, test-to-train Tanimoto similarity, sensitivity cases, and model-ranking stability.
+
+Across six public classification and regression datasets, target balancing reduced absolute target shift in five datasets and achieved better target balance than approximately 91.7–97.2% of random scaffold assignments in those cases. Its predictive effects were not uniformly favourable: among 18 dataset–model comparisons, nine showed smaller generalization gaps, six showed larger gaps, and three were inconclusive after Holm correction. This heterogeneity is central to the paper. It shows that controlling one split-induced confounder does not create a universally easier or more valid benchmark, and that validation conclusions remain conditional on the partition and model.
+
+We believe the manuscript is well aligned with the Journal of Chemometrics because it develops and evaluates a reproducible model-validation framework at the intersection of chemometrics, cheminformatics, sample partitioning, data mining, and benchmark analysis. The contribution is methodological and diagnostic rather than a routine application of predictive algorithms or a claim of state-of-the-art molecular prediction.
+
+The manuscript is original, has not been published previously, and is not under consideration by another journal. Both authors have approved the manuscript. The authors declare no competing interests and received no specific funding for this work. All datasets are public, and the complete code, split-generation procedures, machine-readable results, figures, and LaTeX source are available in the public reproducibility repository:
+
+https://github.com/DCarchimonde/split-diagnostic-molecular-benchmark
+
+Thank you for considering our manuscript. We appreciate the opportunity to submit it to the Journal of Chemometrics.
+
+Sincerely,
+
+Siyuan Tong
+Corresponding author
+Department of Artificial Intelligence
+Faculty of Computer Science and Information Technology
+University of Malaya
+50603 Kuala Lumpur, Malaysia
+Email: 25064241@siswa.um.edu.my
+ORCID: 0009-0004-4450-083X
+
+On behalf of all authors
