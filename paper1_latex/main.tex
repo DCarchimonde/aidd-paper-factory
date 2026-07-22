@@ -1,5 +1,5 @@
-﻿\documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
+\documentclass[11pt]{article}
+\usepackage[margin=3cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{array}
@@ -7,10 +7,15 @@
 \usepackage{caption}
 \usepackage{float}
 \usepackage{microtype}
-\usepackage[numbers,sort&compress]{natbib}
+\usepackage{amsmath}
+\usepackage{setspace}
+\usepackage[super,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
-\graphicspath{{../paper1_leakage_benchmark/figures/}}
-\title{Split-Diagnostic Evaluation of Molecular Property Prediction Benchmarks: Scaffold Effects, Target Shift, and Chemical Similarity in Structure--Property Modelling}
+
+\doublespacing
+\graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
+
+\title{Chemometric Diagnosis of Data-Splitting Effects in Molecular Property Prediction Benchmarks}
 \author{
 \begin{minipage}{0.94\textwidth}
 \centering
@@ -20,17 +25,23 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 \small $^{*}$Corresponding author: \texttt{25064241@siswa.um.edu.my}
 \end{minipage}
 }
-\date{\today}
+\date{}
+
 \begin{document}
 \maketitle
-\input{sections/abstract_neutral}
-\input{sections/introduction_neutral}
-\input{sections/related_work_expanded}
-\input{sections/methods_neutral}
-\input{sections/results_jmgm}
-\input{sections/discussion}
+\begin{center}
+\small\textbf{Short title:} Split Diagnostics for Molecular Property Benchmarks
+\end{center}
+
+\input{sections/abstract_chemometrics}
+\input{sections/introduction_chemometrics}
+\input{sections/related_work_chemometrics}
+\input{sections/methods_chemometrics}
+\input{sections/results_chemometrics}
+\input{sections/discussion_chemometrics}
+\input{appendix_chemometrics}
 \input{statements}
-\input{appendix_jmgm}
-\bibliographystyle{plainnat}
+
+\bibliographystyle{unsrtnat}
 \bibliography{references,references_extra}
 \end{document}
