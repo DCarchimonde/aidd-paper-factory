@@ -3,19 +3,25 @@ Set-Location $PSScriptRoot
 
 $documents = @("main", "supplementary")
 
-Write-Host "[1/6] Cleaning stale LaTeX and BibTeX artifacts..."
+Write-Host "[1/7] Auditing LaTeX sources and bibliography integrity..."
+python audit_manuscript.py | Out-Host
+if ($LASTEXITCODE -ne 0) {
+    throw "Source or bibliography audit failed."
+}
+
+Write-Host "[2/7] Cleaning stale LaTeX and BibTeX artifacts..."
 foreach ($doc in $documents) {
     latexmk -C "$doc.tex" | Out-Host
     Remove-Item "$doc.aux", "$doc.bbl", "$doc.blg", "$doc.fdb_latexmk", "$doc.fls", "$doc.log", "$doc.out" -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "[2/6] Building main manuscript with BibTeX..."
+Write-Host "[3/7] Building main manuscript with BibTeX..."
 latexmk -pdf -bibtex -interaction=nonstopmode -halt-on-error main.tex | Out-Host
 
-Write-Host "[3/6] Building Supporting Information..."
+Write-Host "[4/7] Building Supporting Information..."
 latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex | Out-Host
 
-Write-Host "[4/6] Checking hard LaTeX, citation, reference, and overfull-box errors..."
+Write-Host "[5/7] Checking hard LaTeX, citation, reference, and overfull-box errors..."
 $patterns = @(
     "LaTeX Error",
     "Undefined control sequence",
@@ -34,7 +40,7 @@ foreach ($doc in $documents) {
     }
 }
 
-Write-Host "[5/6] Checking visible question-mark citation artifacts in extracted PDF text..."
+Write-Host "[6/7] Checking visible question-mark citation artifacts in extracted PDF text..."
 if (Get-Command pdftotext -ErrorAction SilentlyContinue) {
     foreach ($doc in $documents) {
         $checkPath = "${doc}_extracted_check.txt"
@@ -50,7 +56,7 @@ if (Get-Command pdftotext -ErrorAction SilentlyContinue) {
     Write-Host "pdftotext is unavailable; visual PDF citation checks remain mandatory."
 }
 
-Write-Host "[6/6] Checking the 25-page main-manuscript limit..."
+Write-Host "[7/7] Checking the 25-page main-manuscript limit..."
 if (Get-Command pdfinfo -ErrorAction SilentlyContinue) {
     $pagesLine = pdfinfo main.pdf | Select-String '^Pages:'
     $pages = [int](($pagesLine -split ':')[1].Trim())
@@ -62,4 +68,4 @@ if (Get-Command pdfinfo -ErrorAction SilentlyContinue) {
     Write-Host "pdfinfo is unavailable; confirm manually that main.pdf is no more than 25 pages."
 }
 
-Write-Host "CLEAN BUILD PASSED: manuscript and Supporting Information contain no unresolved citations, references, overfull boxes, or visible question-mark markers."
+Write-Host "CLEAN BUILD PASSED: manuscript and Supporting Information contain no unresolved citations, references, overfull boxes, visible question-mark markers, or source-audit failures."
