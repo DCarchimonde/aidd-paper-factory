@@ -32,7 +32,7 @@ All molecules were represented by 2048-bit Morgan fingerprints with radius 2 \ci
 
 For classification, the models were logistic regression, random forest, and XGBoost. Logistic regression used a sparse-compatible standardization step, the liblinear solver, balanced class weights, and a maximum of 10,000 iterations. Random forest used 300 trees and balanced class weights. XGBoost used 250 estimators, maximum depth 5, learning rate 0.05, subsample 0.8, and column subsampling 0.8. For regression, ridge regression used the same sparse-compatible standardization with $\alpha=1$, random forest used 300 trees, and XGBoost used the same tree and sampling settings with a squared-error objective. Scikit-learn and XGBoost implementations were used \citep{pedregosa2011scikit,breiman2001random,chen2016xgboost}. Hyperparameters were fixed before split comparison.
 
-ROC-AUC was the primary classification metric, with accuracy, F1, and average precision retained as supporting outputs. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting outputs.
+ROC--AUC was the primary classification metric, with accuracy, $F_1$, and average precision retained as supporting outputs. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting outputs.
 
 \subsection{Partitioning protocols}
 
@@ -42,9 +42,9 @@ All protocols targeted an 80:20 train/test division.
 
 \textbf{Ordinary scaffold partition.} Molecules were grouped by Bemis--Murcko scaffold \citep{bemis1996properties}. Complete scaffold groups were assigned by descending group size, with no scaffold shared between training and test sets. This partition was deterministic; seed-to-seed variation therefore came from stochastic predictive models rather than from resampling the molecules.
 
-\textbf{Target-balanced scaffold partition.} Let $G_1,\ldots,G_m$ denote complete scaffold groups and let $S\subseteq\{1,\ldots,m\}$ denote the groups selected for the test set. For a dataset of size $N$, the target test size was $n^{*}=\operatorname{round}(0.2N)$. If $n_S$ and $\bar{y}_S$ are the size and target mean of the selected test set, while $\bar{y}$ and $s_y$ are the full-dataset target mean and standard deviation, the search minimized
+\textbf{Target-balanced scaffold partition.} Let $G_1,\ldots,G_m$ denote complete scaffold groups and let $S\subseteq\{1,\ldots,m\}$ denote the groups selected for the test set. For a dataset of size $N$, the target test size was $n^{\ast}=\operatorname{round}(0.2N)$. If $n_S$ and $\bar{y}_S$ are the size and target mean of the selected test set, while $\bar{y}$ and $s_y$ are the full-dataset target mean and standard deviation, the search minimized
 \begin{equation}
-J(S)=\frac{|n_S-n^{*}|}{n^{*}}+\frac{|\bar{y}_S-\bar{y}|}{s_y}.\label{eq:balanced-objective}
+J(S)=\frac{|n_S-n^{\ast}|}{n^{\ast}}+\frac{|\bar{y}_S-\bar{y}|}{s_y}.\label{eq:balanced-objective}
 \end{equation}
 The first term penalizes test-size deviation and the second penalizes deviation of the test target mean from the full-dataset mean. Whole scaffold groups were always assigned together, so train/test scaffold overlap was zero. For each seed, 300 stochastic greedy trials were run. At each step, up to 80 remaining scaffold groups were sampled as candidates and the group yielding the smallest provisional objective was added. Selection continued until at least 95\% of the target test size was reached; once selection had begun, candidates producing more than 125\% of the target size were rejected. The lowest-objective trial was retained. This procedure is a diagnostic search, not a claim of globally optimal subset selection.
 
@@ -66,7 +66,7 @@ where $g_r$ is the gap from random scaffold assignment $r$. Thus, $P_b=95$ means
 
 \subsection{Paired robustness analysis}
 
-For classification, the scaffold generalization gap was random-partition ROC-AUC minus scaffold-partition ROC-AUC. For regression, it was scaffold-partition RMSE minus random-partition RMSE. In both cases, a larger positive gap indicates worse scaffold-partition performance relative to the matched random partition.
+For classification, the scaffold generalization gap was random-partition ROC--AUC minus scaffold-partition ROC--AUC. For regression, it was scaffold-partition RMSE minus random-partition RMSE. In both cases, a larger positive gap indicates worse scaffold-partition performance relative to the matched random partition.
 
 For every dataset, model, and seed, the effect of balancing was defined as
 \begin{equation}
