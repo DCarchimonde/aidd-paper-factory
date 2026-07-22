@@ -159,7 +159,7 @@ def main() -> None:
             markerfacecolor=EFFECT_COLOR,
             markeredgecolor=EFFECT_COLOR,
             markersize=6,
-            label="Holm-adjusted p < 0.05",
+            label=r"Holm-adjusted $p < 0.05$",
         ),
         Line2D(
             [0],
