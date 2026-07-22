@@ -5,6 +5,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.lines import Line2D
 
 ROOT = Path(__file__).resolve().parents[2]
 PAPER_DIR = ROOT / "paper1_leakage_benchmark"
@@ -22,6 +23,10 @@ MODEL_LABELS = {
     "Ridge": "Ridge",
 }
 
+EFFECT_COLOR = "#2F5D8A"
+BAR_COLOR = "#5B9BC4"
+REFERENCE_COLOR = "#6E6E6E"
+
 
 def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
     frame = frame.copy()
@@ -35,52 +40,49 @@ def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
     xerr = np.vstack([mean - low, high - mean])
 
     significant = frame["wilcoxon_p_holm"].to_numpy(dtype=float) < 0.05
-    markers = ["o" if sig else "s" for sig in significant]
 
-    for i, marker in enumerate(markers):
+    for i, is_significant in enumerate(significant):
+        marker = "o" if is_significant else "s"
+        marker_face = EFFECT_COLOR if is_significant else "white"
         ax.errorbar(
             mean[i],
             y[i],
             xerr=xerr[:, i : i + 1],
             fmt=marker,
+            color=EFFECT_COLOR,
+            markerfacecolor=marker_face,
+            markeredgecolor=EFFECT_COLOR,
+            markeredgewidth=1.2,
             capsize=3,
-            markersize=5,
+            markersize=5.5,
             linewidth=1.2,
         )
 
-    ax.axvline(0.0, linewidth=1.0, linestyle="--")
+    ax.axvline(0.0, color=REFERENCE_COLOR, linewidth=1.0, linestyle="--")
     ax.set_yticks(y)
     ax.set_yticklabels(frame["label"])
-    ax.set_xlabel("Ordinary minus target-balanced generalization gap")
-    ax.set_title(title, loc="left", fontweight="bold")
-    ax.grid(axis="x", alpha=0.25)
+    ax.set_xlabel("Generalization-gap reduction (ordinary − target-balanced)")
+    ax.set_title(title, loc="left", fontweight="bold", pad=8)
+    ax.grid(axis="x", alpha=0.22)
+    ax.margins(x=0.08, y=0.08)
 
-    xmin, xmax = ax.get_xlim()
-    span = xmax - xmin
     ax.text(
-        xmin + 0.02 * span,
-        len(frame) - 0.35,
-        "Balanced gap larger",
+        0.01,
+        0.985,
+        "← Larger target-balanced gap",
+        transform=ax.transAxes,
         ha="left",
         va="top",
         fontsize=8,
     )
     ax.text(
-        xmax - 0.02 * span,
-        len(frame) - 0.35,
-        "Balanced gap smaller",
+        0.99,
+        0.985,
+        "Smaller target-balanced gap →",
+        transform=ax.transAxes,
         ha="right",
         va="top",
         fontsize=8,
-    )
-    ax.text(
-        0.01,
-        0.01,
-        "Circles: Holm-adjusted p < 0.05; squares: not significant",
-        transform=ax.transAxes,
-        ha="left",
-        va="bottom",
-        fontsize=7.5,
     )
 
 
@@ -91,8 +93,8 @@ def main() -> None:
     classification = robustness[robustness["task_type"] == "classification"].copy()
     regression = robustness[robustness["task_type"] == "regression"].copy()
 
-    fig = plt.figure(figsize=(12.0, 9.2), constrained_layout=True)
-    grid = fig.add_gridspec(2, 2, height_ratios=[0.82, 1.18])
+    fig = plt.figure(figsize=(12.2, 9.2), constrained_layout=True)
+    grid = fig.add_gridspec(2, 2, height_ratios=[0.82, 1.18], hspace=0.10, wspace=0.12)
 
     ax_a = fig.add_subplot(grid[0, :])
     ordered = null_summary.sort_values("balanced_improvement_percentile_mean", ascending=True)
@@ -100,22 +102,23 @@ def main() -> None:
     percentile = 100.0 * ordered["balanced_improvement_percentile_mean"].to_numpy(dtype=float)
     minimum = 100.0 * ordered["balanced_improvement_percentile_min"].to_numpy(dtype=float)
 
-    ax_a.barh(y, percentile, alpha=0.75)
-    ax_a.scatter(minimum, y, marker="|", s=140, linewidths=2)
-    ax_a.axvline(95.0, linewidth=1.0, linestyle="--")
+    ax_a.barh(y, percentile, color=BAR_COLOR, alpha=0.90)
+    ax_a.scatter(minimum, y, color=EFFECT_COLOR, marker="|", s=150, linewidths=2)
+    ax_a.axvline(95.0, color=REFERENCE_COLOR, linewidth=1.0, linestyle="--")
     ax_a.set_yticks(y)
     ax_a.set_yticklabels(ordered["dataset"])
-    ax_a.set_xlim(0, 100)
+    ax_a.set_xlim(0, 102)
     ax_a.set_xlabel("Random scaffold assignments with worse target balance (%)")
     ax_a.set_title(
         "A  Target-balanced scaffold assignments relative to the random-scaffold null",
         loc="left",
         fontweight="bold",
+        pad=8,
     )
-    ax_a.grid(axis="x", alpha=0.25)
+    ax_a.grid(axis="x", alpha=0.22)
 
     for i, value in enumerate(percentile):
-        ax_a.text(min(value + 1.2, 98.0), i, f"{value:.1f}%", va="center", fontsize=8)
+        ax_a.text(value + 0.8, i, f"{value:.1f}%", va="center", fontsize=8)
 
     ax_a.text(
         0.995,
@@ -133,10 +136,36 @@ def main() -> None:
     ax_c = fig.add_subplot(grid[1, 1])
     draw_effect_panel(ax_c, regression, "C  Regression datasets")
 
-    fig.suptitle(
-        "Target balancing reliably reduces label shift but has heterogeneous predictive effects",
-        fontsize=14,
-        fontweight="bold",
+    legend_handles = [
+        Line2D(
+            [0],
+            [0],
+            marker="o",
+            linestyle="none",
+            markerfacecolor=EFFECT_COLOR,
+            markeredgecolor=EFFECT_COLOR,
+            markersize=6,
+            label="Holm-adjusted p < 0.05",
+        ),
+        Line2D(
+            [0],
+            [0],
+            marker="s",
+            linestyle="none",
+            markerfacecolor="white",
+            markeredgecolor=EFFECT_COLOR,
+            markeredgewidth=1.2,
+            markersize=6,
+            label="Not significant after Holm correction",
+        ),
+    ]
+    fig.legend(
+        handles=legend_handles,
+        loc="lower center",
+        bbox_to_anchor=(0.5, -0.01),
+        ncol=2,
+        frameon=False,
+        fontsize=8,
     )
 
     png_path = FIGURE_DIR / "figure_robustness20_split_effects.png"
