@@ -75,7 +75,7 @@ def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
     ax.text(
         0.015,
         0.982,
-        "← Larger target-balanced gap",
+        "← Larger balanced gap",
         transform=ax.transAxes,
         ha="left",
         va="top",
@@ -85,7 +85,7 @@ def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
     ax.text(
         0.985,
         0.982,
-        "Smaller target-balanced gap →",
+        "Smaller balanced gap →",
         transform=ax.transAxes,
         ha="right",
         va="top",
