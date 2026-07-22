@@ -11,7 +11,7 @@ Figure~\ref{fig:workflow} summarizes the analysis. Six public molecular property
 
 \subsection{Target balancing was effective relative to random scaffold assignment}
 
-Table~\ref{tab:null-audit} compares ordinary and target-balanced scaffold partitions with the random-scaffold null distribution. In BACE, BBBP, ClinTox, ESOL, and FreeSolv, the target-balanced search reduced the mean absolute train/test target gap substantially. Across these five datasets, the achieved partitions had better target balance than approximately 91.7--97.2\% of random scaffold assignments. The smallest gains occurred in HIV, where the ordinary scaffold target gap was already only 0.0039. Its mean improvement percentile was 67.3\%, and the bootstrap interval for target-gap reduction included zero.
+Table~\ref{tab:null-audit} compares ordinary and target-balanced scaffold partitions with the random-scaffold null distribution. In BACE, BBBP, ClinTox, ESOL, and FreeSolv, the target-balanced search reduced the mean absolute train/test target gap substantially. Across these five datasets, the achieved partitions had better target balance than approximately 91.7--97.2\% of random scaffold assignments. The smallest gain occurred in HIV, where the ordinary scaffold target gap was already only 0.0039 and the mean improvement percentile was 67.3\%. Although its Holm-adjusted signed-rank test reached $p=0.044$, the bootstrap 95\% interval for the mean target-gap reduction included zero; we therefore treat HIV as an inconclusive boundary case rather than evidence of a practically reliable reduction.
 
 \begin{table}[H]
 \centering
