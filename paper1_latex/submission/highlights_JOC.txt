@@ -1,0 +1,5 @@
+Target-balanced scaffold search reduced target shift in five datasets.
+It outperformed 91.7–97.2% of random scaffold assignments on balance.
+Predictive effects varied strongly across datasets and model classes.
+Twenty-seed paired tests exposed interactions between split and model.
+Molecular benchmark scores require explicit partition diagnostics.
