@@ -73,6 +73,15 @@ def draw_effect_panel(ax, frame: pd.DataFrame, title: str) -> None:
         va="top",
         fontsize=8,
     )
+    ax.text(
+        0.01,
+        0.01,
+        "Circles: Holm-adjusted p < 0.05; squares: not significant",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=7.5,
+    )
 
 
 def main() -> None:
@@ -97,7 +106,7 @@ def main() -> None:
     ax_a.set_yticks(y)
     ax_a.set_yticklabels(ordered["dataset"])
     ax_a.set_xlim(0, 100)
-    ax_a.set_xlabel("Random scaffold assignments outperformed (%)")
+    ax_a.set_xlabel("Random scaffold assignments with worse target balance (%)")
     ax_a.set_title(
         "A  Target-balanced scaffold assignments relative to the random-scaffold null",
         loc="left",
