@@ -3,25 +3,31 @@ Set-Location $PSScriptRoot
 
 $documents = @("main", "supplementary")
 
-Write-Host "[1/7] Auditing LaTeX sources and bibliography integrity..."
+Write-Host "[1/8] Auditing LaTeX sources and bibliography integrity..."
 python audit_manuscript.py | Out-Host
 if ($LASTEXITCODE -ne 0) {
     throw "Source or bibliography audit failed."
 }
 
-Write-Host "[2/7] Cleaning stale LaTeX and BibTeX artifacts..."
+Write-Host "[2/8] Regenerating the 20-seed statistical figure..."
+python ..\paper1_leakage_benchmark\scripts\plot_robustness20_figure.py | Out-Host
+if ($LASTEXITCODE -ne 0) {
+    throw "Statistical figure regeneration failed."
+}
+
+Write-Host "[3/8] Cleaning stale LaTeX and BibTeX artifacts..."
 foreach ($doc in $documents) {
     latexmk -C "$doc.tex" | Out-Host
     Remove-Item "$doc.aux", "$doc.bbl", "$doc.blg", "$doc.fdb_latexmk", "$doc.fls", "$doc.log", "$doc.out" -Force -ErrorAction SilentlyContinue
 }
 
-Write-Host "[3/7] Building main manuscript with BibTeX..."
+Write-Host "[4/8] Building main manuscript with BibTeX..."
 latexmk -pdf -bibtex -interaction=nonstopmode -halt-on-error main.tex | Out-Host
 
-Write-Host "[4/7] Building Supporting Information..."
+Write-Host "[5/8] Building Supporting Information..."
 latexmk -pdf -interaction=nonstopmode -halt-on-error supplementary.tex | Out-Host
 
-Write-Host "[5/7] Checking hard LaTeX, citation, reference, and overfull-box errors..."
+Write-Host "[6/8] Checking hard LaTeX, citation, reference, and overfull-box errors..."
 $patterns = @(
     "LaTeX Error",
     "Undefined control sequence",
@@ -40,7 +46,7 @@ foreach ($doc in $documents) {
     }
 }
 
-Write-Host "[6/7] Checking visible question-mark citation artifacts in extracted PDF text..."
+Write-Host "[7/8] Checking visible question-mark citation artifacts in extracted PDF text..."
 if (Get-Command pdftotext -ErrorAction SilentlyContinue) {
     foreach ($doc in $documents) {
         $checkPath = "${doc}_extracted_check.txt"
@@ -56,7 +62,7 @@ if (Get-Command pdftotext -ErrorAction SilentlyContinue) {
     Write-Host "pdftotext is unavailable; visual PDF citation checks remain mandatory."
 }
 
-Write-Host "[7/7] Checking the 25-page main-manuscript limit..."
+Write-Host "[8/8] Checking the 25-page main-manuscript limit..."
 if (Get-Command pdfinfo -ErrorAction SilentlyContinue) {
     $pagesLine = pdfinfo main.pdf | Select-String '^Pages:'
     $pages = [int](($pagesLine -split ':')[1].Trim())
