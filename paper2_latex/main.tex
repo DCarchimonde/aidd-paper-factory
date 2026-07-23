@@ -19,7 +19,24 @@
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
 \doublespacing
+\raggedbottom
 \graphicspath{{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
+
+% Permit figures to share pages with neighboring Results text.  The original
+% structural draft marked every figure [p], which forced a sequence of sparse
+% float-only pages.  Explicit legacy placement arguments are normalized here
+% while the individual section files are progressively cleaned.
+\setcounter{topnumber}{3}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{5}
+\renewcommand{\topfraction}{0.92}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.06}
+\renewcommand{\floatpagefraction}{0.75}
+\makeatletter
+\let\paperoriginalxfloat\@xfloat
+\def\@xfloat#1[#2]{\paperoriginalxfloat{#1}[!htbp]}
+\makeatother
 
 \title{Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift}
 \author{
