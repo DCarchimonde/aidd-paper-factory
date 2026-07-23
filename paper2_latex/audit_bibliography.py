@@ -8,8 +8,8 @@ that the locally verified bibliography remains internally consistent after edits
 - every citation key in the manuscript exists in references.bib;
 - bibliography keys are unique;
 - cited recent references (2021--2026) meet the manuscript minimum;
-- cited journal articles contain a DOI;
-- cited conference entries contain either a DOI or an official venue record;
+- cited journal articles contain a DOI or a complete verified journal record;
+- cited conference entries contain either a DOI, URL, or official venue record;
 - unused entries are listed for manual review.
 """
 
@@ -52,6 +52,17 @@ def citation_keys() -> list[str]:
     return keys
 
 
+def complete_doi_less_article(entry: dict[str, str]) -> bool:
+    """Allow journals that legitimately publish without Crossref DOI metadata.
+
+    A DOI-less entry is accepted only when journal, volume, and pages are all
+    present.  Such entries remain listed in literature_audit.md with their
+    official publisher record (for example, JMLR).
+    """
+
+    return all(entry.get(field) for field in ("journal", "volume", "pages"))
+
+
 def main() -> None:
     bib_text = BIB_PATH.read_text(encoding="utf-8")
     raw_keys = re.findall(r"@\w+\s*\{\s*([^,\s]+)\s*,", bib_text)
@@ -73,8 +84,14 @@ def main() -> None:
         if year is not None and RECENT_START <= year <= RECENT_END:
             recent_cited.append(key)
         entry_type = entry.get("entry_type")
-        if entry_type == "article" and not entry.get("doi"):
-            metadata_issues.append(f"{key}: cited article has no DOI")
+        if (
+            entry_type == "article"
+            and not entry.get("doi")
+            and not complete_doi_less_article(entry)
+        ):
+            metadata_issues.append(
+                f"{key}: cited article has neither DOI nor complete journal/volume/pages"
+            )
         if entry_type == "inproceedings" and not (
             entry.get("doi") or entry.get("url") or entry.get("booktitle")
         ):
