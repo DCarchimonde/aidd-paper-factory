@@ -1,0 +1,5 @@
+research_question,claim_scope,primary_files
+RQ1,"Predictive performance and calibration across random, scaffold, and cluster splits",table_rq1_classification_performance.csv; table_rq1_regression_performance.csv; table_rq1_classification_calibration.csv
+RQ2,"Applicability-domain association, threshold sensitivity, and selective prediction",table_rq2_ad_continuous.csv; table_rq2_ad_threshold_sensitivity.csv; table_rq2_ad_similarity_quartiles.csv; table_rq2_rq3_selective_prediction.csv
+RQ3,Marginal summaries concealing class-conditional and subgroup failure,table_rq3_rq4_classification_conformal.csv; table_rq3_rq4_classification_paired_effects.csv; table_rq2_rq3_selective_prediction.csv
+RQ4,"Mondrian, shift-weighted, and adaptive conformal coverage-efficiency trade-offs",table_rq3_rq4_classification_conformal.csv; table_rq3_rq4_classification_paired_effects.csv; table_rq4_regression_conformal.csv; table_rq4_regression_paired_effects.csv

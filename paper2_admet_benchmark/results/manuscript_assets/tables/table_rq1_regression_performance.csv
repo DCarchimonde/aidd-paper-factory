@@ -1,0 +1,7 @@
+endpoint,split_type,aggregation_note,rmse,mae,r2
+esol,cluster,descriptive mean across frozen model/regime combinations,1.5077978687303868,1.1579240940772557,0.4512454224690369
+esol,random,descriptive mean across frozen model/regime combinations,1.4412175049218723,1.0913935259345067,0.48829794856651354
+esol,scaffold,descriptive mean across frozen model/regime combinations,2.034572514144351,1.6125536418886537,0.08927919547000027
+lipophilicity,cluster,descriptive mean across frozen model/regime combinations,1.3859177804070326,1.0492841860466169,-0.6168182541780913
+lipophilicity,random,descriptive mean across frozen model/regime combinations,1.1920603770166507,0.878547822889965,-0.17452790859694428
+lipophilicity,scaffold,descriptive mean across frozen model/regime combinations,1.3211077366673805,1.0049590542772844,-0.5025780700109422

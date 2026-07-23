@@ -1,0 +1,7 @@
+endpoint,split_type,aggregation_note,roc_auc,pr_auc,balanced_accuracy
+bbbp,cluster,descriptive mean across frozen model/regime combinations,0.8643438740848035,0.9408482012049131,0.7479613151061133
+bbbp,random,descriptive mean across frozen model/regime combinations,0.885646729390681,0.9491309724160331,0.7894704301075268
+bbbp,scaffold,descriptive mean across frozen model/regime combinations,0.8508028652924333,0.9398528229996079,0.735676775678612
+clintox,cluster,descriptive mean across frozen model/regime combinations,0.674675367456179,0.2740180586118221,0.5523452451795337
+clintox,random,descriptive mean across frozen model/regime combinations,0.7032358674463938,0.2830341920721699,0.574847709551657
+clintox,scaffold,descriptive mean across frozen model/regime combinations,0.6790877062972054,0.24311174651316275,0.5373270853759966

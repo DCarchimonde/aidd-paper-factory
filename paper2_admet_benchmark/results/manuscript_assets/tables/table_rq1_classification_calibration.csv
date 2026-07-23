@@ -1,0 +1,7 @@
+endpoint,split_type,aggregation_note,brier_score,negative_log_likelihood,ece_probability,ece_confidence
+bbbp,cluster,descriptive mean across frozen model/regime combinations,0.11926434886300338,0.5150808838109915,0.08809952747342184,0.07613044969649103
+bbbp,random,descriptive mean across frozen model/regime combinations,0.10173698043717128,0.43894247749851656,0.07510171888735978,0.06317966505428263
+bbbp,scaffold,descriptive mean across frozen model/regime combinations,0.11994265198493381,0.525082050737456,0.09585328853429687,0.08238191654573278
+clintox,cluster,descriptive mean across frozen model/regime combinations,0.0653804223190621,0.3901612566211973,0.053189135616246955,0.04879805828229301
+clintox,random,descriptive mean across frozen model/regime combinations,0.060034773323509004,0.3234093745870041,0.0511511160090932,0.04327806363462161
+clintox,scaffold,descriptive mean across frozen model/regime combinations,0.06803419482466413,0.3788223210227234,0.057270202955286065,0.05161179312159757
