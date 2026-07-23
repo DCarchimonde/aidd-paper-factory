@@ -1,0 +1,38 @@
+\section{Discussion}
+\label{sec:discussion}
+
+This study shows that reliability in ADMET prediction cannot be reduced to a single performance, calibration, or uncertainty metric. Across four endpoints and three label-blind evaluation designs, the same method could be informative for one endpoint, weak for another, and directionally misleading under a particular shift mechanism. The resulting picture is not a ranking of universally superior algorithms, but a map of complementary diagnostics and their failure modes.
+
+\subsection{Random splitting remained an optimistic reference}
+
+Random splitting generally produced the strongest predictive performance and probability calibration. The size of the optimism, however, depended on endpoint. BBBP retained useful discrimination under scaffold and cluster shift, whereas ESOL performance deteriorated sharply under scaffold splitting. The negative mean $R^2$ values for Lipophilicity under all split types provide an important boundary condition: conformal intervals can retain nominal marginal coverage even when the underlying point predictor has limited practical value. Coverage validity and predictive usefulness must therefore be reported separately.
+
+\subsection{Chemical similarity was not a universal uncertainty proxy}
+
+Maximum Tanimoto similarity to the training set was a strong and reproducible risk indicator for Lipophilicity and a moderate indicator for BBBP. It was weak for ClinTox and reversed under the ESOL scaffold split. This endpoint dependence argues against treating a single fingerprint-based distance or threshold as a universal applicability-domain rule. Chemical novelty, model uncertainty, and prediction difficulty are related but non-equivalent concepts. Continuous association analyses were consequently more informative than a single low- versus high-domain cutoff, while threshold analyses were useful for exposing sensitivity and sparse-reference-group problems.
+
+\subsection{Marginal validity concealed clinically relevant class failure}
+
+The ClinTox results illustrate the limits of aggregate conformal coverage. Marginal and shift-weighted methods achieved overall coverage near 0.90 while positive-class coverage remained below 0.16. A headline marginal value would therefore imply acceptable validity while the minority class was almost systematically excluded. This is especially concerning for toxicity-oriented tasks, where the minority class may carry disproportionate scientific or safety relevance. Class-conditional coverage, class support, empty-set rate, and prediction-set size should be considered minimum reporting requirements for imbalanced classification conformal studies.
+
+Mondrian calibration corrected the class imbalance robustly across model families, but the correction came primarily through ambiguous two-label sets. This result clarifies an important distinction: statistical coverage repair is not equivalent to decision usefulness. In a binary task, a prediction set containing both labels is valid but minimally informative. The appropriate comparison is therefore not coverage alone, but coverage jointly with ambiguity, set size, and the operational consequences of abstention or follow-up testing.
+
+\subsection{Shift weighting and local adaptivity did not guarantee improvement}
+
+Density-ratio weighting produced endpoint- and split-specific changes but no stable class-level repair for ClinTox and no universal regression coverage--efficiency benefit. Likewise, adaptive normalized regression intervals introduced some width variation, but width--error associations were weak and no consistent advantage emerged across endpoints and model families. These negative results are methodologically useful. They indicate that more elaborate uncertainty procedures should not be presumed superior without paired evidence showing both validity and practical efficiency under the target shift.
+
+\subsection{Selective prediction can create an illusion of safety}
+
+Confidence-based rejection reduced ordinary ClinTox error while disproportionately removing positive cases. Balanced-risk pAURC and class-specific retention revealed that the apparent safety gain partly reflected a change in sample composition rather than uniformly improved reliability. Similarity-based rejection retained more positive examples but remained split dependent. Selective-prediction studies should therefore report the full retained-coverage range, matched random-rejection baselines, balanced risk, and class-specific retention. An aggregate risk curve alone is insufficient for imbalanced ADMET endpoints.
+
+\subsection{Implications for chemometric benchmark design}
+
+The results support a multidimensional benchmark standard. At minimum, molecular-property evaluations should combine: (i) label-blind chemical splits in addition to random splits; (ii) repeated seeds and model-specific uncertainty; (iii) probability calibration for classification; (iv) marginal and subgroup conformal validity; (v) efficiency or informativeness measures; (vi) continuous applicability-domain diagnostics with threshold sensitivity; and (vii) retention-aware selective risk. These components answer different questions and should not be collapsed into a single ``trustworthiness'' score.
+
+\subsection{Limitations}
+
+The study is limited to four public endpoints, ECFP-centred molecular representations, and a fixed set of conventional model families. The results therefore do not establish how graph neural networks, pretrained molecular encoders, three-dimensional representations, or alternative similarity measures would change the observed reliability patterns. Confirmatory seed counts were finite, and some endpoint--domain subgroups, particularly ClinTox high-domain groups under scaffold and cluster splits, were sparse. The analysis evaluates benchmark reliability rather than prospective wet-laboratory or clinical validation. Finally, the density-ratio and adaptive procedures examined here represent specific implementations; failure to show universal improvement should not be generalized to every possible shift-aware or locally adaptive method.
+
+\subsection{Conclusion}
+
+Trustworthy ADMET evaluation requires more than high aggregate accuracy or nominal marginal coverage. Chemical distribution shift, class imbalance, prediction-set informativeness, applicability-domain behavior, and selective-retention effects can point in different directions. Joint reporting of these dimensions provides a more defensible basis for interpreting molecular-property benchmarks and for deciding when a prediction is sufficiently reliable to support downstream use.
