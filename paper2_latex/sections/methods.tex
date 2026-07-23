@@ -1,56 +1,106 @@
 \section{Methods}
 \label{sec:methods}
 
-\subsection{Study design and endpoints}
+\subsection{Confirmatory design and evidence boundary}
 
-The confirmatory benchmark comprised four public molecular-property endpoints: BBBP and ClinTox for binary classification, and ESOL and Lipophilicity for regression. Molecular representations, model families, data preprocessing, split-generation rules, and analysis procedures were frozen before interpretation of the confirmatory outputs. Seed~99 was used only for technical smoke testing and was excluded from scientific conclusions.
+The analysis was organized as a frozen confirmatory benchmark rather than a post hoc search for favorable endpoint--method combinations. Development splits and seed~99 were used only for implementation checks and exploratory debugging. Scientific conclusions were restricted to previously unseen confirmatory splits: seeds 101--110 for random and scaffold designs and seeds 101--105 for similarity-cluster designs. Model families, imbalance regimes, conformal methods, applicability-domain definitions, selective-prediction metrics, and stopping rules were fixed before confirmatory outputs were inspected. No endpoint, model, seed, threshold, or unfavorable result was removed after inspection. This separation follows recent recommendations that molecular machine-learning comparisons distinguish practical effects, paired evaluation units, and repeated-split uncertainty rather than treating model architectures as independent replicates \citep{ash2025comparison}.
 
-% TODO: insert endpoint-specific source, sample size, class prevalence, target units,
-% exclusion criteria, duplicate handling, and final train/calibration/test counts from
-% the frozen dataset and split manifests.
+\subsection{Endpoint acquisition and structure standardization}
 
-\subsection{Molecular representation and frozen model families}
+Four public MoleculeNet/DeepChem endpoints were selected to span imbalanced binary classification and continuous regression \citep{wu2018moleculenet}. BBBP used the binary \texttt{p\_np} endpoint, ClinTox used \texttt{CT\_TOX}, ESOL used measured log aqueous solubility in mol\,L$^{-1}$, and Lipophilicity used the experimental \texttt{exp} target. BBBP is historically associated with in silico blood--brain barrier penetration modeling \citep{martins2012bbbp}, whereas ESOL originates from the Delaney aqueous-solubility collection \citep{delaney2004esol}.
 
-All models used the frozen ECFP-based molecular representation defined in the reproducibility pipeline. Classification analyses included linear, random-forest, gradient-boosted, and multilayer-perceptron model families under the prespecified training regimes. Regression analyses used four frozen regressors. Hyperparameters, software versions, and random-state handling were fixed in the benchmark scripts and were not tuned on the confirmatory test sets.
+Raw files were downloaded from the public DeepChem dataset distribution and hashed with SHA-256. Rows with missing structures or targets were removed, and SMILES strings were canonicalized with RDKit. Molecules that could not be parsed after canonicalization were discarded. Duplicate canonical structures were resolved before featurization. For classification, the majority label among duplicate records was retained; an exact tie between conflicting labels was treated as ambiguous and removed. For regression, duplicate target values were aggregated by their median. Table~\ref{tab:endpoints} reports the resulting core datasets. The ClinTox positive prevalence of 6.45\% was retained rather than artificially balanced outside the training-only resampling regime.
 
-% TODO: insert exact fingerprint radius/length, model identifiers, hyperparameters,
-% scaling, class-balancing regimes, software versions, and hardware provenance from
-% the frozen configuration files.
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Core endpoint composition after structure cleaning and duplicate resolution.} Classification prevalence is the fraction labeled positive. Regression ranges are reported in the native target scale distributed with MoleculeNet/DeepChem.}
+\label{tab:endpoints}
+\small
+\begin{tabular}{llrrrrl}
+\toprule
+Endpoint & Task & Raw $n$ & Clean $n$ & Removed & Conflicts & Prevalence or target range \\
+\midrule
+BBBP & Classification & 2050 & 1965 & 85 & 10 & 0.7634 positive \\
+ClinTox & Classification & 1484 & 1442 & 42 & 19 & 0.0645 positive \\
+ESOL & Regression & 1128 & 1117 & 11 & 6 & $-11.60$ to $1.58$ \\
+Lipophilicity & Regression & 4200 & 4200 & 0 & 0 & $-1.50$ to $4.50$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\subsection{Label-blind random, scaffold, and similarity-cluster splits}
+\subsection{Molecular representation}
 
-Three evaluation designs were used. Random splitting provided a conventional reference. Scaffold splitting separated compounds by molecular scaffold, and similarity-cluster splitting separated compounds using label-blind chemical clusters. Each split was partitioned into training, calibration, and test subsets before model fitting or conformal calibration. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for cluster splitting.
+Canonical structures were encoded as 2048-bit binary Morgan fingerprints with radius~2, corresponding to ECFP4 \citep{rogers2010ecfp}. The same frozen fingerprint matrix was used for model fitting, similarity-based splitting, density-ratio estimation, and applicability-domain analysis. This design intentionally isolates reliability diagnostics from representation changes; it does not imply that ECFP4 is universally optimal relative to modern graph or geometry-aware representations \citep{heid2024chemprop,fang2022geometry,kim2024quantum}.
 
-% TODO: insert exact split proportions, scaffold definition, clustering algorithm,
-% similarity metric, cluster-allocation rule, validation checks, and endpoint-specific
-% skipped-split handling from the frozen manifests.
+\subsection{Random, scaffold, and similarity-cluster splits}
+
+Every confirmatory split assigned approximately 60\% of molecules to training, 20\% to calibration, and 20\% to testing. Models and training-only resampling used the training role. Calibration, conformal thresholds, density-ratio estimation, and learned error-scale transformations used only training and/or calibration information as specified below. Test labels were never used for model fitting, split construction, threshold selection, or method selection.
+
+Random classification splits were generated in two stages with stratification whenever both classes had sufficient support; regression random splits were unstratified. The same seed controlled the train-versus-temporary split and the equal calibration-versus-test partition of the temporary set.
+
+For scaffold evaluation, Bemis--Murcko scaffold groups already stored in the processed split files were assigned intact and without target information. Scaffold groups were first shuffled by the prespecified seed, stably ordered by decreasing group size, and allocated to the role with the smallest projected fill ratio relative to its target size. Seed-derived tie ordering was used only when projected ratios were equal. Structural validation required every molecule to receive one role and every scaffold to occur in exactly one role.
+
+Similarity-cluster evaluation used an order-randomized leader algorithm on binary ECFP4 fingerprints. This was not exact Butina clustering. For each seed, molecules were visited in a seeded random order; a molecule joined the most similar existing leader when its Tanimoto similarity was at least 0.60 and otherwise initiated a new cluster. Clusters were then assigned intact to training, calibration, or testing using group size only and the same projected-fill principle. The clustering step was prespecified for endpoints with at most 10,000 molecules; all four core endpoints satisfied this cap. Validation required zero cluster crossover between roles.
+
+\subsection{Frozen predictive models and imbalance regimes}
+
+Four model families were evaluated for each endpoint. Classification used logistic regression, random forest, XGBoost, and a multilayer perceptron on ECFP4. Regression used ridge regression and the corresponding random-forest, XGBoost, and ECFP multilayer-perceptron regressors.
+
+The linear classification pipeline used sparse-compatible standardization and logistic regression with the liblinear solver, 2000 maximum iterations, no class weighting, and the split seed as the random state. Ridge regression used sparse-compatible standardization and $\ell_2$ penalty $\alpha=1.0$. Random forests used 500 trees and the split seed. XGBoost used 300 estimators, maximum depth~4, learning rate~0.05, subsampling~0.90, column subsampling~0.90, histogram tree construction, and the split seed. The multilayer perceptron used sparse-compatible standardization, hidden layers of 256 and 128 units, ReLU activation, $\ell_2$ coefficient $10^{-4}$, a maximum of 300 iterations, early stopping, and the split seed.
+
+Classification was evaluated under two separate regimes. The unweighted regime trained every model on the original training distribution. In the balanced-oversample regime, the minority class was sampled with replacement within the training role until it matched the majority count; the same seeded resampled training matrix was supplied to all four model families. Calibration and test roles were never resampled. Regression required no imbalance regime. Architecture comparisons never mixed weighted and unweighted training as though they were a single model ranking.
 
 \subsection{Predictive performance and probability calibration}
 
-Classification performance was summarized using ROC--AUC, PR--AUC, and balanced accuracy. Regression performance was summarized using RMSE, MAE, and $R^2$. Classification calibration was assessed using the Brier score, negative log-likelihood, and expected calibration error. Metrics were first summarized within model across confirmatory split seeds. Cross-model headline values were used descriptively and were not treated as independent inferential replicates.
+Classification performance was summarized by ROC--AUC, PR--AUC, and balanced accuracy; regression performance used RMSE, MAE, and $R^2$. For binary probability evaluation, predictions were clipped to $[10^{-7},1-10^{-7}]$ before the Brier score and negative log-likelihood were calculated. Calibration was examined in two distinct ten-bin views \citep{guo2017calibration}: positive-probability calibration compared mean $P(Y=1)$ with observed positive frequency, whereas confidence calibration compared maximum class probability with empirical correctness. Expected calibration error was the bin-frequency-weighted absolute gap, and maximum calibration error was the largest occupied-bin gap. These two views were retained separately because calibration of the positive probability is not equivalent to calibration of classification confidence.
 
-\subsection{Conformal prediction}
+\subsection{Marginal and Mondrian conformal prediction}
 
-At nominal coverage $1-\alpha=0.90$, classification analyses compared marginal label-agnostic conformal prediction, density-ratio shift-weighted conformal prediction, and Mondrian label-conditional conformal prediction. Evaluation included overall coverage, positive- and negative-class coverage, class-conditional coverage gap, mean prediction-set size, empty-set rate, singleton rate, and ambiguous two-label set rate.
+All headline conformal analyses used $\alpha=0.10$. For binary classification, the least-ambiguous-classification nonconformity score was
+\begin{equation}
+  s_i = 1-\widehat{p}_{y_i}(x_i),
+\end{equation}
+where $\widehat{p}_{y_i}(x_i)$ is the probability assigned to the observed class. Marginal split conformal prediction used one calibration distribution for both labels. Its finite-sample order statistic was indexed by
+\begin{equation}
+  k=\min\!\left\{n_{\mathrm{cal}},\left\lceil(n_{\mathrm{cal}}+1)(1-\alpha)\right\rceil\right\}.
+\end{equation}
+A candidate label was included when its test nonconformity score did not exceed the corresponding threshold. Mondrian prediction used separate calibration-score distributions and thresholds for class~0 and class~1, providing class-conditional rather than only marginal calibration motivation \citep{cauchois2021knowing,ding2023classconditional}. We reported overall and class-specific coverage, the absolute class-coverage gap, prediction-set size, empty-set rate, singleton rate, and ambiguous two-label rate. These efficiency measures were considered jointly with validity because class-conditional coverage can be repaired by returning weakly informative sets \citep{krstajic2021critical,fisch2022trading}.
 
-Regression analyses compared marginal absolute-residual conformal intervals, density-ratio shift-weighted absolute-residual intervals, and split-calibration adaptive normalized intervals. Evaluation included empirical coverage, absolute coverage gap, mean and median interval width, interval-width variation, infinite-interval rate, and association between interval width and realized absolute error.
+For regression, standard split conformal intervals used absolute calibration residuals $|y_i-\widehat{y}_i|$ and the same finite-sample quantile rule. Test intervals were symmetric around the point prediction.
+
+\subsection{Empirical covariate-shift-weighted conformal baseline}
+
+The shift-aware baseline followed the weighted-conformal principle that target-domain coverage can be recovered under covariate shift when the relevant likelihood ratio is known or estimated sufficiently accurately \citep{tibshirani2019covariate}. In each run, calibration ECFP4 vectors were assigned domain label~0 and the unlabeled test ECFP4 vectors domain label~1. Density ratios were estimated with five-fold cross-fitted $\ell_2$ logistic regression using $C=1.0$, liblinear optimization, and no class weighting. Domain-classifier odds were multiplied by $n_{\mathrm{cal}}/n_{\mathrm{test}}$ and clipped to $[0.05,20]$. Weighted conformal quantiles included the test-point mass at infinity. We recorded domain-classifier AUC, effective sample size of the calibration weights, infinite-threshold frequency, empirical coverage, and efficiency.
+
+Because the ratios were estimated from finite molecular samples rather than known analytically, these results are described as empirical shift-aware diagnostics, not as exact guarantees under arbitrary chemical shift. CoDrug provides a recent molecular example of density-aware conformal correction under covariate shift, but uses a different density-estimation strategy \citep{laghuvarapu2023codrug}.
+
+\subsection{Adaptive normalized regression intervals}
+
+The locally adaptive regression baseline divided the calibration role deterministically into equal scale-fitting and conformal-quantile halves using a random generator derived from the split seed. A random-forest scale model with 300 trees, \texttt{min\_samples\_leaf}=20, and \texttt{max\_features}=\texttt{sqrt} was fitted on the first half to predict $\log(1+|y-\widehat{y}|)$. The second half supplied normalized residual scores. The predicted scale was floored at
+\begin{equation}
+  \max\{0.1\,\mathrm{median}(|r|_{\mathrm{scale}}),\,0.001\},
+\end{equation}
+and the test half-width was the normalized conformal quantile multiplied by the predicted test scale. Evaluation included coverage, absolute coverage gap, interval width, width coefficient of variation, infinite-interval rate, and Pearson and Spearman association between width and realized absolute error.
 
 \subsection{Applicability-domain diagnostics}
 
-Chemical domain was represented by maximum Tanimoto similarity between each test compound and the training set. Primary analyses treated similarity continuously and assessed its Spearman association with predictive risk and conformal miscoverage. The complementary out-of-domain score, one minus maximum similarity, was evaluated as a discriminator of high-risk or miscovered samples. Threshold analyses over a prespecified range and similarity-quartile summaries were used as sensitivity analyses rather than as universal applicability-domain definitions.
+For each test molecule, the primary chemical-domain score was its maximum Tanimoto similarity to the training fingerprints. Mean top-five similarity and unseen-scaffold status were also generated in the pipeline, while the main manuscript emphasizes maximum similarity because it was used consistently in continuous, threshold, and selective analyses. The complementary out-of-domain score was $1-$maximum similarity. We calculated Spearman association between similarity and predictive risk and between similarity and marginal-conformal miscoverage. Out-of-domain AUC measured whether the complementary score discriminated erroneous or miscovered observations.
 
-\subsection{Selective prediction}
+Prespecified descriptive bins were low domain ($<0.40$), medium domain ($0.40$--$<0.70$), and high domain ($\geq0.70$). Because any fixed structural-similarity threshold is representation and endpoint dependent \citep{kim2025distance}, primary inference used continuous association. Sensitivity analyses swept thresholds from 0.30 to 0.80 and also examined similarity quartiles. Sparse or single-class groups were retained with warnings rather than silently excluded.
 
-Selective prediction ranked samples using model confidence for classification and chemical-domain distance for classification and regression. Risk--coverage curves were compared with matched random rejection. Because the retained-coverage grid spanned 0.10--1.00, the integrated quantity was reported as partial area under the risk--coverage curve (pAURC), not full AURC. For classification, ordinary error, balanced error, positive-class retention, negative-class retention, and class-balance shift were reported together. Selective and random balanced-risk curves were integrated only over matched finite coverage points.
+\subsection{Selective prediction and retained-class diagnostics}
 
-\subsection{Confirmatory comparisons and evidence boundary}
+Classification samples were ranked separately by $1-$maximum class probability and by $1-$maximum Tanimoto similarity; regression used the latter. Retained coverage ranged from 0.10 to 1.00 in increments of 0.05. At every retained fraction, the selected subset was compared with 500 deterministic repeated random-rejection samples of the same size. Classification outputs included ordinary error, balanced error when both classes remained, false-negative and false-positive rates, positive and negative retention, and the shift in retained class balance. Regression outputs included RMSE and MAE.
 
-Method comparisons were paired within the same endpoint, split, seed, and model. Model-specific means, standard deviations, and 95\% $t$ intervals were calculated across split seeds. Counts of model-specific intervals entirely above or below zero were used to describe cross-model stability. Cross-model headline means remained descriptive summaries and did not use model families as inferential replicates. All negative and null results were retained.
+The area metric was explicitly reported as partial AURC because integration covered retained fractions 0.10--1.00 rather than the full mathematical domain. Selective and random balanced-error curves were integrated only over matched coverage points for which both quantities were finite. This matched-support rule prevents apparent improvements caused solely by dropping different undefined low-coverage points.
 
-\begin{figure}[p]
+\subsection{Aggregation, paired comparisons, and uncertainty}
+
+Metrics were first summarized within a fixed endpoint, split type, seed, model, and imbalance regime. Model-specific means, standard deviations, and two-sided 95\% Student-$t$ intervals were then calculated across confirmatory seeds. Method contrasts were paired within the same endpoint, split, seed, model, and regime. Cross-model headline averages were used only as compact descriptive summaries; model families were not treated as independent inferential replicates. For each paired effect, we additionally counted how many frozen model or model--regime combinations had a model-specific confidence interval entirely above or below zero. No multiplicity-adjusted null-hypothesis testing across model families was used, and null or adverse effects were retained.
+
+\begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{figure_1_confirmatory_design.pdf}
-\caption{\textbf{Confirmatory reliability-evaluation workflow.} Four ADMET endpoints and frozen ECFP-based model families were evaluated under label-blind random, scaffold, and similarity-cluster designs with explicit training, calibration, and test subsets. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for cluster splitting. Comparisons were paired within endpoint, model, and seed. Reliability modules addressed predictive performance and calibration (RQ1), applicability-domain robustness (RQ2), class-conditional and subgroup failure (RQ3), and conformal coverage--efficiency--informativeness trade-offs (RQ4).}
+\includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{figure_1_confirmatory_design.pdf}
+\caption{\textbf{Confirmatory reliability-evaluation workflow.} Four core endpoints and frozen ECFP-based model families were evaluated under random, label-blind scaffold, and label-blind similarity-cluster designs with separate training, calibration, and test roles. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for similarity-cluster splitting. Method contrasts were paired within endpoint, split, model, regime, and seed.}
 \label{fig:workflow}
 \end{figure}
-\FloatBarrier
