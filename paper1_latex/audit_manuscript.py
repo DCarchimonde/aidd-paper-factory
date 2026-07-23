@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 MAIN = ROOT / "main.tex"
+SUPPLEMENTARY = ROOT / "supplementary.tex"
 BIB_FILES = [ROOT / "references.bib", ROOT / "references_extra.bib", ROOT / "references_recent.bib"]
 RECENT_START = 2021
 RECENT_END = 2026
@@ -21,6 +22,39 @@ def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8-sig")
 
 
+def resolve_input_target(raw_target: str, including_file: Path) -> Path:
+    """Resolve a LaTeX input using project-root semantics with a local fallback.
+
+    LaTeX in this project is compiled from ``paper1_latex``. Therefore an input such
+    as ``sections/results_chemometrics_target`` remains root-relative even when it
+    appears inside another file in ``sections``. A current-file-relative fallback is
+    retained for genuinely local input paths.
+    """
+    target = Path(raw_target.strip())
+    if target.suffix.lower() != ".tex":
+        target = target.with_suffix(".tex")
+
+    if target.is_absolute():
+        candidates = [target]
+    else:
+        candidates = [ROOT / target, including_file.parent / target]
+
+    attempted: list[Path] = []
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved in attempted:
+            continue
+        attempted.append(resolved)
+        if resolved.exists():
+            return resolved
+
+    attempted_text = ", ".join(str(path) for path in attempted)
+    raise AuditFailure(
+        f"Missing LaTeX input '{raw_target}' referenced by "
+        f"{including_file.relative_to(ROOT)}; attempted: {attempted_text}"
+    )
+
+
 def resolve_inputs(path: Path, visited: set[Path] | None = None) -> list[Path]:
     if visited is None:
         visited = set()
@@ -33,7 +67,7 @@ def resolve_inputs(path: Path, visited: set[Path] | None = None) -> list[Path]:
     files = [path]
     text = read_text(path)
     for match in re.finditer(r"\\input\{([^}]+)\}", text):
-        child = (path.parent / match.group(1)).with_suffix(".tex")
+        child = resolve_input_target(match.group(1), path)
         files.extend(resolve_inputs(child, visited))
     return files
 
@@ -114,6 +148,9 @@ def main() -> int:
     warnings: list[str] = []
 
     main_files = resolve_inputs(MAIN)
+    supplementary_files = resolve_inputs(SUPPLEMENTARY)
+    all_tex_files = list(dict.fromkeys(main_files + supplementary_files))
+
     entries = parse_bib_entries()
     cited = collect_citations(main_files)
 
@@ -150,7 +187,7 @@ def main() -> int:
         for doi, keys in sorted(duplicate_dois.items()):
             errors.append(f"Duplicate DOI {doi}: {', '.join(keys)}")
 
-    for path in main_files:
+    for path in all_tex_files:
         text = read_text(path)
         if "??" in text:
             errors.append(f"{path.relative_to(ROOT)}: source contains literal '??'")
@@ -170,6 +207,7 @@ def main() -> int:
         warnings.append(f"Unused BibTeX entries: {len(unused)} (not printed by BibTeX).")
 
     print(f"Main LaTeX files audited: {len(main_files)}")
+    print(f"Supporting Information files audited: {len(supplementary_files)}")
     print(f"Unique cited references: {len(cited)}")
     print(f"Cited references from {RECENT_START}–{RECENT_END}: {len(recent_cited)}")
     print("Recent cited keys: " + ", ".join(recent_cited))
