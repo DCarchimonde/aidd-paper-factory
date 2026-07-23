@@ -1,0 +1,56 @@
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Study design and endpoints}
+
+The confirmatory benchmark comprised four public molecular-property endpoints: BBBP and ClinTox for binary classification, and ESOL and Lipophilicity for regression. Molecular representations, model families, data preprocessing, split-generation rules, and analysis procedures were frozen before interpretation of the confirmatory outputs. Seed~99 was used only for technical smoke testing and was excluded from scientific conclusions.
+
+% TODO: insert endpoint-specific source, sample size, class prevalence, target units,
+% exclusion criteria, duplicate handling, and final train/calibration/test counts from
+% the frozen dataset and split manifests.
+
+\subsection{Molecular representation and frozen model families}
+
+All models used the frozen ECFP-based molecular representation defined in the reproducibility pipeline. Classification analyses included linear, random-forest, gradient-boosted, and multilayer-perceptron model families under the prespecified training regimes. Regression analyses used four frozen regressors. Hyperparameters, software versions, and random-state handling were fixed in the benchmark scripts and were not tuned on the confirmatory test sets.
+
+% TODO: insert exact fingerprint radius/length, model identifiers, hyperparameters,
+% scaling, class-balancing regimes, software versions, and hardware provenance from
+% the frozen configuration files.
+
+\subsection{Label-blind random, scaffold, and similarity-cluster splits}
+
+Three evaluation designs were used. Random splitting provided a conventional reference. Scaffold splitting separated compounds by molecular scaffold, and similarity-cluster splitting separated compounds using label-blind chemical clusters. Each split was partitioned into training, calibration, and test subsets before model fitting or conformal calibration. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for cluster splitting.
+
+% TODO: insert exact split proportions, scaffold definition, clustering algorithm,
+% similarity metric, cluster-allocation rule, validation checks, and endpoint-specific
+% skipped-split handling from the frozen manifests.
+
+\subsection{Predictive performance and probability calibration}
+
+Classification performance was summarized using ROC--AUC, PR--AUC, and balanced accuracy. Regression performance was summarized using RMSE, MAE, and $R^2$. Classification calibration was assessed using the Brier score, negative log-likelihood, and expected calibration error. Metrics were first summarized within model across confirmatory split seeds. Cross-model headline values were used descriptively and were not treated as independent inferential replicates.
+
+\subsection{Conformal prediction}
+
+At nominal coverage $1-\alpha=0.90$, classification analyses compared marginal label-agnostic conformal prediction, density-ratio shift-weighted conformal prediction, and Mondrian label-conditional conformal prediction. Evaluation included overall coverage, positive- and negative-class coverage, class-conditional coverage gap, mean prediction-set size, empty-set rate, singleton rate, and ambiguous two-label set rate.
+
+Regression analyses compared marginal absolute-residual conformal intervals, density-ratio shift-weighted absolute-residual intervals, and split-calibration adaptive normalized intervals. Evaluation included empirical coverage, absolute coverage gap, mean and median interval width, interval-width variation, infinite-interval rate, and association between interval width and realized absolute error.
+
+\subsection{Applicability-domain diagnostics}
+
+Chemical domain was represented by maximum Tanimoto similarity between each test compound and the training set. Primary analyses treated similarity continuously and assessed its Spearman association with predictive risk and conformal miscoverage. The complementary out-of-domain score, one minus maximum similarity, was evaluated as a discriminator of high-risk or miscovered samples. Threshold analyses over a prespecified range and similarity-quartile summaries were used as sensitivity analyses rather than as universal applicability-domain definitions.
+
+\subsection{Selective prediction}
+
+Selective prediction ranked samples using model confidence for classification and chemical-domain distance for classification and regression. Risk--coverage curves were compared with matched random rejection. Because the retained-coverage grid spanned 0.10--1.00, the integrated quantity was reported as partial area under the risk--coverage curve (pAURC), not full AURC. For classification, ordinary error, balanced error, positive-class retention, negative-class retention, and class-balance shift were reported together. Selective and random balanced-risk curves were integrated only over matched finite coverage points.
+
+\subsection{Confirmatory comparisons and evidence boundary}
+
+Method comparisons were paired within the same endpoint, split, seed, and model. Model-specific means, standard deviations, and 95\% $t$ intervals were calculated across split seeds. Counts of model-specific intervals entirely above or below zero were used to describe cross-model stability. Cross-model headline means remained descriptive summaries and did not use model families as inferential replicates. All negative and null results were retained.
+
+\begin{figure}[p]
+\centering
+\includegraphics[width=\textwidth]{figure_1_confirmatory_design.pdf}
+\caption{\textbf{Confirmatory reliability-evaluation workflow.} Four ADMET endpoints and frozen ECFP-based model families were evaluated under label-blind random, scaffold, and similarity-cluster designs with explicit training, calibration, and test subsets. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for cluster splitting. Comparisons were paired within endpoint, model, and seed. Reliability modules addressed predictive performance and calibration (RQ1), applicability-domain robustness (RQ2), class-conditional and subgroup failure (RQ3), and conformal coverage--efficiency--informativeness trade-offs (RQ4).}
+\label{fig:workflow}
+\end{figure}
+\FloatBarrier
