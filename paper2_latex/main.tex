@@ -1,0 +1,53 @@
+\documentclass[11pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=3cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage{microtype}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage[super,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+
+\doublespacing
+\graphicspath{{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
+
+\title{Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift}
+\author{
+\begin{minipage}{0.94\textwidth}
+\centering
+S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
+\small $^{1}$Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia\\
+\small $^{2}$Faculty of Data Science, City University of Macau, Macau SAR, China\\[0.30em]
+\small $^{*}$Corresponding author: \texttt{25064241@siswa.um.edu.my}
+\end{minipage}
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{center}
+\small\textbf{Short title:} Reliability Diagnostics for ADMET Prediction
+\end{center}
+
+\input{sections/abstract}
+\input{sections/introduction}
+\input{sections/methods}
+\input{sections/results}
+\input{sections/discussion}
+\input{statements}
+
+\bibliographystyle{unsrtnat}
+\bibliography{references}
+
+\end{document}
