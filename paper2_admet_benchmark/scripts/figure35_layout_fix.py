@@ -3,11 +3,11 @@ from __future__ import annotations
 """Final layout corrections for the Paper 2 main-figure package.
 
 The frozen numerical content is unchanged.  This wrapper rebuilds the refined
-figure package, then overwrites Figures 1 and 2 to correct two visual issues
+figure package, then overwrites Figures 1 and 2 to correct visual issues
 identified in the compiled manuscript:
 
-1. the connector arrow entering the third workflow box in Figure 1 crossed the
-   first line of box text;
+1. workflow connector arrows must remain completely within the white gaps
+   between boxes and never cross any box text;
 2. the small explanatory sentence below Figure 2 collided visually with the
    bottom legend after LaTeX scaling.  That sentence is already stated in the
    manuscript caption, so it is removed from the artwork.
@@ -81,21 +81,26 @@ def rebuild_workflow_figure() -> list[Path]:
             linespacing=1.20,
         )
 
-    # Stop arrowheads before they enter the boxes.  The previous version ended
-    # the arrow at the box boundary and the head crossed the first text line.
-    for start, end in [((0.300, 0.81), (0.372, 0.81)), ((0.627, 0.81), (0.699, 0.81))]:
+    # Put each arrowhead in the white inter-box gap, rather than on the target
+    # rectangle boundary.  Long centered text in the third box reaches close to
+    # its left edge, so even a boundary-aligned arrowhead can appear to strike
+    # the first characters after manuscript scaling.
+    for start, end in [
+        ((0.305, 0.81), (0.358, 0.81)),
+        ((0.632, 0.81), (0.685, 0.81)),
+    ]:
         ax.annotate(
             "",
             xy=end,
             xytext=start,
             xycoords=ax.transAxes,
             arrowprops=dict(
-                arrowstyle="-|>",
+                arrowstyle="->",
                 lw=1.45,
                 color=base.PALETTE["outline"],
                 mutation_scale=11,
-                shrinkA=6,
-                shrinkB=12,
+                shrinkA=0,
+                shrinkB=0,
             ),
         )
 
