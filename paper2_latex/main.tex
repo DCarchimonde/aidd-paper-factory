@@ -25,8 +25,10 @@
 % Permit figures to share pages with neighboring Results text.  The original
 % structural draft marked every figure [p] and followed it with a hard
 % \FloatBarrier, which forced sparse float-only pages.  Legacy placement
-% arguments are normalized here, and the old barriers are disabled.  A single
-% \clearpage at the Results--Discussion boundary preserves section order.
+% arguments are normalized here, and the old per-figure barriers are disabled.
+% The original placeins barrier is retained under a private command and used
+% once at the Results--Discussion boundary; unlike \clearpage, it does not
+% force a new page when no Results float remains pending.
 \setcounter{topnumber}{3}
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{5}
@@ -34,6 +36,7 @@
 \renewcommand{\bottomfraction}{0.85}
 \renewcommand{\textfraction}{0.06}
 \renewcommand{\floatpagefraction}{0.75}
+\let\paperhardfloatbarrier\FloatBarrier
 \renewcommand{\FloatBarrier}{}
 \makeatletter
 \let\paperoriginalxfloat\@xfloat
@@ -63,7 +66,7 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 \input{sections/introduction}
 \input{sections/methods}
 \input{sections/results}
-\clearpage
+\paperhardfloatbarrier
 \input{sections/discussion}
 \input{statements}
 
