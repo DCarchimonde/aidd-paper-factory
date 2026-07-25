@@ -2,10 +2,10 @@ from __future__ import annotations
 
 """Safely refresh the final Paper 2 manuscript figures.
 
-The final layout pass only needs to overwrite Figures 1 and 2.  Figures 3--6 are
-already frozen manuscript assets.  A previous entry point unnecessarily invoked
+The final layout pass only needs to overwrite Figures 1 and 2. Figures 3--6 are
+already frozen manuscript assets. A previous entry point unnecessarily invoked
 the full figure builder first, which required a large row-level selective-curve
-CSV even when the frozen Figure 5 PDF/PNG already existed.  This wrapper:
+CSV even when the frozen Figure 5 PDF/PNG already existed. This wrapper:
 
 1. performs a full rebuild when all raw dependencies are available;
 2. otherwise reuses the existing frozen Figures 3--6;
@@ -18,6 +18,7 @@ No model fitting or statistical re-analysis is performed.
 from pathlib import Path
 
 import figure35_layout_fix as layout
+import figure37_workflow_final_fix as workflow
 
 
 REUSABLE_STEMS = [
@@ -62,7 +63,7 @@ def main() -> None:
             "rebuilding layout-corrected Figures 1 and 2 only."
         )
 
-    layout.rebuild_workflow_figure()
+    workflow.rebuild_workflow_figure()
     layout.rebuild_performance_figure()
     layout.refresh_manifest()
     print("Safe final manuscript figure refresh complete.")
