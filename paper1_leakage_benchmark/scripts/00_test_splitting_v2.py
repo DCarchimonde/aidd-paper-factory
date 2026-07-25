@@ -78,6 +78,13 @@ def main() -> None:
         size_b["split_size_matched_scaffold_v2"]
     )
 
+    reference_n = int(size_meta_a["actual_test_n"])
+    reference_scaffolds = sorted(
+        size_a.loc[
+            size_a["split_size_matched_scaffold_v2"].eq("test"),
+            "scaffold",
+        ].astype(str).unique().tolist()
+    )
     balanced, balanced_meta = add_searched_scaffold_split_v2(
         base,
         seed=123,
@@ -85,15 +92,19 @@ def main() -> None:
         test_size=0.25,
         n_trials=30,
         candidate_pool=10,
+        target_n_override=reference_n,
+        reference_test_scaffolds=reference_scaffolds,
     )
     assert_valid_split(
         balanced,
         "split_target_balanced_scaffold_v2",
         require_scaffold_disjoint=True,
     )
-    assert balanced_meta["actual_test_n"] == int(
+    assert balanced_meta["strict_size_lock"] is True
+    assert balanced_meta["actual_test_n"] == reference_n
+    assert int(
         balanced["split_target_balanced_scaffold_v2"].eq("test").sum()
-    )
+    ) == reference_n
 
     singleton = prepare_scaffold_frame(
         synthetic_frame(),
