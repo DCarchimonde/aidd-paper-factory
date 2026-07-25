@@ -81,6 +81,7 @@ def add_random_split_v2(
     return out, {
         "protocol": "random_observation",
         "partition_seed": int(seed),
+        "nominal_target_test_n": int(round(len(out) * test_size)),
         "target_test_n": int(round(len(out) * test_size)),
         "actual_test_n": int(len(test_idx)),
         "partition_hash": partition_hash(out, "split_random_v2"),
@@ -117,6 +118,7 @@ def add_legacy_scaffold_split_v2(
     return out, {
         "protocol": "legacy_scaffold",
         "partition_seed": None,
+        "nominal_target_test_n": target_n,
         "target_test_n": target_n,
         "actual_test_n": int(len(test_idx)),
         "size_deviation": float(
@@ -129,26 +131,46 @@ def add_legacy_scaffold_split_v2(
     }
 
 
-def _score(
+def _components(
     selected_n: int,
     selected_sum: float,
     target_n: int,
     global_mean: float,
     target_std: float,
-    objective: SplitObjective,
-) -> tuple[float, float, float]:
+) -> tuple[float, float]:
     if selected_n <= 0:
-        return float("inf"), float("inf"), float("inf")
+        return float("inf"), float("inf")
     size_component = abs(selected_n - target_n) / max(target_n, 1)
     mean_component = abs(
         (selected_sum / selected_n) - global_mean
     ) / max(target_std, 1e-12)
-    total = (
-        size_component
-        if objective == "size_only"
-        else size_component + mean_component
-    )
-    return float(total), float(size_component), float(mean_component)
+    return float(size_component), float(mean_component)
+
+
+def _candidate_key(
+    *,
+    objective: SplitObjective,
+    size_component: float,
+    mean_component: float,
+    tie_breaker: float,
+) -> tuple[float, ...]:
+    if objective == "size_only":
+        return (size_component, tie_breaker)
+    return (size_component, mean_component, tie_breaker)
+
+
+def _final_key(
+    *,
+    objective: SplitObjective,
+    within_constraints: bool,
+    size_component: float,
+    mean_component: float,
+    scaffold_key: tuple[str, ...],
+) -> tuple:
+    penalty = 0 if within_constraints else 1
+    if objective == "size_only":
+        return (penalty, size_component, scaffold_key)
+    return (penalty, size_component, mean_component, scaffold_key)
 
 
 def _search(
@@ -164,12 +186,20 @@ def _search(
     candidate_pool: int,
     min_target_ratio: float,
     max_target_ratio: float,
+    target_n_override: int | None,
 ) -> tuple[list[int], dict]:
-    target_n = int(round(n_rows * test_size))
+    nominal_target_n = int(round(n_rows * test_size))
+    target_n = (
+        int(target_n_override)
+        if target_n_override is not None
+        else nominal_target_n
+    )
+    if target_n <= 0 or target_n >= n_rows:
+        raise ValueError(f"Invalid target test size: {target_n}")
     min_n = max(1, int(np.floor(target_n * min_target_ratio)))
     max_n = max(min_n, int(np.ceil(target_n * max_target_ratio)))
     best_selected: list[int] | None = None
-    best_key: tuple[float, float, tuple[str, ...]] | None = None
+    best_key: tuple | None = None
     best_meta: dict | None = None
 
     for trial in range(n_trials):
@@ -185,23 +215,30 @@ def _search(
                 size=min(candidate_pool, len(remaining)),
                 replace=False,
             )
-            candidates: list[tuple[tuple[float, float, float], int]] = []
+            candidates: list[tuple[tuple[float, ...], int]] = []
             for raw_idx in candidate_ids:
                 idx = int(raw_idx)
                 group = groups[idx]
                 new_n = selected_n + group.n
                 if selected_n > 0 and new_n > max_n:
                     continue
-                total, size_component, _ = _score(
+                size_component, mean_component = _components(
                     new_n,
                     selected_sum + group.target_sum,
                     target_n,
                     global_mean,
                     target_std,
-                    objective,
                 )
                 candidates.append(
-                    ((total, size_component, float(rng.random()) * 1e-12), idx)
+                    (
+                        _candidate_key(
+                            objective=objective,
+                            size_component=size_component,
+                            mean_component=mean_component,
+                            tie_breaker=float(rng.random()) * 1e-12,
+                        ),
+                        idx,
+                    )
                 )
             if not candidates:
                 break
@@ -214,33 +251,53 @@ def _search(
 
         if not selected:
             continue
-        total, size_component, mean_component = _score(
+        size_component, mean_component = _components(
             selected_n,
             selected_sum,
             target_n,
             global_mean,
             target_std,
-            objective,
         )
         scaffold_key = tuple(sorted(groups[idx].scaffold for idx in selected))
-        penalty = 0.0 if min_n <= selected_n <= max_n else 1.0
-        key = (penalty + total, size_component, scaffold_key)
+        within_constraints = min_n <= selected_n <= max_n
+        key = _final_key(
+            objective=objective,
+            within_constraints=within_constraints,
+            size_component=size_component,
+            mean_component=mean_component,
+            scaffold_key=scaffold_key,
+        )
         if best_key is None or key < best_key:
             best_key = key
             best_selected = list(selected)
             best_meta = {
                 "objective": objective,
-                "objective_value": total,
+                "objective_value": (
+                    size_component
+                    if objective == "size_only"
+                    else mean_component
+                ),
                 "size_component": size_component,
                 "mean_component": mean_component,
+                "nominal_target_test_n": nominal_target_n,
                 "target_test_n": target_n,
+                "reference_test_n": (
+                    int(target_n_override)
+                    if target_n_override is not None
+                    else None
+                ),
                 "actual_test_n": selected_n,
                 "min_test_n": min_n,
                 "max_test_n": max_n,
-                "within_size_constraints": bool(min_n <= selected_n <= max_n),
+                "within_size_constraints": bool(within_constraints),
                 "n_trials": int(n_trials),
                 "candidate_pool": int(candidate_pool),
                 "partition_seed": int(seed),
+                "selection_priority": (
+                    "size_only"
+                    if objective == "size_only"
+                    else "size_then_target_mean"
+                ),
             }
 
     if best_selected is None or best_meta is None:
@@ -259,8 +316,9 @@ def add_searched_scaffold_split_v2(
     candidate_pool: int = 80,
     min_target_ratio: float = 0.95,
     max_target_ratio: float = 1.25,
+    target_n_override: int | None = None,
 ) -> tuple[pd.DataFrame, dict]:
-    """Create size-only or target-balanced splits with identical constraints."""
+    """Create audited scaffold splits with size-first selection."""
     if objective not in {"size_only", "target_balanced"}:
         raise ValueError(f"Unsupported objective: {objective}")
     out = df.copy().reset_index(drop=True)
@@ -281,6 +339,7 @@ def add_searched_scaffold_split_v2(
         candidate_pool=candidate_pool,
         min_target_ratio=min_target_ratio,
         max_target_ratio=max_target_ratio,
+        target_n_override=target_n_override,
     )
     test_idx = np.concatenate([groups[idx].indices for idx in selected])
     split_col = (
