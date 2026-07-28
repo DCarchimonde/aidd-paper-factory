@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 from rdkit import RDLogger
 
@@ -49,6 +50,8 @@ def parse_args() -> argparse.Namespace:
         choices=["single_group", "singleton"],
         default="single_group",
     )
+    parser.add_argument("--absolute-threshold", type=float, default=0.02)
+    parser.add_argument("--relative-threshold", type=float, default=0.05)
     return parser.parse_args()
 
 
@@ -111,7 +114,8 @@ def main() -> None:
                 )
                 if size_n != balanced_n:
                     raise AssertionError(
-                        f"Budget audit lost exact size matching for {dataset}, seed={seed}, budget={budget}"
+                        f"Budget audit lost exact size matching for "
+                        f"{dataset}, seed={seed}, budget={budget}"
                     )
                 rows.append(
                     {
@@ -151,17 +155,64 @@ def main() -> None:
         )
     )
 
-    suffix = f"{args.acyclic_mode}_{args.n_seeds}s"
+    convergence_rows: list[dict] = []
+    group_cols = ["dataset", "task_type", "acyclic_mode"]
+    for keys, group in summary.groupby(group_cols, sort=True):
+        ordered = group.sort_values("requested_candidates").reset_index(drop=True)
+        for index in range(len(ordered) - 1):
+            lower = ordered.iloc[index]
+            higher = ordered.iloc[index + 1]
+            lower_gap = float(lower["mean_target_balanced_target_gap"])
+            higher_gap = float(higher["mean_target_balanced_target_gap"])
+            absolute_change = abs(lower_gap - higher_gap)
+            relative_change = absolute_change / max(abs(lower_gap), 1e-12)
+            convergence_rows.append(
+                {
+                    "dataset": keys[0],
+                    "task_type": keys[1],
+                    "acyclic_mode": keys[2],
+                    "lower_budget": int(lower["requested_candidates"]),
+                    "higher_budget": int(higher["requested_candidates"]),
+                    "lower_mean_balanced_gap": lower_gap,
+                    "higher_mean_balanced_gap": higher_gap,
+                    "absolute_change": absolute_change,
+                    "relative_change": relative_change,
+                    "absolute_threshold": float(args.absolute_threshold),
+                    "relative_threshold": float(args.relative_threshold),
+                    "meets_absolute_rule": bool(
+                        absolute_change <= args.absolute_threshold + 1e-15
+                    ),
+                    "meets_relative_rule": bool(
+                        relative_change <= args.relative_threshold + 1e-15
+                    ),
+                    "meets_stopping_rule": bool(
+                        absolute_change <= args.absolute_threshold + 1e-15
+                        and relative_change <= args.relative_threshold + 1e-15
+                    ),
+                }
+            )
+    convergence = pd.DataFrame(convergence_rows)
+
+    dataset_tag = "all" if args.datasets == "all" else "-".join(datasets)
+    budget_tag = f"{min(budgets)}-{max(budgets)}"
+    suffix = (
+        f"{dataset_tag}_{args.acyclic_mode}_{args.n_seeds}s_{budget_tag}c"
+    )
     detail_path = OUT_DIR / f"candidate_budget_detail_v3_{suffix}.csv"
     summary_path = OUT_DIR / f"candidate_budget_summary_v3_{suffix}.csv"
+    convergence_path = OUT_DIR / f"candidate_budget_convergence_v3_{suffix}.csv"
     detail.to_csv(detail_path, index=False)
     summary.to_csv(summary_path, index=False)
+    convergence.to_csv(convergence_path, index=False)
 
     print("\nCandidate-budget summary:")
     print(summary.to_string(index=False))
+    print("\nAdjacent-budget convergence decisions:")
+    print(convergence.to_string(index=False))
     print("\nSaved:")
     print(detail_path)
     print(summary_path)
+    print(convergence_path)
     print("\nCANDIDATE BUDGET V3 AUDIT COMPLETED")
 
 
