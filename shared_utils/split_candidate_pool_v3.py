@@ -99,6 +99,7 @@ def generate_candidate_pool(
         "partition_seed": int(seed),
         "requested_candidates": int(n_candidates),
         "unique_candidates": int(len(candidates)),
+        "duplicate_candidate_fraction": float(1.0 - len(candidates) / n_candidates),
         "target_test_n": int(target_n),
         "candidate_generation": "random_scaffold_prefix_closest_crossing",
         "target_blind_generation": True,
@@ -162,10 +163,20 @@ def select_paired_candidates(
         )
     pool_table = pd.DataFrame(rows)
     matched_table = pool_table.loc[pool_table["eligible_same_size"]].copy()
-    best_gap = float(matched_table["abs_target_mean_gap"].min())
+    matched_gaps = matched_table["abs_target_mean_gap"].to_numpy(dtype=float)
+    best_gap = float(np.min(matched_gaps))
+    baseline_gap = float(
+        pool_table.loc[pool_table["selected_size_matched"], "abs_target_mean_gap"].iloc[0]
+    )
+    best_mask = np.isclose(matched_gaps, best_gap, rtol=0.0, atol=1e-15)
     balanced_hashes = set(
         matched_table.loc[
-            np.isclose(matched_table["abs_target_mean_gap"], best_gap, rtol=0.0, atol=1e-15),
+            np.isclose(
+                matched_table["abs_target_mean_gap"],
+                best_gap,
+                rtol=0.0,
+                atol=1e-15,
+            ),
             "candidate_hash",
         ]
     )
@@ -176,8 +187,12 @@ def select_paired_candidates(
     pool_table["selected_target_balanced"] = pool_table["candidate_hash"].eq(
         balanced_candidate.candidate_hash
     )
-    fraction_as_good_or_better = float(
-        (matched_table["abs_target_mean_gap"] <= best_gap + 1e-15).mean()
+
+    absolute_reduction = float(baseline_gap - best_gap)
+    relative_reduction = (
+        float(absolute_reduction / baseline_gap)
+        if baseline_gap > 0
+        else 0.0
     )
     meta = {
         "size_matched_n_test": int(size_candidate.n_test),
@@ -185,15 +200,29 @@ def select_paired_candidates(
         "exact_size_match": bool(size_candidate.n_test == balanced_candidate.n_test),
         "n_min_size_ties": int(len(size_ties)),
         "n_same_size_candidates": int(len(matched)),
-        "size_matched_target_gap": float(
-            pool_table.loc[pool_table["selected_size_matched"], "abs_target_mean_gap"].iloc[0]
-        ),
+        "size_matched_target_gap": baseline_gap,
         "target_balanced_target_gap": best_gap,
-        "fraction_same_size_candidates_as_good_or_better": fraction_as_good_or_better,
+        "target_gap_absolute_reduction": absolute_reduction,
+        "target_gap_relative_reduction": relative_reduction,
+        "same_size_gap_min": best_gap,
+        "same_size_gap_q05": float(np.quantile(matched_gaps, 0.05)),
+        "same_size_gap_q25": float(np.quantile(matched_gaps, 0.25)),
+        "same_size_gap_median": float(np.quantile(matched_gaps, 0.50)),
+        "same_size_gap_mean": float(np.mean(matched_gaps)),
+        "same_size_gap_q75": float(np.quantile(matched_gaps, 0.75)),
+        "same_size_gap_q95": float(np.quantile(matched_gaps, 0.95)),
+        "same_size_gap_max": float(np.max(matched_gaps)),
+        "size_baseline_empirical_cdf": float(
+            np.mean(matched_gaps <= baseline_gap + 1e-15)
+        ),
+        "n_balanced_min_ties": int(np.sum(best_mask)),
+        "balanced_min_tie_fraction": float(np.mean(best_mask)),
         "same_partition": bool(size_candidate.candidate_hash == balanced_candidate.candidate_hash),
     }
     if not meta["exact_size_match"]:
         raise AssertionError("Candidate-pool paired split lost exact size matching")
+    if meta["target_balanced_target_gap"] > meta["size_matched_target_gap"] + 1e-15:
+        raise AssertionError("Target-balanced selection is worse than its paired baseline")
     return size_candidate, balanced_candidate, pool_table, meta
 
 
