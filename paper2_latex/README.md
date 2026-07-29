@@ -49,6 +49,6 @@ Scientific conclusions are restricted to frozen confirmatory outputs. Developmen
 - Main numerical result package: integrity checks passed
 - Abstract, Introduction, Methods, Results, Discussion, and Conclusion: complete and under final language polishing
 - Figures 1--6: publication assets linked and integrity-manifested
-- Supporting Information: available in `paper2_latex/supplementary.tex`
+- Supporting evidence tables: frozen under `paper2_admet_benchmark/results/manuscript_assets/tables/`
 - Bibliography: 41 cited entries; duplicate, missing-key, metadata, and unused-entry audits passed
-- Remaining pre-submission tasks: clean recompilation, visual PDF inspection, repository archival release/persistent identifier, and journal submission packaging
+- Remaining pre-submission tasks: assemble and compile the standalone Supporting Information, clean recompilation, visual PDF inspection, repository archival release/persistent identifier, and journal submission packaging
