@@ -25,7 +25,31 @@ latexmk -C
 latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error main.tex
 ```
 
-Clean generated files when needed:
+## Supporting Information build
+
+The standalone Supporting Information is generated from frozen model-specific and manuscript-ready CSV tables:
+
+```powershell
+cd E:\AIDD_Paper_Factory
+conda activate aidd_paper
+python paper2_admet_benchmark/scripts/35_build_supporting_information.py
+
+cd paper2_latex
+latexmk -C supplementary.tex
+latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
+```
+
+The Python step writes `paper2_latex/generated_supplementary_tables.tex`. It does not fit models, rebuild splits, estimate conformal thresholds, or select results. If a required model-specific table is missing, regenerate the frozen comparison tables first:
+
+```powershell
+python paper2_admet_benchmark/scripts/27_complete_classification_conformal_comparison.py
+python paper2_admet_benchmark/scripts/29_summarize_paired_classification_effects.py
+python paper2_admet_benchmark/scripts/30_complete_regression_conformal_comparison.py
+python paper2_admet_benchmark/scripts/33_build_final_manuscript_results_package.py
+python paper2_admet_benchmark/scripts/35_build_supporting_information.py
+```
+
+Clean generated LaTeX files when needed:
 
 ```powershell
 latexmk -C
@@ -49,6 +73,7 @@ Scientific conclusions are restricted to frozen confirmatory outputs. Developmen
 - Main numerical result package: integrity checks passed
 - Abstract, Introduction, Methods, Results, Discussion, and Conclusion: complete and under final language polishing
 - Figures 1--6: publication assets linked and integrity-manifested
+- Supporting Information source and automated table builder: added
 - Supporting evidence tables: frozen under `paper2_admet_benchmark/results/manuscript_assets/tables/`
 - Bibliography: 41 cited entries; duplicate, missing-key, metadata, and unused-entry audits passed
-- Remaining pre-submission tasks: assemble and compile the standalone Supporting Information, clean recompilation, visual PDF inspection, repository archival release/persistent identifier, and journal submission packaging
+- Remaining pre-submission tasks: generate and inspect `supplementary.pdf`, create the repository archival release/persistent identifier, prepare the cover letter, and package the journal submission
