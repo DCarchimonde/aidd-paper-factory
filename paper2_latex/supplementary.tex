@@ -1,0 +1,60 @@
+\documentclass[10pt]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{pdflscape}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{xurl}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+
+\setstretch{1.15}
+\setlength{\LTpre}{0.5em}
+\setlength{\LTpost}{1.0em}
+\renewcommand{\arraystretch}{1.08}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\raggedbottom
+
+\title{Supporting Information\\[0.5em]
+\large Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift}
+\author{S. Tong and Y. Wang}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Scope and frozen evidence boundary}
+
+This Supporting Information accompanies the confirmatory ADMET reliability benchmark reported in the main manuscript. The evidence boundary is identical to that of the main analysis. Development splits and seed~99 were excluded from scientific conclusions. Random and scaffold analyses used confirmatory seeds 101--110, and similarity-cluster analyses used seeds 101--105. Model families were not treated as independent inferential replicates. Means, standard deviations, and two-sided 95\% Student-$t$ intervals were calculated across confirmatory seeds within a fixed endpoint, split, model, and classification imbalance regime. Method contrasts were paired within the same endpoint, split, seed, model, and regime.
+
+The tables below are generated directly from frozen CSV outputs. The generation step performs no model fitting, split construction, conformal threshold estimation, method selection, or additional hypothesis testing. Descriptive cross-model averages are retained only for compact headline reporting. Model-specific confidence intervals and paired effects are presented separately so that architecture-level averages are not mistaken for independent inferential replication.
+
+\section{Reproducibility and machine-readable files}
+
+From the repository root, the Supporting Information tables and PDF are generated with:
+
+\begin{verbatim}
+conda activate aidd_paper
+python paper2_admet_benchmark/scripts/35_build_supporting_information.py
+cd paper2_latex
+latexmk -C supplementary.tex
+latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
+\end{verbatim}
+
+The builder reads the frozen model-specific files in \path{paper2_admet_benchmark/results/tables/} and the integrity-checked headline package in \path{paper2_admet_benchmark/results/manuscript_assets/tables/}. The complete machine-readable outputs remain the authoritative source for all decimal precision, sparse-group warnings, and secondary metrics. In particular, high-domain ClinTox subgroup results under scaffold and similarity-cluster splitting should be treated as descriptive because positive-class support can be sparse. No sparse or adverse result was removed after inspection.
+
+\IfFileExists{generated_supplementary_tables.tex}{%
+  \input{generated_supplementary_tables.tex}
+}{%
+  \section{Generated tables not found}
+  The generated table file is absent. Run
+  \texttt{python paper2\_admet\_benchmark/scripts/35\_build\_supporting\_information.py}
+  from the repository root, then compile this document again.
+}
+
+\end{document}
