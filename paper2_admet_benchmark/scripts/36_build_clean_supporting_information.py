@@ -98,7 +98,7 @@ def polish_generated_tex(path: Path) -> None:
         "Integrity manifest for the manuscript-ready frozen result tables.",
         "Integrity manifest for the manuscript-ready frozen result tables. "
         "SHA-256 prefixes are printed for readability; full hashes are retained "
-        "in final_results_integrity_manifest.csv.",
+        "in the machine-readable integrity manifest.",
     )
 
     encoded = text.encode("utf-8")
