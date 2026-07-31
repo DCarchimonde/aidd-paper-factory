@@ -80,6 +80,17 @@ def polish_generated_tex(path: Path) -> None:
     # to inspect at normal zoom. The revised layouts support \scriptsize.
     text = text.replace(r"\tiny", r"\scriptsize")
 
+    # Constrain the selective-prediction table to the landscape text width. The
+    # previous natural-width numeric columns extended beyond the right margin and
+    # clipped the class-balance-shift column in the rendered PDF.
+    old_selective_layout = r"lllp{4.5cm}cccccc"
+    new_selective_layout = (
+        r"p{1.3cm}p{1.8cm}p{1.4cm}p{4.0cm}"
+        r"*{6}{>{\centering\arraybackslash}p{1.55cm}}"
+    )
+    selective_layout_updates = text.count(old_selective_layout)
+    text = text.replace(old_selective_layout, new_selective_layout)
+
     # Full 64-character hashes remain in final_results_integrity_manifest.csv.
     # The printed SI shows stable prefixes to avoid an unreadably compressed table.
     def shorten_hash(match: re.Match[str]) -> str:
@@ -125,11 +136,17 @@ def polish_generated_tex(path: Path) -> None:
             "SI layout normalization left section headings outside landscape "
             f"tables: {stranded}"
         )
+    if old_selective_layout in text or selective_layout_updates != 1:
+        raise RuntimeError(
+            "Selective-prediction table layout was not replaced exactly once; "
+            f"replacement count={selective_layout_updates}"
+        )
 
     path.write_text(text, encoding="utf-8", newline="\n")
     print("sanitized and polished", path)
     print("control-sequence replacements", control_counts)
     print("landscape section headings moved", moved_sections)
+    print("selective table layouts constrained", selective_layout_updates)
     print("integrity hashes shortened for print", shortened_hashes)
 
 
