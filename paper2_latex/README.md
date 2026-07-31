@@ -27,11 +27,12 @@ latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error ma
 
 ## Supporting Information build
 
-The standalone Supporting Information is generated from frozen model-specific and manuscript-ready CSV tables:
+The standalone Supporting Information is generated from frozen model-specific and manuscript-ready CSV tables. The cross-seed aggregate must be rebuilt locally first because `confirmatory_aggregate_long.csv` is a generated table rather than a permanently tracked source file:
 
 ```powershell
 cd E:\AIDD_Paper_Factory
 conda activate aidd_paper
+python paper2_admet_benchmark/scripts/26_aggregate_confirmatory_results.py --mode confirmatory_full
 python paper2_admet_benchmark/scripts/35_build_supporting_information.py
 
 cd paper2_latex
@@ -39,9 +40,13 @@ latexmk -C supplementary.tex
 latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
 ```
 
-The Python step writes `paper2_latex/generated_supplementary_tables.tex`. It does not fit models, rebuild splits, estimate conformal thresholds, or select results. If a required model-specific table is missing, regenerate the frozen comparison tables first:
+The aggregation and SI-generation steps read frozen confirmatory outputs only. They do not fit models, rebuild splits, estimate conformal thresholds, or select results. The SI builder writes `paper2_latex/generated_supplementary_tables.tex`.
+
+If another required model-specific table is missing, regenerate the frozen comparison tables and manuscript package in this order:
 
 ```powershell
+cd E:\AIDD_Paper_Factory
+python paper2_admet_benchmark/scripts/26_aggregate_confirmatory_results.py --mode confirmatory_full
 python paper2_admet_benchmark/scripts/27_complete_classification_conformal_comparison.py
 python paper2_admet_benchmark/scripts/29_summarize_paired_classification_effects.py
 python paper2_admet_benchmark/scripts/30_complete_regression_conformal_comparison.py
