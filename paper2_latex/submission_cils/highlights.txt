@@ -1,0 +1,5 @@
+• Repeated chemical splits exposed endpoint-specific reliability failures.
+• ClinTox marginal coverage masked severe positive-class undercoverage.
+• Mondrian calibration restored coverage but yielded 71% ambiguous sets.
+• Chemical similarity ranked risk inconsistently across ADMET endpoints.
+• Selective rejection could reduce error by removing minority examples.
