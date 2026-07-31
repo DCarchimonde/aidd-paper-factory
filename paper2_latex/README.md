@@ -29,18 +29,20 @@ latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error ma
 
 The standalone Supporting Information is generated only from the versioned, integrity-checked CSV files under `paper2_admet_benchmark/results/manuscript_assets/`. It does not require local model files, row-level predictions, or historical intermediate aggregation tables.
 
+Use the clean wrapper, which runs the frozen-asset builder and validates that the generated TeX contains no illegal control characters:
+
 ```powershell
 cd E:\AIDD_Paper_Factory
 git pull origin main
 conda activate aidd_paper
-python paper2_admet_benchmark/scripts/35_build_supporting_information.py
+python paper2_admet_benchmark/scripts/36_build_clean_supporting_information.py
 
 cd paper2_latex
 latexmk -C supplementary.tex
 latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
 ```
 
-The Python step writes `paper2_latex/generated_supplementary_tables.tex`. It performs no model fitting, split construction, conformal threshold estimation, result selection, or additional hypothesis testing.
+The Python step writes and sanitizes `paper2_latex/generated_supplementary_tables.tex`. It performs no model fitting, split construction, conformal threshold estimation, result selection, or additional hypothesis testing. Script 35 is the underlying table builder; script 36 is the submission-facing wrapper and should be used for final builds.
 
 Clean generated LaTeX files when needed:
 
@@ -66,6 +68,6 @@ Scientific conclusions are restricted to frozen confirmatory outputs. Developmen
 - Main numerical result package: integrity checks passed
 - Abstract, Introduction, Methods, Results, Discussion, and Conclusion: complete and under final language polishing
 - Figures 1--6: publication assets linked and integrity-manifested
-- Supporting Information source and self-contained table builder: added
+- Supporting Information source and clean self-contained table builder: added
 - Bibliography: 41 cited entries; duplicate, missing-key, metadata, and unused-entry audits passed
 - Remaining pre-submission tasks: generate and inspect `supplementary.pdf`, create the repository archival release/persistent identifier, prepare the cover letter, and package the journal submission
