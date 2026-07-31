@@ -15,9 +15,10 @@
 \setstretch{1.15}
 \setlength{\LTpre}{0.5em}
 \setlength{\LTpost}{1.0em}
-\renewcommand{\arraystretch}{1.08}
+\renewcommand{\arraystretch}{1.12}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thetable}{S\arabic{table}}
+\setlength{\emergencystretch}{2em}
 \raggedbottom
 
 \title{Supporting Information\\[0.5em]
@@ -40,20 +41,20 @@ From the repository root, the Supporting Information tables and PDF are generate
 
 \begin{verbatim}
 conda activate aidd_paper
-python paper2_admet_benchmark/scripts/35_build_supporting_information.py
+python paper2_admet_benchmark/scripts/36_build_clean_supporting_information.py
 cd paper2_latex
 latexmk -C supplementary.tex
 latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
 \end{verbatim}
 
-The builder reads only the frozen CSV files under \path{paper2_admet_benchmark/results/manuscript_assets/}. It does not require local row-level prediction files, trained model binaries, or intermediate aggregation tables. The machine-readable CSVs remain the authoritative source for full decimal precision and secondary metrics. High-domain ClinTox subgroup results under scaffold and similarity-cluster splitting should be treated as descriptive because positive-class support can be sparse. No sparse or adverse result was removed after inspection.
+The clean builder reads only the frozen CSV files under \path{paper2_admet_benchmark/results/manuscript_assets/}. It does not require local row-level prediction files, trained model binaries, or intermediate aggregation tables. Its post-processing is limited to LaTeX safety, readable display labels, landscape-page placement, and print formatting; it does not alter any numerical result. The machine-readable CSVs remain the authoritative source for full decimal precision, complete SHA-256 hashes, and secondary metrics. High-domain ClinTox subgroup results under scaffold and similarity-cluster splitting should be treated as descriptive because positive-class support can be sparse. No sparse or adverse result was removed after inspection.
 
 \IfFileExists{generated_supplementary_tables.tex}{%
   \input{generated_supplementary_tables.tex}
 }{%
   \section{Generated tables not found}
   The generated table file is absent. Run
-  \texttt{python paper2\_admet\_benchmark/scripts/35\_build\_supporting\_information.py}
+  \texttt{python paper2\_admet\_benchmark/scripts/36\_build\_clean\_supporting\_information.py}
   from the repository root, then compile this document again.
 }
 
