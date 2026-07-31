@@ -2,36 +2,36 @@ from __future__ import annotations
 
 """Build the standalone Paper 2 Supporting Information tables.
 
-The script reads only frozen confirmatory result tables. It performs no model fitting,
-threshold selection, or statistical re-analysis. Model-specific means, SDs, and 95% t
-intervals are reproduced from the already generated model-level CSV files.
+This builder reads only the small, versioned, integrity-checked manuscript asset
+CSVs. It performs no model fitting, split construction, threshold estimation, or
+statistical re-analysis. The resulting SI is therefore reproducible from a clean
+clone of the repository and does not depend on local row-level prediction files.
 """
 
 from pathlib import Path
 import math
+from typing import Iterable
+
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[2]
 PAPER_DIR = ROOT / "paper2_admet_benchmark"
-TABLE_DIR = PAPER_DIR / "results" / "tables"
-ASSET_TABLE_DIR = PAPER_DIR / "results" / "manuscript_assets" / "tables"
+ASSET_DIR = PAPER_DIR / "results" / "manuscript_assets"
+TABLE_DIR = ASSET_DIR / "tables"
 LATEX_DIR = ROOT / "paper2_latex"
 OUTPUT = LATEX_DIR / "generated_supplementary_tables.tex"
 
 
-def read_required(path: Path, required: set[str] | None = None) -> pd.DataFrame:
+def read_required(name: str) -> pd.DataFrame:
+    path = TABLE_DIR / name
     if not path.exists():
         raise FileNotFoundError(
-            f"Required frozen table is missing: {path}\n"
-            "Regenerate the frozen comparison tables before building the SI."
+            f"Required frozen manuscript table is missing: {path}\n"
+            "Run script 33 to rebuild the integrity-checked manuscript package."
         )
     frame = pd.read_csv(path, low_memory=False)
     if frame.empty:
-        raise RuntimeError(f"Required frozen table is empty: {path}")
-    if required:
-        missing = required - set(frame.columns)
-        if missing:
-            raise KeyError(f"{path.name} missing columns: {sorted(missing)}")
+        raise RuntimeError(f"Required frozen manuscript table is empty: {path}")
     return frame
 
 
@@ -54,23 +54,16 @@ def tex(value: object) -> str:
     return "".join(replacements.get(char, char) for char in text)
 
 
-def fmt(value: object, digits: int = 3) -> str:
+def fmt_number(value: object, digits: int = 3) -> str:
     try:
         number = float(value)
     except (TypeError, ValueError):
         return tex(value)
     if not math.isfinite(number):
         return "--"
-    if abs(number) < 0.0005:
+    if abs(number) < 0.5 * 10 ** (-digits):
         number = 0.0
     return f"{number:.{digits}f}"
-
-
-def ci_cell(row: pd.Series) -> str:
-    return (
-        f"{fmt(row['mean'])} "
-        f"[{fmt(row['ci95_low'])}, {fmt(row['ci95_high'])}]"
-    )
 
 
 def longtable(
@@ -79,6 +72,7 @@ def longtable(
     widths: str,
     caption: str,
     label: str,
+    *,
     landscape: bool = True,
     font_command: str = r"\scriptsize",
 ) -> str:
@@ -108,176 +102,116 @@ def longtable(
     )
     out.extend(" & ".join(row) + r" \\" for row in rows)
     out.append(r"\end{longtable}")
+    out.append(r"\normalsize")
     if landscape:
         out.append(r"\end{landscape}")
     return "\n".join(out) + "\n"
 
 
-def add_model_display(frame: pd.DataFrame) -> pd.DataFrame:
-    if "model" not in frame.columns:
-        raise KeyError("Model-specific table does not contain a model column")
-    regime_columns = [
-        column
-        for column in [
-            "imbalance_regime",
-            "training_regime",
-            "regime",
-            "class_balance_regime",
-        ]
-        if column in frame.columns
-    ]
-
-    def build(row: pd.Series) -> str:
-        pieces = [str(row["model"])]
-        for column in regime_columns:
-            value = row.get(column)
-            if pd.notna(value) and str(value).strip() and str(value).lower() != "nan":
-                pieces.append(str(value))
-        return " / ".join(pieces)
-
-    out = frame.copy()
-    out["model_display"] = out.apply(build, axis=1)
-    return out
-
-
-def ci_pivot_table(
-    frame: pd.DataFrame,
-    metrics: list[str],
-    metric_headers: list[str],
-    caption: str,
-    label: str,
-    extra_index: list[str] | None = None,
-) -> str:
-    required = {
-        "endpoint",
-        "split_type",
-        "model_display",
-        "metric",
-        "mean",
-        "ci95_low",
-        "ci95_high",
-    }
-    missing = required - set(frame.columns)
-    if missing:
-        raise KeyError(f"CI table missing columns: {sorted(missing)}")
-    extra_index = extra_index or []
-    index_columns = ["endpoint", "split_type", "model_display", *extra_index]
-    subset = frame[frame["metric"].isin(metrics)].copy()
-    if subset.empty:
-        raise RuntimeError(f"No rows found for metrics {metrics}")
-
-    rows: list[list[str]] = []
-    for keys, group in subset.groupby(index_columns, sort=True, dropna=False):
-        if not isinstance(keys, tuple):
-            keys = (keys,)
-        row = [tex(value) for value in keys]
-        for metric in metrics:
-            metric_rows = group[group["metric"] == metric]
-            if len(metric_rows) != 1:
-                raise RuntimeError(
-                    f"Expected one row for {dict(zip(index_columns, keys))}, "
-                    f"metric={metric}; found {len(metric_rows)}"
-                )
-            row.append(ci_cell(metric_rows.iloc[0]))
-        rows.append(row)
-
-    headers = [
-        "Endpoint",
-        "Split",
-        "Model / regime",
-        *[tex(column.replace("_", " ").title()) for column in extra_index],
-        *metric_headers,
-    ]
-    widths = "lll" + "l" * len(extra_index) + "p{3.0cm}" * len(metrics)
-    return longtable(rows, headers, widths, caption, label)
-
-
-def simple_table(
+def table_from_frame(
     frame: pd.DataFrame,
     columns: list[str],
     headers: list[str],
+    widths: str,
     caption: str,
     label: str,
+    *,
     digits: dict[str, int] | None = None,
+    path_columns: Iterable[str] = (),
+    landscape: bool = True,
+    font_command: str = r"\scriptsize",
 ) -> str:
-    digits = digits or {}
     missing = set(columns) - set(frame.columns)
     if missing:
-        raise KeyError(f"Simple table missing columns: {sorted(missing)}")
+        raise KeyError(f"{label} missing columns: {sorted(missing)}")
+    digits = digits or {}
+    path_columns = set(path_columns)
     rows: list[list[str]] = []
     for _, record in frame[columns].iterrows():
         row: list[str] = []
         for column in columns:
             value = record[column]
             if column in digits:
-                row.append(fmt(value, digits[column]))
-            elif pd.api.types.is_number(value):
-                row.append(fmt(value))
+                row.append(fmt_number(value, digits[column]))
+            elif column in path_columns:
+                if pd.isna(value):
+                    row.append("--")
+                else:
+                    row.append(r"\path{" + str(value) + "}")
             else:
                 row.append(tex(value))
         rows.append(row)
-    widths = "l" * min(4, len(columns)) + "p{2.5cm}" * max(0, len(columns) - 4)
-    return longtable(rows, headers, widths, caption, label)
+    return longtable(
+        rows,
+        headers,
+        widths,
+        caption,
+        label,
+        landscape=landscape,
+        font_command=font_command,
+    )
 
 
 def build_rq1_tables() -> str:
-    aggregate = add_model_display(
-        read_required(
-            TABLE_DIR / "confirmatory_aggregate_long.csv",
-            {
-                "endpoint",
-                "task_type",
-                "split_type",
-                "source_table",
-                "model",
-                "metric",
-                "mean",
-                "ci95_low",
-                "ci95_high",
-            },
-        )
-    )
-    parts = [r"\section{Model-specific predictive performance and calibration}"]
+    parts = [r"\section{Predictive performance and calibration}"]
 
-    class_perf = aggregate[
-        (aggregate["task_type"] == "classification")
-        & (aggregate["source_table"] == "baseline_test")
-    ]
+    classification = read_required("table_rq1_classification_performance.csv").sort_values(
+        ["endpoint", "split_type"]
+    )
     parts.append(
-        ci_pivot_table(
-            class_perf,
-            ["roc_auc", "pr_auc", "balanced_accuracy"],
-            ["ROC--AUC mean [95\% CI]", "PR--AUC mean [95\% CI]", "Balanced accuracy mean [95\% CI]"],
-            "Model-specific classification performance across confirmatory seeds. Cluster splits use five seeds; random and scaffold splits use ten seeds.",
+        table_from_frame(
+            classification,
+            ["endpoint", "split_type", "roc_auc", "pr_auc", "balanced_accuracy"],
+            ["Endpoint", "Split", "ROC--AUC", "PR--AUC", "Balanced accuracy"],
+            "llccc",
+            "Descriptive classification performance means across the frozen model--regime and seed cells. Model families are not inferential replicates.",
             "tab:s1_classification_performance",
+            digits={"roc_auc": 3, "pr_auc": 3, "balanced_accuracy": 3},
+            landscape=False,
         )
     )
 
-    class_cal = aggregate[
-        (aggregate["task_type"] == "classification")
-        & (aggregate["source_table"] == "calibration_test")
-    ]
+    calibration = read_required("table_rq1_classification_calibration.csv").sort_values(
+        ["endpoint", "split_type"]
+    )
     parts.append(
-        ci_pivot_table(
-            class_cal,
-            ["brier_score", "negative_log_likelihood", "ece_probability", "ece_confidence"],
-            ["Brier mean [95\% CI]", "NLL mean [95\% CI]", "Probability ECE mean [95\% CI]", "Confidence ECE mean [95\% CI]"],
-            "Model-specific classification probability and confidence calibration across confirmatory seeds.",
+        table_from_frame(
+            calibration,
+            [
+                "endpoint",
+                "split_type",
+                "brier_score",
+                "negative_log_likelihood",
+                "ece_probability",
+                "ece_confidence",
+            ],
+            ["Endpoint", "Split", "Brier", "NLL", "Probability ECE", "Confidence ECE"],
+            "llcccc",
+            "Descriptive classification calibration means across the frozen model--regime and seed cells.",
             "tab:s2_classification_calibration",
+            digits={
+                "brier_score": 3,
+                "negative_log_likelihood": 3,
+                "ece_probability": 3,
+                "ece_confidence": 3,
+            },
+            landscape=False,
         )
     )
 
-    reg_perf = aggregate[
-        (aggregate["task_type"] == "regression")
-        & (aggregate["source_table"] == "baseline_test")
-    ]
+    regression = read_required("table_rq1_regression_performance.csv").sort_values(
+        ["endpoint", "split_type"]
+    )
     parts.append(
-        ci_pivot_table(
-            reg_perf,
-            ["rmse", "mae", "r2"],
-            ["RMSE mean [95\% CI]", "MAE mean [95\% CI]", "$R^2$ mean [95\% CI]"],
-            "Model-specific regression performance across confirmatory seeds.",
+        table_from_frame(
+            regression,
+            ["endpoint", "split_type", "rmse", "mae", "r2"],
+            ["Endpoint", "Split", "RMSE", "MAE", "$R^2$"],
+            "llccc",
+            "Descriptive regression performance means across the frozen model and seed cells.",
             "tab:s3_regression_performance",
+            digits={"rmse": 3, "mae": 3, "r2": 3},
+            landscape=False,
         )
     )
     return "\n".join(parts)
@@ -285,11 +219,11 @@ def build_rq1_tables() -> str:
 
 def build_classification_conformal_tables() -> str:
     parts = [r"\section{Classification conformal prediction}"]
-    headline = read_required(
-        ASSET_TABLE_DIR / "table_rq3_rq4_classification_conformal.csv"
-    ).sort_values(["endpoint", "split_type", "method"])
+    headline = read_required("table_rq3_rq4_classification_conformal.csv").sort_values(
+        ["endpoint", "split_type", "method"]
+    )
     parts.append(
-        simple_table(
+        table_from_frame(
             headline,
             [
                 "endpoint",
@@ -308,60 +242,67 @@ def build_classification_conformal_tables() -> str:
                 "Split",
                 "Method",
                 "Coverage",
-                "Positive coverage",
-                "Negative coverage",
+                "Positive cov.",
+                "Negative cov.",
                 "Class gap",
                 "Mean set size",
                 "Empty rate",
                 "Ambiguous rate",
             ],
-            "Descriptive classification conformal summaries at $\alpha=0.10$. Values average frozen model--regime and seed cells and are not inferential replicates.",
-            "tab:s4_classification_conformal_headline",
-            {column: 3 for column in [
-                "empirical_coverage",
-                "positive_coverage",
-                "negative_coverage",
-                "class_conditional_coverage_gap",
-                "mean_prediction_set_size",
-                "empty_set_rate",
-                "ambiguous_set_rate",
-            ]},
-        )
-    )
-
-    paired = add_model_display(
-        read_required(
-            TABLE_DIR / "paired_classification_conformal_by_model_alpha01.csv",
-            {
-                "endpoint",
-                "split_type",
-                "model",
-                "comparison",
-                "metric",
-                "mean",
-                "ci95_low",
-                "ci95_high",
+            "llp{4.0cm}ccccccc",
+            "Classification conformal summaries at $\alpha=0.10$. Values are descriptive averages across frozen model--regime and seed cells.",
+            "tab:s4_classification_conformal",
+            digits={
+                "empirical_coverage": 3,
+                "positive_coverage": 3,
+                "negative_coverage": 3,
+                "class_conditional_coverage_gap": 3,
+                "mean_prediction_set_size": 3,
+                "empty_set_rate": 3,
+                "ambiguous_set_rate": 3,
             },
         )
     )
+
+    paired = read_required("table_rq3_rq4_classification_paired_effects.csv").sort_values(
+        ["endpoint", "split_type", "comparison"]
+    )
     parts.append(
-        ci_pivot_table(
+        table_from_frame(
             paired,
             [
-                "positive_coverage",
-                "class_conditional_coverage_gap",
-                "mean_prediction_set_size",
-                "ambiguous_set_rate",
+                "endpoint",
+                "split_type",
+                "comparison",
+                "mean_delta_positive_coverage",
+                "models_positive_coverage_ci_strictly_positive",
+                "mean_delta_class_conditional_coverage_gap",
+                "models_class_conditional_coverage_gap_ci_strictly_negative",
+                "mean_delta_mean_prediction_set_size",
+                "mean_delta_ambiguous_set_rate",
             ],
             [
-                "$\Delta$ positive coverage [95\% CI]",
-                "$\Delta$ class gap [95\% CI]",
-                "$\Delta$ mean set size [95\% CI]",
-                "$\Delta$ ambiguity [95\% CI]",
+                "Endpoint",
+                "Split",
+                "Comparison",
+                "$\Delta$ positive cov.",
+                "Model CIs $>0$",
+                "$\Delta$ class gap",
+                "Model CIs $<0$",
+                "$\Delta$ mean set size",
+                "$\Delta$ ambiguity",
             ],
-            "Model-specific paired classification conformal effects. Deltas are treatment minus marginal conformal prediction on matched endpoint, split, seed, model, and regime cells.",
+            "llp{4.2cm}cccccc",
+            "Paired classification conformal effects. Deltas are treatment minus marginal conformal prediction on matched cells. CI-count columns report how many of the eight frozen model--regime cross-seed 95\% intervals exclude zero in the stated direction.",
             "tab:s5_classification_paired",
-            ["comparison"],
+            digits={
+                "mean_delta_positive_coverage": 3,
+                "models_positive_coverage_ci_strictly_positive": 0,
+                "mean_delta_class_conditional_coverage_gap": 3,
+                "models_class_conditional_coverage_gap_ci_strictly_negative": 0,
+                "mean_delta_mean_prediction_set_size": 3,
+                "mean_delta_ambiguous_set_rate": 3,
+            },
         )
     )
     return "\n".join(parts)
@@ -369,82 +310,94 @@ def build_classification_conformal_tables() -> str:
 
 def build_regression_conformal_tables() -> str:
     parts = [r"\section{Regression conformal prediction}"]
-    by_model = add_model_display(
-        read_required(
-            TABLE_DIR / "regression_conformal_by_model_alpha01.csv",
-            {
-                "endpoint",
-                "split_type",
-                "model",
-                "method",
-                "metric",
-                "mean",
-                "ci95_low",
-                "ci95_high",
-            },
-        )
+    headline = read_required("table_rq4_regression_conformal.csv").sort_values(
+        ["endpoint", "split_type", "method"]
     )
     parts.append(
-        ci_pivot_table(
-            by_model,
+        table_from_frame(
+            headline,
             [
+                "endpoint",
+                "split_type",
+                "method",
                 "empirical_coverage",
                 "absolute_coverage_gap",
                 "mean_interval_width",
+                "interval_width_cv",
                 "width_error_spearman",
             ],
             [
-                "Coverage mean [95\% CI]",
-                "Absolute gap mean [95\% CI]",
-                "Mean width [95\% CI]",
-                "Width--error $\rho$ [95\% CI]",
+                "Endpoint",
+                "Split",
+                "Method",
+                "Coverage",
+                "Absolute gap",
+                "Mean width",
+                "Width CV",
+                "Width--error $\rho$",
             ],
-            "Model-specific regression conformal summaries at $\alpha=0.10$. Width--error association is undefined for constant-width marginal intervals.",
+            "llp{5.0cm}ccccc",
+            "Regression conformal summaries at $\alpha=0.10$. Width--error association is undefined for constant-width marginal intervals.",
             "tab:s6_regression_conformal",
-            ["method"],
-        )
-    )
-
-    paired = add_model_display(
-        read_required(
-            TABLE_DIR / "paired_regression_conformal_by_model_alpha01.csv",
-            {
-                "endpoint",
-                "split_type",
-                "model",
-                "comparison",
-                "metric",
-                "mean",
-                "ci95_low",
-                "ci95_high",
+            digits={
+                "empirical_coverage": 3,
+                "absolute_coverage_gap": 3,
+                "mean_interval_width": 3,
+                "interval_width_cv": 3,
+                "width_error_spearman": 3,
             },
         )
     )
+
+    paired = read_required("table_rq4_regression_paired_effects.csv").sort_values(
+        ["endpoint", "split_type", "comparison"]
+    )
     parts.append(
-        ci_pivot_table(
+        table_from_frame(
             paired,
-            ["empirical_coverage", "absolute_coverage_gap", "mean_interval_width"],
             [
-                "$\Delta$ coverage [95\% CI]",
-                "$\Delta$ absolute gap [95\% CI]",
-                "$\Delta$ mean width [95\% CI]",
+                "endpoint",
+                "split_type",
+                "comparison",
+                "mean_delta_empirical_coverage",
+                "mean_delta_absolute_coverage_gap",
+                "models_absolute_coverage_gap_ci_strictly_negative",
+                "mean_delta_mean_interval_width",
+                "models_mean_interval_width_ci_strictly_positive",
             ],
-            "Model-specific paired regression conformal effects. Deltas are treatment minus marginal intervals on matched endpoint, split, seed, and model cells.",
+            [
+                "Endpoint",
+                "Split",
+                "Comparison",
+                "$\Delta$ coverage",
+                "$\Delta$ absolute gap",
+                "Model CIs gap $<0$",
+                "$\Delta$ mean width",
+                "Model CIs width $>0$",
+            ],
+            "llp{4.2cm}ccccc",
+            "Paired regression conformal effects. Deltas are treatment minus marginal intervals on matched endpoint, split, seed, and model cells; CI counts are out of four frozen regressors.",
             "tab:s7_regression_paired",
-            ["comparison"],
+            digits={
+                "mean_delta_empirical_coverage": 3,
+                "mean_delta_absolute_coverage_gap": 3,
+                "models_absolute_coverage_gap_ci_strictly_negative": 0,
+                "mean_delta_mean_interval_width": 3,
+                "models_mean_interval_width_ci_strictly_positive": 0,
+            },
         )
     )
     return "\n".join(parts)
 
 
-def build_domain_and_selective_tables() -> str:
-    parts = [r"\section{Applicability-domain and selective-prediction sensitivity analyses}"]
-    ad = read_required(ASSET_TABLE_DIR / "table_rq2_ad_continuous.csv").sort_values(
+def build_domain_tables() -> str:
+    parts = [r"\section{Applicability-domain sensitivity analyses}"]
+    continuous = read_required("table_rq2_ad_continuous.csv").sort_values(
         ["endpoint", "split_type"]
     )
     parts.append(
-        simple_table(
-            ad,
+        table_from_frame(
+            continuous,
             [
                 "endpoint",
                 "split_type",
@@ -462,25 +415,28 @@ def build_domain_and_selective_tables() -> str:
                 "Miscoverage--similarity $\rho$",
                 "Risk OOD AUC",
                 "Miscoverage OOD AUC",
-                "Models with risk CI $<0$",
-                "Models with miscoverage CI $<0$",
+                "Model CIs risk $<0$",
+                "Model CIs miscov. $<0$",
             ],
-            "Continuous applicability-domain diagnostics. Blank risk OOD AUC cells for regression reflect the prespecified output definition rather than missing runs.",
+            "llcccccc",
+            "Continuous applicability-domain diagnostics. Blank regression risk-OOD AUC cells reflect the prespecified output definition rather than missing runs.",
             "tab:s8_ad_continuous",
-            {column: 3 for column in [
-                "mean_risk_similarity_spearman",
-                "mean_miscoverage_similarity_spearman",
-                "mean_risk_ood_auc",
-                "mean_miscoverage_ood_auc",
-            ]},
+            digits={
+                "mean_risk_similarity_spearman": 3,
+                "mean_miscoverage_similarity_spearman": 3,
+                "mean_risk_ood_auc": 3,
+                "mean_miscoverage_ood_auc": 3,
+                "models_risk_spearman_ci_strictly_negative": 0,
+                "models_miscoverage_spearman_ci_strictly_negative": 0,
+            },
         )
     )
 
-    quartiles = read_required(
-        ASSET_TABLE_DIR / "table_rq2_ad_similarity_quartiles.csv"
-    ).sort_values(["endpoint", "split_type", "similarity_quartile"])
+    quartiles = read_required("table_rq2_ad_similarity_quartiles.csv").sort_values(
+        ["endpoint", "split_type", "similarity_quartile"]
+    )
     parts.append(
-        simple_table(
+        table_from_frame(
             quartiles,
             [
                 "endpoint",
@@ -502,75 +458,133 @@ def build_domain_and_selective_tables() -> str:
                 "Mean miscoverage",
                 "Unseen-scaffold rate",
             ],
+            "llcccccc",
             "Similarity-quartile sensitivity analysis. Quartile 1 is the lowest-similarity group and quartile 4 the highest-similarity group.",
             "tab:s9_ad_quartiles",
-            {column: 3 for column in [
-                "mean_similarity",
-                "mean_risk",
-                "mean_miscoverage",
-                "mean_unseen_scaffold_rate",
-            ]},
+            digits={
+                "similarity_quartile": 0,
+                "model_seed_cells": 0,
+                "mean_similarity": 3,
+                "mean_risk": 3,
+                "mean_miscoverage": 3,
+                "mean_unseen_scaffold_rate": 3,
+            },
         )
     )
 
-    selective = read_required(
-        ASSET_TABLE_DIR / "table_rq2_rq3_selective_prediction.csv"
-    ).sort_values(["endpoint", "split_type", "uncertainty_measure"])
+    thresholds = read_required("table_rq2_ad_threshold_sensitivity.csv").sort_values(
+        ["endpoint", "split_type", "threshold"]
+    )
     parts.append(
-        simple_table(
-            selective,
+        table_from_frame(
+            thresholds,
             [
                 "endpoint",
-                "task_type",
                 "split_type",
-                "uncertainty_measure",
-                "primary_paurc_improvement_vs_random",
-                "risk_improvement_at_05",
-                "balanced_paurc_improvement_vs_random",
-                "positive_retention_at_05",
-                "negative_retention_at_05",
-                "class_balance_shift_at_05",
+                "threshold",
+                "valid_two_group_cells",
+                "mean_low_fraction",
+                "mean_delta_risk_low_minus_high",
+                "mean_delta_miscoverage_low_minus_high",
+                "models_risk_delta_ci_strictly_positive",
+                "models_miscoverage_delta_ci_strictly_positive",
             ],
             [
                 "Endpoint",
-                "Task",
                 "Split",
-                "Rejection score",
-                "Primary pAURC improvement",
-                "Risk improvement at 0.50",
-                "Balanced pAURC improvement",
-                "Positive retention at 0.50",
-                "Negative retention at 0.50",
-                "Class-balance shift at 0.50",
+                "Threshold",
+                "Valid cells",
+                "Low-domain fraction",
+                "$\Delta$ risk low--high",
+                "$\Delta$ miscov. low--high",
+                "Model CIs risk $>0$",
+                "Model CIs miscov. $>0$",
             ],
-            "Selective-prediction summaries against matched random rejection. Blank class-specific cells are not applicable to regression.",
-            "tab:s10_selective",
-            {column: 3 for column in [
-                "primary_paurc_improvement_vs_random",
-                "risk_improvement_at_05",
-                "balanced_paurc_improvement_vs_random",
-                "positive_retention_at_05",
-                "negative_retention_at_05",
-                "class_balance_shift_at_05",
-            ]},
+            "llccccccc",
+            "Threshold sensitivity for low-domain minus high-domain risk and miscoverage. Threshold partitions are sensitivity analyses, not universal applicability-domain definitions.",
+            "tab:s10_ad_thresholds",
+            digits={
+                "threshold": 2,
+                "valid_two_group_cells": 0,
+                "mean_low_fraction": 3,
+                "mean_delta_risk_low_minus_high": 3,
+                "mean_delta_miscoverage_low_minus_high": 3,
+                "models_risk_delta_ci_strictly_positive": 0,
+                "models_miscoverage_delta_ci_strictly_positive": 0,
+            },
+            font_command=r"\tiny",
         )
     )
     return "\n".join(parts)
 
 
+def build_selective_table() -> str:
+    selective = read_required("table_rq2_rq3_selective_prediction.csv").sort_values(
+        ["endpoint", "split_type", "uncertainty_measure"]
+    )
+    return "\n".join(
+        [
+            r"\section{Selective prediction}",
+            table_from_frame(
+                selective,
+                [
+                    "endpoint",
+                    "task_type",
+                    "split_type",
+                    "uncertainty_measure",
+                    "primary_paurc_improvement_vs_random",
+                    "risk_improvement_at_05",
+                    "balanced_paurc_improvement_vs_random",
+                    "positive_retention_at_05",
+                    "negative_retention_at_05",
+                    "class_balance_shift_at_05",
+                ],
+                [
+                    "Endpoint",
+                    "Task",
+                    "Split",
+                    "Rejection score",
+                    "Primary pAURC impr.",
+                    "Risk impr. at 0.50",
+                    "Balanced pAURC impr.",
+                    "Positive retention",
+                    "Negative retention",
+                    "Class-balance shift",
+                ],
+                "lllp{4.5cm}cccccc",
+                "Selective-prediction summaries against matched random rejection. Blank class-specific cells are not applicable to regression.",
+                "tab:s11_selective",
+                digits={
+                    "primary_paurc_improvement_vs_random": 3,
+                    "risk_improvement_at_05": 3,
+                    "balanced_paurc_improvement_vs_random": 3,
+                    "positive_retention_at_05": 3,
+                    "negative_retention_at_05": 3,
+                    "class_balance_shift_at_05": 3,
+                },
+            ),
+        ]
+    )
+
+
 def build_integrity_table() -> str:
-    manifest = read_required(
-        PAPER_DIR / "results" / "manuscript_assets" / "final_results_integrity_manifest.csv"
-    ).sort_values("file")
+    path = ASSET_DIR / "final_results_integrity_manifest.csv"
+    if not path.exists():
+        raise FileNotFoundError(f"Required integrity manifest is missing: {path}")
+    manifest = pd.read_csv(path).sort_values("file")
     return "\n".join(
         [
             r"\section{Frozen-result integrity manifest}",
-            simple_table(
+            table_from_frame(
                 manifest,
                 ["file", "rows", "expected_rows", "row_count_valid", "sha256"],
                 ["File", "Rows", "Expected", "Valid", "SHA-256"],
+                "p{8.0cm}cccp{10.0cm}",
                 "Integrity manifest for the manuscript-ready frozen result tables.",
-                "tab:s11_integrity",
+                "tab:s12_integrity",
+                digits={"rows": 0, "expected_rows": 0},
+                path_columns={"file", "sha256"},
+                font_command=r"\tiny",
             ),
         ]
     )
@@ -580,16 +594,17 @@ def main() -> None:
     LATEX_DIR.mkdir(parents=True, exist_ok=True)
     sections = [
         "% AUTO-GENERATED by paper2_admet_benchmark/scripts/35_build_supporting_information.py",
-        "% Do not edit this file manually; edit the builder or frozen source tables.",
+        "% Source boundary: versioned integrity-checked manuscript asset CSVs only.",
         build_rq1_tables(),
         build_classification_conformal_tables(),
         build_regression_conformal_tables(),
-        build_domain_and_selective_tables(),
+        build_domain_tables(),
+        build_selective_table(),
         build_integrity_table(),
     ]
     OUTPUT.write_text("\n\n".join(sections) + "\n", encoding="utf-8")
     print("saved", OUTPUT)
-    print("Supporting Information table generation complete.")
+    print("Supporting Information table generation complete from frozen manuscript assets.")
 
 
 if __name__ == "__main__":
