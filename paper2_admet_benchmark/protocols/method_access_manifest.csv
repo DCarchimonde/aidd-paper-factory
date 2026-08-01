@@ -1,0 +1,15 @@
+method,scope,estimand,dev_labels,policy_labels,conf_labels,test_covariates,target_covariates,test_labels,access_class,primary_rankable,status_note
+ECFP_marginal_LAC,all_primary,marginal_set_coverage,yes,no,yes,yes,no,no,inductive,yes,core
+ECFP_Mondrian_LAC,all_primary,class_conditional_set_coverage,yes,no,yes,yes,no,no,inductive,yes,core
+heterogeneous_Mondrian,all_primary,class_conditional_set_coverage,yes,no,yes,yes,no,no,inductive,yes,core
+stacking_Mondrian,all_primary,class_conditional_set_coverage,yes,no,yes,yes,no,no,inductive,yes,core_reference
+unrestricted_reliability_stacking_Mondrian,all_primary,class_conditional_set_coverage,yes,no,yes,yes,no,no,inductive,yes,core
+RACER_score_no_gate,all_primary,class_conditional_set_coverage,yes,no,yes,yes,no,no,inductive,yes,ablation
+stacking_RACER_gate_selected_Mondrian,all_primary,selected_class_conditional_set_coverage,yes,yes,yes,yes,no,no,inductive,yes,ablation
+full_RACER_C,all_primary,selected_class_conditional_set_coverage_and_CSY,yes,yes,yes,yes,no,no,inductive,yes,candidate_method
+RCP_class_conditional,all_primary,approximate_conditional_plus_marginal_set_coverage,yes,no,yes,yes,no,no,inductive,yes,implementation_requires_estimand_mapping
+InfoSP,anchors,false_coverage_rate_on_batch_selected_sets,yes,no,yes,yes,yes,no,batch_inductive,no,separate_anchor_table
+InfoSCOP,anchors,false_coverage_rate_on_batch_selected_sets,yes,no,yes,yes,yes,no,batch_transductive,no,separate_anchor_table
+SCRC_I,anchors,PAC_style_selected_risk_and_coverage,yes,no,yes,yes,no,no,inductive_PAC,no,separate_anchor_table
+SCRC_T,anchors,exact_transductive_selected_risk_and_coverage,yes,no,yes,yes,yes,no,transductive,no,separate_anchor_table
+SCoRE,anchors,bounded_risk_among_selected_cases,yes,no,yes,yes,conditional,no,selected_risk,no,preprint_and_access_mapping_required
