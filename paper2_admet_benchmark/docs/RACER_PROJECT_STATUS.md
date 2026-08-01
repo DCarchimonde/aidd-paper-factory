@@ -24,7 +24,7 @@ The protocol is explicitly **not frozen**.
 
 - `a620ad6` Fix Paper 2 bibliography audit inputs.
 - `5cdced5` Add Paper 2 RACER pre-freeze protocol audit.
-- Project-status checkpoint: this follow-up commit.
+- `2a8d49a` Record Paper 2 extension Phase 0 status.
 
 ## Artifacts
 
@@ -41,7 +41,8 @@ The protocol is explicitly **not frozen**.
 ## Quality gates
 
 - Existing Python scripts compile: PASS (non-fatal warnings documented).
-- Existing bibliography audit: repaired; rerun pending in this status snapshot.
+- Existing bibliography audit: PASS (42 cited keys, no missing or duplicate keys,
+  34 cited references from 2021--2026).
 - Existing frozen asset integrity: PASS (CRLF-aware for historical table hashes).
 - New protocol-contract tests: PASS.
 - Formal endpoint freeze: BLOCKED.
@@ -69,9 +70,9 @@ The protocol is explicitly **not frozen**.
 
 ## Next automatic action
 
-Implement protocol-contract and integrity tests, run all non-expensive gates,
-commit and push the branch, then begin deterministic endpoint acquisition/cleaning
-preparation without generating extension model predictions.
+Begin deterministic endpoint acquisition/cleaning preparation: lock source
+identifiers and original license records, add hash/rejection logging, and implement
+pre-model role-feasibility inputs without generating extension model predictions.
 
 ## Protocol deviations
 
