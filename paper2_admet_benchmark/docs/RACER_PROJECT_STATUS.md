@@ -22,7 +22,9 @@ The protocol is explicitly **not frozen**.
 
 ## Commits
 
-Pending the Phase 0 quality-gate commit.
+- `a620ad6` Fix Paper 2 bibliography audit inputs.
+- `5cdced5` Add Paper 2 RACER pre-freeze protocol audit.
+- Project-status checkpoint: this follow-up commit.
 
 ## Artifacts
 
