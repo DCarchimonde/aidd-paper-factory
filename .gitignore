@@ -75,3 +75,4 @@ paper2_admet_benchmark/results/applicability/applicability_details_*.csv
 *.synctex.gz
 paper1_latex/main.pdf
 paper2_admet_benchmark/manuscript/main.pdf
+paper2_latex/generated_supplementary_tables.tex
