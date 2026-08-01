@@ -49,6 +49,18 @@ class ProtocolContractTests(unittest.TestCase):
         self.assertTrue(any(row["access_class"] == "transductive" for row in rows))
         self.assertTrue(any(row["primary_rankable"] == "yes" for row in rows))
 
+    def test_phase1_contracts_are_present_and_pre_freeze(self) -> None:
+        provenance = P2 / "protocols/data_provenance_license_manifest.csv"
+        standardization = P2 / "protocols/chemical_standardization_contract.yaml"
+        runbook = P2 / "protocols/data_acquisition_and_cleaning_runbook.md"
+        self.assertTrue(provenance.is_file())
+        self.assertIn("status: draft_pre_freeze", standardization.read_text(encoding="utf-8"))
+        self.assertIn("creates no model predictions", runbook.read_text(encoding="utf-8"))
+        with provenance.open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 17)
+        self.assertTrue(any(row["analysis_use_status"] == "pending_original_terms" for row in rows))
+
     def test_frozen_headline_tables_match_integrity_manifest(self) -> None:
         asset_root = P2 / "results/manuscript_assets"
         manifest = asset_root / "final_results_integrity_manifest.csv"

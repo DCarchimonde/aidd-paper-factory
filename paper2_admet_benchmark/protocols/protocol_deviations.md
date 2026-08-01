@@ -11,6 +11,11 @@ not post-outcome deviations.
 | 2026-08-01 | Phase 0 | Select one global `T_max` from a development-only grid including 1.0 | fixed 2.0 lacked justification; including no rectification prevents forced benefit | no extension predictions generated |
 | 2026-08-01 | Phase 0 | Move InfoSP/InfoSCOP, SCRC, and SCoRE to access-matched anchor analyses | their estimands/access regimes are not interchangeable with inductive Mondrian CP | no extension predictions generated |
 | 2026-08-01 | Phase 0 | Treat ClinTox as a likely calibration-limited failure-mode anchor | approximately 93 positives cannot support the proposed four-role selected CP hierarchy | only old frozen baseline outcomes known |
+| 2026-08-02 | Phase 1 | Treat `Dataset License: Not Specified` as a Freeze-1 blocker | TDC code licensing and individual dataset licensing are distinct; availability is not permission | no extension predictions generated |
+| 2026-08-02 | Phase 1 | Use RDKit 2026.03.4 classification standardization candidate with explicit conflict exclusion | create deterministic hashes and prevent majority vote from erasing label conflicts | no extension predictions generated |
+| 2026-08-02 | Phase 1 | Replace label-aware scaffold/cluster allocation with size-only label-blind allocation | the prototype violated the chemical-shift access contract | no extension predictions generated; earlier feasibility output discarded |
+| 2026-08-02 | Phase 1 | Use one deterministic 0.60-similarity leader partition per endpoint | separate group construction from role-allocation seeds and include the 12k--13k CYP endpoints under a frozen 15k cap | no extension predictions generated |
+| 2026-08-02 | Phase 1 | Add a study-level source/mechanism breadth gate | three endpoints from one Veith qHTS campaign cannot support an ADMET-wide pooled claim | no extension predictions generated |
 
 Post-freeze entries MUST include affected files, commits, seeds/endpoints, whether
 labels or results had been inspected, scientific impact, and user approval where

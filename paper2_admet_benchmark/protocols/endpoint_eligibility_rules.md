@@ -42,6 +42,15 @@ All conditions must hold for every main split seed:
 These are minimum gates, not proof of statistical power. Grouped allocation and
 simulation can still downgrade a numerically large endpoint.
 
+## Study-level breadth gate
+
+Endpoint-equal weighting does not make several endpoints from one assay campaign
+independent scientific domains. If all primary-eligible endpoints come from one
+source family (for example, the Veith CYP qHTS panel), the confirmatory claim and
+title must be restricted to that family. An ADMET-wide pooled superiority claim
+requires primary endpoints spanning multiple pharmacokinetic/toxicity mechanisms
+and source families. No numerical result may be used to add a family after freeze.
+
 ## Secondary and calibration-limited
 
 - `secondary`: scientifically valid and structurally feasible, with adequate

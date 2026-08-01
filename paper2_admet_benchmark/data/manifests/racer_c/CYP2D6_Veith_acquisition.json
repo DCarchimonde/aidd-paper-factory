@@ -1,0 +1,14 @@
+{
+  "access_layer": "TDC",
+  "distribution_identifier": "doi:10.7910/DVN/21LKWG",
+  "endpoint": "CYP2D6_Veith",
+  "license_evidence_url": "https://tdcommons.ai/single_pred_tasks/adme/",
+  "loader_identifier": "ADME:CYP2D6_Veith",
+  "raw_byte_sha256": "1b50a2f02a6d9c02d29fd9e3684d661f64bfe8afb1fea09e5ffb3d54174c411b",
+  "retrieved_at_utc": "2026-08-01T18:27:53+00:00",
+  "source_bytes": 799509,
+  "source_code_commit": "c310c35f27e3f506411018ac43d97b8ba23ca652",
+  "source_file_id": "4259580",
+  "source_license_statement": "CC BY 4.0",
+  "source_url": "https://dataverse.harvard.edu/api/access/datafile/4259580"
+}

@@ -9,6 +9,15 @@ outer_role_candidates:
 preferred_pending_audit: {dev: 0.50, policy: 0.10, conformal: 0.20, test: 0.20}
 
 tracks: [random_grouped, strict_scaffold, similarity_cluster]
+similarity_cluster:
+  algorithm: deterministic_ordered_leader_clustering
+  fingerprint: {kind: Morgan, radius: 2, n_bits: 2048, chirality: false}
+  similarity: Tanimoto
+  join_threshold_inclusive: 0.60
+  order_seed: 1701
+  order_key: sha256_order_seed_and_structure_id
+  max_endpoint_n: 15000
+  assignment_uses_labels: false
 main_split_seeds: [101, 102, 103, 104, 105]
 anchor_extra_split_seeds: [106, 107, 108, 109, 110]
 development_meta_folds: 3
@@ -26,6 +35,7 @@ attenuation:
   selection_scope: global_development_only
 gate:
   threshold_grid: [0.50, 0.60, 0.70, 0.80, 0.90, 1.00]
+  minimum_planned_retention: 0.50
   selected_calibration_minimum_per_class: 35
 conformal:
   alpha_primary: 0.10

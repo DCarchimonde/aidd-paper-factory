@@ -1,0 +1,22 @@
+{
+  "algorithm": "deterministic_ordered_leader_clustering",
+  "assignment_uses_labels": false,
+  "cleaned_byte_sha256": "3a075325f82b1445db721d755438e757840c22bbe06e760f35e3bf6eba6ef5a0",
+  "clustering_script_byte_sha256": "03b6f523ddfb731cbcad47aea4868c659a20d90fb1802725c3d71ec64d4f83e0",
+  "elapsed_seconds_development_audit": 10.846751,
+  "endpoint": "CYP2D6_Veith",
+  "fingerprint": "Morgan_radius2_2048bits_no_chirality",
+  "join_threshold_inclusive": 0.6,
+  "max_cluster_size": 43,
+  "max_endpoint_n": 15000,
+  "median_cluster_size": 1,
+  "n_clusters": 8892,
+  "n_structures": 13083,
+  "order_key": "sha256(order_seed|structure_id)",
+  "order_seed": 1701,
+  "rdkit_version": "2026.03.4",
+  "role_input_with_clusters_byte_sha256": "f4d47c2918ae9ec2e27d03982c5ef1e52fd25621bbd54b90f7668bd07fd94b86",
+  "similarity": "Tanimoto",
+  "singleton_clusters": 7131,
+  "tie_rule": "earliest_leader_in_deterministic_order"
+}
