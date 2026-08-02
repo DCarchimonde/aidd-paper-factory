@@ -1,0 +1,16 @@
+{
+  "access_layer": "NCATS_Tox21_2014",
+  "analysis_use_status": "allowed_analysis_no_redistribution",
+  "assay_property": "NR-Aromatase",
+  "endpoint": "Tox21_NR_Aromatase",
+  "label_semantics": "1=active; 0=inactive; absent property=unavailable",
+  "redistribution_status": "no_raw_redistribution_claimed",
+  "retrieved_at_utc": "2026-08-02T16:43:20.099640+00:00",
+  "source_archive_bytes": 2627177,
+  "source_archive_sha256": "024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b",
+  "source_member": "tox21_10k_data_all.sdf",
+  "source_member_bytes": 24728393,
+  "source_member_sha256": "d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206",
+  "source_rows": 11764,
+  "source_url": "https://tripod.nih.gov/tox21/challenge/download?id=tox21_10k_data_allsdf&sec="
+}

@@ -247,6 +247,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--input-dir", type=Path, default=DEFAULT_INPUT_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument(
+        "--endpoints",
+        default="",
+        help="optional comma-separated endpoint allowlist for staged preflight audits",
+    )
     return parser.parse_args()
 
 
@@ -254,6 +259,15 @@ def main() -> int:
     args = parse_args()
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
     input_paths = sorted(args.input_dir.glob("*_role_input.csv"))
+    requested = {value.strip() for value in args.endpoints.split(",") if value.strip()}
+    if requested:
+        by_endpoint = {
+            path.name.removesuffix("_role_input.csv"): path for path in input_paths
+        }
+        missing = requested - set(by_endpoint)
+        if missing:
+            raise FileNotFoundError(f"missing requested role inputs: {sorted(missing)}")
+        input_paths = [by_endpoint[endpoint] for endpoint in sorted(requested)]
     if not input_paths:
         raise FileNotFoundError(
             f"no role inputs under {args.input_dir}; acquire, clean, and hash data first"

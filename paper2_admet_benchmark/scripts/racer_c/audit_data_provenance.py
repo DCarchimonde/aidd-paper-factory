@@ -24,6 +24,7 @@ DEFAULT_OUTPUT = P2 / "results" / "racer_c_preflight" / "data_provenance_audit.c
 
 ALLOWED_ANALYSIS_STATUSES = {
     "allowed_with_attribution",
+    "allowed_analysis_no_redistribution",
     "legacy_secondary_only",
     "pending_original_terms",
 }
@@ -66,6 +67,7 @@ def audit_rows(
     provenance = list(provenance_rows)
     candidates = list(candidate_rows)
     candidate_names = {row["endpoint"] for row in candidates}
+    candidate_by_name = {row["endpoint"]: row for row in candidates}
     observed_names = [row.get("endpoint", "") for row in provenance]
     if len(observed_names) != len(set(observed_names)):
         raise ValueError("duplicate endpoints in provenance manifest")
@@ -93,10 +95,22 @@ def audit_rows(
             issues.append("allowed_without_explicit_license")
         if status == "allowed_with_attribution" and row.get("redistribution_status") != "yes_with_attribution":
             issues.append("license_redistribution_mismatch")
+        if status == "allowed_analysis_no_redistribution":
+            if "analysis" not in license_statement.lower() and "model" not in license_statement.lower():
+                issues.append("analysis_permission_not_documented")
+            if row.get("redistribution_status") not in {"no", "no_raw_redistribution_claimed"}:
+                issues.append("analysis_only_redistribution_mismatch")
 
-        license_ready = status in {"allowed_with_attribution", "legacy_secondary_only"}
+        license_ready = status in {
+            "allowed_with_attribution",
+            "allowed_analysis_no_redistribution",
+            "legacy_secondary_only",
+        }
         acquisition_ready = raw_hash != "pending"
-        extension_candidate = status == "allowed_with_attribution"
+        extension_candidate = status in {
+            "allowed_with_attribution",
+            "allowed_analysis_no_redistribution",
+        }
         freeze_ready = extension_candidate and acquisition_ready and not issues
         blockers: list[str] = []
         if not license_ready:
@@ -110,6 +124,8 @@ def audit_rows(
             {
                 "endpoint": endpoint,
                 "task_type": row.get("task_type", ""),
+                "candidate_status": candidate_by_name[endpoint].get("candidate_status", ""),
+                "eligibility_status": candidate_by_name[endpoint].get("eligibility_status", ""),
                 "analysis_use_status": status,
                 "license_ready": str(license_ready).lower(),
                 "raw_hash_ready": str(acquisition_ready).lower(),
@@ -155,8 +171,14 @@ def main() -> int:
     print(f"manifest byte sha256: {sha256_file(args.provenance)}")
     print(f"manifest canonical sha256: {canonical_csv_sha256(args.provenance)}")
     print(f"wrote: {args.output}")
-    if args.require_freeze_ready and ready != len(rows):
-        return 2
+    if args.require_freeze_ready:
+        required = [
+            row
+            for row in rows
+            if row["candidate_status"] == "freeze1_primary_candidate"
+        ]
+        if not required or any(row["freeze1_ready"] != "true" for row in required):
+            return 2
     return 0
 
 

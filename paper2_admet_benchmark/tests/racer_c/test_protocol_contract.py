@@ -58,7 +58,7 @@ class ProtocolContractTests(unittest.TestCase):
         self.assertIn("creates no model predictions", runbook.read_text(encoding="utf-8"))
         with provenance.open(newline="", encoding="utf-8") as handle:
             rows = list(csv.DictReader(handle))
-        self.assertEqual(len(rows), 17)
+        self.assertEqual(len(rows), 29)
         self.assertTrue(any(row["analysis_use_status"] == "pending_original_terms" for row in rows))
 
     def test_frozen_headline_tables_match_integrity_manifest(self) -> None:

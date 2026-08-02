@@ -57,13 +57,16 @@ class Phase1ProvenanceTests(unittest.TestCase):
             PROVENANCE.read_csv(provenance_path),
             PROVENANCE.read_csv(candidate_path),
         )
-        self.assertEqual(len(rows), 17)
+        self.assertEqual(len(rows), 29)
         by_endpoint = {row["endpoint"]: row for row in rows}
         self.assertIn("original_terms_unresolved", by_endpoint["HIA_Hou"]["blockers"])
         self.assertEqual(by_endpoint["CYP2C9_Veith"]["raw_hash_ready"], "true")
         self.assertEqual(by_endpoint["CYP2C9_Veith"]["freeze1_ready"], "true")
         self.assertEqual(by_endpoint["CYP2C9_Veith"]["license_ready"], "true")
         self.assertEqual(by_endpoint["AMES"]["license_ready"], "false")
+        self.assertEqual(by_endpoint["Tox21_NR_ER"]["license_ready"], "true")
+        self.assertEqual(by_endpoint["Tox21_NR_ER"]["raw_hash_ready"], "true")
+        self.assertEqual(by_endpoint["Tox21_NR_ER"]["freeze1_ready"], "true")
 
     def test_canonical_hash_ignores_row_order_and_line_endings(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

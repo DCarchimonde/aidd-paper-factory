@@ -16,6 +16,8 @@ not post-outcome deviations.
 | 2026-08-02 | Phase 1 | Replace label-aware scaffold/cluster allocation with size-only label-blind allocation | the prototype violated the chemical-shift access contract | no extension predictions generated; earlier feasibility output discarded |
 | 2026-08-02 | Phase 1 | Use one deterministic 0.60-similarity leader partition per endpoint | separate group construction from role-allocation seeds and include the 12k--13k CYP endpoints under a frozen 15k cap | no extension predictions generated |
 | 2026-08-02 | Phase 1 | Add a study-level source/mechanism breadth gate | three endpoints from one Veith qHTS campaign cannot support an ADMET-wide pooled claim | no extension predictions generated |
+| 2026-08-03 | Phase 2 | Add `50/20/15/15` as a pre-freeze outer-role candidate | under `50/10/20/20`, the smallest primary policy critical-class cell cannot certify a 10% error ceiling under the frozen 108-test Bonferroni contract even with zero observed errors | count-only precision evidence; no model outputs generated |
+| 2026-08-03 | Phase 2 | Run a development-only seed-99 ECFP/logistic nested-OOF CPU smoke | exercise actual group allocation, feature generation, nested calibration, and transitive lineage before the production trainer exists | 2,928 ephemeral development OOF probabilities checked only for finiteness and lineage; no performance metric or policy/conformal/test prediction generated |
 
 Post-freeze entries MUST include affected files, commits, seeds/endpoints, whether
 labels or results had been inspected, scientific impact, and user approval where

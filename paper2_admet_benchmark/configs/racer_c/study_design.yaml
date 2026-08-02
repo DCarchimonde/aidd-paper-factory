@@ -6,7 +6,9 @@ outer_role_candidates:
   - {dev: 0.50, policy: 0.10, conformal: 0.20, test: 0.20}
   - {dev: 0.50, policy: 0.15, conformal: 0.15, test: 0.20}
   - {dev: 0.55, policy: 0.15, conformal: 0.15, test: 0.15}
-preferred_pending_audit: {dev: 0.50, policy: 0.10, conformal: 0.20, test: 0.20}
+  - {dev: 0.50, policy: 0.20, conformal: 0.15, test: 0.15}
+selected_after_count_precision_audit: {dev: 0.50, policy: 0.20, conformal: 0.15, test: 0.15}
+selection_uses_model_outputs: false
 
 tracks: [random_grouped, strict_scaffold, similarity_cluster]
 similarity_cluster:
@@ -37,15 +39,24 @@ gate:
   threshold_grid: [0.50, 0.60, 0.70, 0.80, 0.90, 1.00]
   minimum_planned_retention: 0.50
   selected_calibration_minimum_per_class: 35
+  policy_familywise_alpha: 0.05
+  policy_bonferroni_tests: 108
+  class_retention_lower_bound_minimum: 0.50
+  critical_selected_base_error_upper_bound_maximum: 0.10
+  minimum_policy_count_per_true_class: 25
+  minimum_selected_critical_count: 25
 conformal:
   alpha_primary: 0.10
   quantile: finite_sample_order_statistic
   insufficient_cell_threshold: positive_infinity
 
+completed_pre_freeze_gates:
+  - endpoint_provenance_and_count_eligibility
+  - count_only_precision_power_audit
+  - abstract_transitive_lineage_contract_tests
 formal_freeze_blockers:
-  - endpoint_eligibility
-  - precision_power_audit
+  - claim_scope_and_source_family_breadth
   - exact_software_and_model_revisions
-  - leakage_tests
-  - measured_compute_benchmark
+  - production_trainer_lineage_instrumentation
+  - measured_gpu_compute_benchmark
   - user_approval

@@ -1,0 +1,13 @@
+endpoint,source_family,clean_n,class_0_n,class_1_n,selected_allocation,passing_track_seed_cells,audited_track_seed_cells,eligibility_status,eligibility_reason,selection_used_model_outputs
+Tox21_NR_AR,NCATS_Tox21_2014,6972,6722,250,50_20_15_15,0,0,calibration-limited,clean class minimum 250 < 350; no primary claim,false
+Tox21_NR_AhR,NCATS_Tox21_2014,6289,5589,700,50_20_15_15,14,15,track_limited_secondary,14/15 cells pass; failed tracks=similarity_cluster,false
+Tox21_NR_AR_LBD,NCATS_Tox21_2014,6532,6320,212,50_20_15_15,0,0,calibration-limited,clean class minimum 212 < 350; no primary claim,false
+Tox21_NR_ER,NCATS_Tox21_2014,5855,5230,625,50_20_15_15,15,15,primary_candidate,all 15/15 track-seed count cells pass under 50_20_15_15,false
+Tox21_NR_ER_LBD,NCATS_Tox21_2014,6687,6406,281,50_20_15_15,0,0,calibration-limited,clean class minimum 281 < 350; no primary claim,false
+Tox21_NR_Aromatase,NCATS_Tox21_2014,5596,5342,254,50_20_15_15,0,0,calibration-limited,clean class minimum 254 < 350; no primary claim,false
+Tox21_NR_PPAR_gamma,NCATS_Tox21_2014,6243,6081,162,50_20_15_15,0,0,calibration-limited,clean class minimum 162 < 350; no primary claim,false
+Tox21_SR_ARE,NCATS_Tox21_2014,5598,4753,845,50_20_15_15,15,15,primary_candidate,all 15/15 track-seed count cells pass under 50_20_15_15,false
+Tox21_SR_ATAD5,NCATS_Tox21_2014,6825,6592,233,50_20_15_15,0,0,calibration-limited,clean class minimum 233 < 350; no primary claim,false
+Tox21_SR_HSE,NCATS_Tox21_2014,6224,5917,307,50_20_15_15,0,0,calibration-limited,clean class minimum 307 < 350; no primary claim,false
+Tox21_SR_MMP,NCATS_Tox21_2014,5588,4737,851,50_20_15_15,15,15,primary_candidate,all 15/15 track-seed count cells pass under 50_20_15_15,false
+Tox21_SR_p53,NCATS_Tox21_2014,6549,6159,390,50_20_15_15,0,15,track_limited_secondary,0/15 cells pass; failed tracks=random_grouped+similarity_cluster+strict_scaffold,false

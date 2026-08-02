@@ -70,11 +70,14 @@ and conflicts follow the frozen endpoint-specific rule and are counted.
 
 ## 5. Outer roles
 
-The preferred allocation is `50/10/20/20` for
-`dev/policy/conf/test`, because selected class-conditional conformal calibration
-is more data-hungry than gate selection. The alternative allocations
-`50/15/15/20` and `55/15/15/15` remain candidates only until the pre-model
-feasibility audit.
+The count-only precision audit selected `50/20/15/15` for
+`dev/policy/conf/test`. Under the initial `50/10/20/20` candidate, the smallest
+primary policy critical-class cell could not certify a 10% error ceiling under
+the predeclared 108-test Bonferroni contract even with zero observed errors.
+Increasing policy to 20% removes that structural impossibility while retaining
+at least 70 observations per class in every primary conformal and test cell. The
+decision used no predictions or model outputs. The rejected allocations remain
+in the audit outputs rather than being deleted.
 
 The allocation is selected by a deterministic rule using grouped class counts and
 precision, never model outputs. Each role is group-exclusive.
@@ -199,6 +202,16 @@ On `D_policy`, search the 36 pairs using a deterministic lexicographic rule:
 The precision audit freezes the bounds, familywise confidence correction, margins,
 and minimum counts. No feasible pair yields `policy-infeasible`; constraints and
 grid are not changed.
+
+The Phase-2 numerical contract is a familywise alpha of 0.05 with conservative
+Bonferroni correction across 36 pairs times three simultaneous constraints. Both
+true classes require an exact one-sided retention lower bound of at least 0.50.
+Among selected members of the scientifically critical true class, the exact
+one-sided upper bound for base-classification error must not exceed 0.10. Each
+policy true-class denominator and the selected critical-class denominator must
+contain at least 25 observations. This policy error is deliberately measured
+before `D_conf` conformal calibration; selected-domain prediction-set validity is
+evaluated separately on `D_conf` and `D_test`.
 
 ## 12. Dual-track class-conditional conformal prediction
 

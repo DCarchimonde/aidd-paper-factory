@@ -1,6 +1,7 @@
 # Precision and power audit plan
 
-Status: draft; must execute before endpoint Freeze 1.
+Status: **count-only Phase 2 audit completed; model-dependent precision remains
+pre-freeze**.
 
 ## Required inputs
 
@@ -65,3 +66,28 @@ the endpoint is descriptive or calibration-limited. A conventional value such as
 - `paired_effect_simulation.csv`;
 - `policy_grid_error_control.csv`;
 - a signed decision file containing frozen margins and endpoint statuses.
+
+## Phase 2 execution decision (2026-08-03)
+
+The count-only audit was executed across four allocation candidates, three tracks,
+and seeds 101--105 without fitting a model or inspecting an extension prediction.
+Outputs are committed under `results/racer_c_phase2_preflight/`.
+
+The original `50/10/20/20` candidate is structurally incapable of certifying the
+predeclared 10% critical-class base-error ceiling in its smallest policy cells
+under a familywise alpha of 0.05, 36 gate pairs, and three simultaneous
+constraints per pair (108 Bonferroni tests), even when zero errors are observed.
+The count-only selection therefore chose `50/20/15/15`. This choice used no model
+outputs and is recorded in `protocol_deviations.md`.
+
+Under the selected allocation, three Tox21 endpoints pass all 15 track-seed count
+cells: `Tox21_NR_ER`, `Tox21_SR_ARE`, and `Tox21_SR_MMP`. Their smallest policy
+critical-class cell is 104. Exact zero-error bounds are mathematically capable of
+meeting the 10% ceiling at sufficiently high retention; this is not evidence that
+the trained method will do so. The policy selector must return
+`policy-infeasible` if no one of the 36 pairs satisfies the frozen simultaneous
+bounds.
+
+The signed machine-readable decision is
+`results/racer_c_phase2_preflight/precision_policy_decision.json`. Model-dependent
+paired effects, empirical gate feasibility, and measured compute remain unexecuted.

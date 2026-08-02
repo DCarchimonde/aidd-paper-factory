@@ -1,6 +1,6 @@
 # Endpoint eligibility rules
 
-Status: draft for pre-model precision audit.
+Status: **applied to the Phase 2 count-only audit; protocol remains pre-freeze**.
 
 ## Deterministic order
 
@@ -67,3 +67,18 @@ inhibition usually make the adverse-liability class critical, subject to source
 verification. Poor HIA or poor bioavailability may make label 0 critical. BBB
 penetration is context-dependent; unless a deployment context is prespecified,
 both-class and worst-class preservation replace a single critical class.
+
+## Phase 2 application
+
+The selected count-only allocation is `50/20/15/15`. Every primary candidate must
+pass all three tracks and all five main seeds (15 cells) under that allocation.
+The audit selected the following statuses without model outputs:
+
+- primary candidates: `Tox21_NR_ER`, `Tox21_SR_ARE`, `Tox21_SR_MMP`;
+- track-limited secondary: `Tox21_NR_AhR`, `Tox21_SR_p53`;
+- calibration-limited: the remaining seven Tox21 Challenge endpoints.
+
+These statuses establish provenance and count/precision eligibility only. They do
+not imply that a model, gate pair, or conformal procedure will be feasible. The
+study-level breadth rule still restricts the claim because all three primary
+candidates come from the NCATS Tox21 2014 Challenge source family.
