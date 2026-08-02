@@ -1,0 +1,61 @@
+status: candidate_pending_rtx4090_verification
+lock_version: 0.1
+python: 3.11.13
+platform: linux_x86_64
+
+gpu:
+  required: true
+  count: 1
+  device_name_contains: RTX 4090
+  torch_cuda_build: "13.0"
+
+packages:
+  torch: 2.13.0
+  chemprop: 2.3.0
+  transformers: 5.12.1
+  rdkit: 2026.3.4
+  numpy: 2.3.5
+  scipy: 1.18.0
+  pandas: 2.2.3
+  scikit-learn: 1.9.0
+  xgboost: 3.3.0
+  pyyaml: 6.0.3
+
+molformer:
+  model_id: ibm-research/MoLFormer-XL-both-10pct
+  revision: 361063d0ad524ef77cf39b08469f6be770dc550f
+  trust_remote_code: true
+  deterministic_eval: true
+  input_column: standardized_smiles
+  pooling: pooler_output
+  embedding_dtype: float32
+  max_tokens_including_special_tokens: 202
+  truncation: false
+  overlength_action: fail_closed_before_any_fit
+
+chemprop:
+  task_type: classification
+  loss_function: bce
+  message_hidden_dim: 300
+  depth: 3
+  dropout: 0.0
+  aggregation: mean
+  ffn_hidden_dim: 300
+  ffn_num_layers: 2
+  batch_size: 64
+  epochs: 50
+  patience: 10
+  init_lr: 0.0001
+  max_lr: 0.001
+  final_lr: 0.0001
+  internal_validation_fraction: 0.10
+  internal_validation_assignment: label_blind_group_size_seeded
+  accelerator: gpu
+  devices: "0"
+  training_regime: unweighted
+
+runtime_lock_outputs:
+  - environment_audit.json
+  - pip_freeze.txt
+  - pip_freeze.sha256
+  - nvidia_smi.txt

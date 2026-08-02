@@ -54,6 +54,8 @@ completed_pre_freeze_gates:
   - endpoint_provenance_and_count_eligibility
   - count_only_precision_power_audit
   - abstract_transitive_lineage_contract_tests
+  - arbitrary_label_permutation_invariance_for_covariate_shift_roles
+  - seed99_gpu_component_benchmark_plan
 formal_freeze_blockers:
   - claim_scope_and_source_family_breadth
   - exact_software_and_model_revisions

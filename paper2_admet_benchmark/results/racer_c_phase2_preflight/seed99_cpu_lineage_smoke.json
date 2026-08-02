@@ -1,13 +1,13 @@
 {
   "allocation": "50_20_15_15",
   "clean_input_sha256": "2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0",
-  "dev_class_0_n": 2654,
-  "dev_class_1_n": 274,
+  "dev_class_0_n": 2653,
+  "dev_class_1_n": 275,
   "dev_n": 2928,
   "endpoint": "Tox21_NR_ER",
-  "feature_seconds": 0.279631,
+  "feature_seconds": 0.289439,
   "fit_node_count": 12,
-  "fit_seconds": 0.301501,
+  "fit_seconds": 0.373658,
   "interpretation": "technical lineage integration only; not a GPU benchmark or scientific model result",
   "numpy": "2.5.1",
   "outer_folds": [
@@ -41,6 +41,6 @@
   "script_sha256": "da21149b3f035f38a751ac8a495c213222698e63e1b206473bd741f49216f63d",
   "seed": 99,
   "status": "pass_development_only_cpu_smoke",
-  "total_seconds": 1.263721,
+  "total_seconds": 1.420885,
   "track": "strict_scaffold"
 }

@@ -80,11 +80,12 @@ constraints per pair (108 Bonferroni tests), even when zero errors are observed.
 The count-only selection therefore chose `50/20/15/15`. This choice used no model
 outputs and is recorded in `protocol_deviations.md`.
 
-Under the selected allocation, three Tox21 endpoints pass all 15 track-seed count
-cells: `Tox21_NR_ER`, `Tox21_SR_ARE`, and `Tox21_SR_MMP`. Their smallest policy
-critical-class cell is 104. Exact zero-error bounds are mathematically capable of
-meeting the 10% ceiling at sufficiently high retention; this is not evidence that
-the trained method will do so. The policy selector must return
+After correcting the residual label-dependent group-order key, four Tox21
+endpoints pass all 15 track-seed count cells: `Tox21_NR_AhR`, `Tox21_NR_ER`,
+`Tox21_SR_ARE`, and `Tox21_SR_MMP`. Their smallest policy critical-class cell is
+104. Exact zero-error bounds are mathematically capable of meeting the 10% ceiling
+at sufficiently high retention; this is not evidence that the trained method will
+do so. The policy selector must return
 `policy-infeasible` if no one of the 36 pairs satisfies the frozen simultaneous
 bounds.
 

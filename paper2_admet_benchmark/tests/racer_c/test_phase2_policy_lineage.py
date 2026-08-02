@@ -238,11 +238,11 @@ class Tox21ManifestTests(unittest.TestCase):
             self.assertEqual(row["selection_used_model_outputs"], "false")
         self.assertEqual(
             by_status["primary_candidate"],
-            {"Tox21_NR_ER", "Tox21_SR_ARE", "Tox21_SR_MMP"},
+            {"Tox21_NR_AhR", "Tox21_NR_ER", "Tox21_SR_ARE", "Tox21_SR_MMP"},
         )
         self.assertEqual(
             by_status["track_limited_secondary"],
-            {"Tox21_NR_AhR", "Tox21_SR_p53"},
+            {"Tox21_SR_p53"},
         )
         self.assertEqual(len(by_status["calibration-limited"]), 7)
 

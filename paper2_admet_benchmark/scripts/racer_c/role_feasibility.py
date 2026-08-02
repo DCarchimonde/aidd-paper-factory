@@ -99,15 +99,21 @@ def allocate_groups(
     role_totals: Counter[str] = Counter()
     assignment: dict[str, str] = {}
 
-    ordered_groups = sorted(
-        grouped,
-        key=lambda group_id: (
-            -max(grouped[group_id][0], grouped[group_id][1]),
-            -sum(grouped[group_id].values()),
-            stable_tie(seed, group_id),
-            group_id,
-        ),
-    )
+    def ordering_key(group_id: str) -> tuple[object, ...]:
+        group_size = sum(grouped[group_id].values())
+        if use_labels_for_assignment:
+            return (
+                -max(grouped[group_id][0], grouped[group_id][1]),
+                -group_size,
+                stable_tie(seed, group_id),
+                group_id,
+            )
+        # Scaffold and similarity-cluster tracks are covariate-only shifts.
+        # Their group order, just like their role objective below, must remain
+        # invariant under *any* reassignment of labels at fixed group IDs.
+        return (-group_size, stable_tie(seed, group_id), group_id)
+
+    ordered_groups = sorted(grouped, key=ordering_key)
 
     def objective(candidate_role: str, group_id: str) -> tuple[float, int]:
         score = 0.0

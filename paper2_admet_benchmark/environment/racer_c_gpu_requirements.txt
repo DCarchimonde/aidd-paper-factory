@@ -1,0 +1,11 @@
+# Candidate runtime for the pre-freeze RTX-4090 seed-99 benchmark.
+# PyTorch is installed separately from the official cu130 wheel index.
+chemprop==2.3.0
+transformers==5.12.1
+rdkit==2026.3.4
+numpy==2.3.5
+scipy==1.18.0
+pandas==2.2.3
+scikit-learn==1.9.0
+xgboost==3.3.0
+pyyaml==6.0.3

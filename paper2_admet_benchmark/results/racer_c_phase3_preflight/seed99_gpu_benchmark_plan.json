@@ -1,0 +1,119 @@
+{
+  "allocation": "50_20_15_15",
+  "class_0_n": 2653,
+  "class_1_n": 275,
+  "clean_input_sha256": "2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0",
+  "dev_n": 2928,
+  "dmpnn_final_fit_equivalents_per_endpoint_track_seed": 6.0,
+  "dmpnn_fit_jobs_per_endpoint_track_seed": 9,
+  "endpoint": "Tox21_NR_ER",
+  "endpoint_decisions_sha256": "07be0597ee683c5e903920e694f5737b87ba2da4d95919cd0994a28273682677",
+  "jobs": [
+    {
+      "fit_class_0_n": 872,
+      "fit_class_1_n": 104,
+      "fit_n": 976,
+      "job_id": "outer_0_inner_0",
+      "predict_class_0_n": 888,
+      "predict_class_1_n": 88,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 888,
+      "fit_class_1_n": 88,
+      "fit_n": 976,
+      "job_id": "outer_0_inner_1",
+      "predict_class_0_n": 872,
+      "predict_class_1_n": 104,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1760,
+      "fit_class_1_n": 192,
+      "fit_n": 1952,
+      "job_id": "outer_0_final",
+      "predict_class_0_n": 893,
+      "predict_class_1_n": 83,
+      "predict_n": 976,
+      "stage": "outer_final"
+    },
+    {
+      "fit_class_0_n": 886,
+      "fit_class_1_n": 90,
+      "fit_n": 976,
+      "job_id": "outer_1_inner_0",
+      "predict_class_0_n": 891,
+      "predict_class_1_n": 85,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 891,
+      "fit_class_1_n": 85,
+      "fit_n": 976,
+      "job_id": "outer_1_inner_1",
+      "predict_class_0_n": 886,
+      "predict_class_1_n": 90,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1777,
+      "fit_class_1_n": 175,
+      "fit_n": 1952,
+      "job_id": "outer_1_final",
+      "predict_class_0_n": 876,
+      "predict_class_1_n": 100,
+      "predict_n": 976,
+      "stage": "outer_final"
+    },
+    {
+      "fit_class_0_n": 896,
+      "fit_class_1_n": 80,
+      "fit_n": 976,
+      "job_id": "outer_2_inner_0",
+      "predict_class_0_n": 873,
+      "predict_class_1_n": 103,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 873,
+      "fit_class_1_n": 103,
+      "fit_n": 976,
+      "job_id": "outer_2_inner_1",
+      "predict_class_0_n": 896,
+      "predict_class_1_n": 80,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1769,
+      "fit_class_1_n": 183,
+      "fit_n": 1952,
+      "job_id": "outer_2_final",
+      "predict_class_0_n": 884,
+      "predict_class_1_n": 92,
+      "predict_n": 976,
+      "stage": "outer_final"
+    }
+  ],
+  "meta_folds": 3,
+  "performance_metrics_permitted": false,
+  "policy_conformal_test_predictions_generated": false,
+  "primary_endpoint_count": 4,
+  "primary_endpoint_track_seed_cells": 60,
+  "primary_seeds": 5,
+  "primary_tracks": 3,
+  "role_input_sha256": "edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900",
+  "scientific_interpretation": "technical timing and lineage only; not a model result",
+  "script_sha256": "6c53fe95f30b0c63763756924d0ecbecd40e5ed03ee0e3796a7a97949616f3e8",
+  "seed": 99,
+  "status": "ready_for_target_gpu_component_benchmark",
+  "track": "strict_scaffold",
+  "trainer_label_roles": [
+    "dev"
+  ]
+}

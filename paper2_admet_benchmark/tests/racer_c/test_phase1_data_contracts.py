@@ -92,7 +92,11 @@ class Phase1RoleFeasibilityTests(unittest.TestCase):
 
     def test_scaffold_assignment_is_label_blind(self) -> None:
         rows = synthetic_rows(120, 120)
-        permuted = [dict(row, target=str(1 - int(row["target"]))) for row in rows]
+        # Use a non-complement permutation.  A global 0/1 flip preserves the
+        # per-group majority count and cannot detect label-dependent ordering.
+        labels = [row["target"] for row in rows]
+        shifted = labels[37:] + labels[:37]
+        permuted = [dict(row, target=label) for row, label in zip(rows, shifted)]
         original = ROLE.allocate_groups(
             rows,
             "murcko_scaffold_id",

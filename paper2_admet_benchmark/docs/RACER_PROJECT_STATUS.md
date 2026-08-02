@@ -4,7 +4,7 @@ Last updated: 2026-08-03
 
 ## Current phase
 
-Phase 2 endpoint, policy-precision, and lineage-contract checkpoint.
+Phase 3 target-GPU benchmark readiness after the corrected Phase-2 checkpoint.
 The protocol is explicitly **not frozen**.
 
 ## Completed work
@@ -31,12 +31,17 @@ The protocol is explicitly **not frozen**.
   cells across four prospective allocations.
 - Selected `50/20/15/15` using count-only exact precision evidence after proving
   the previous policy fraction could be structurally incapable of certification.
-- Assigned three Tox21 primary candidates, two track-limited secondary endpoints,
+- Assigned four Tox21 primary candidates, one track-limited secondary endpoint,
   and seven calibration-limited endpoints without model outcomes.
+- Removed residual label access from the scaffold/cluster group-order key and
+  regenerated every Phase-2 role, precision, and endpoint decision artifact.
 - Implemented a deterministic fail-closed 36-pair policy selector and a transitive
   training/prediction lineage validator.
 - Passed a development-only seed-99 CPU nested-OOF integration smoke on 2,928
   NR-ER rows without computing a performance metric or predicting any outer role.
+- Added an exact candidate GPU environment audit, fixed MoLFormer revision and
+  token policy, a nine-fit nested benchmark plan, and a development-only
+  RTX-4090 component benchmark entry point.
 
 ## Commits
 
@@ -73,6 +78,13 @@ The protocol is explicitly **not frozen**.
 - `scripts/racer_c/lineage_contract.py`
 - `results/racer_c_phase2_preflight/*`
 - `scripts/racer_c/run_seed99_cpu_lineage_smoke.py`
+- `configs/racer_c/gpu_environment_lock.yaml`
+- `environment/racer_c_gpu_requirements.txt`
+- `scripts/racer_c/capture_gpu_environment.py`
+- `scripts/racer_c/prepare_seed99_gpu_benchmark.py`
+- `scripts/racer_c/run_seed99_gpu_component_benchmark.py`
+- `protocols/seed99_gpu_benchmark_runbook.md`
+- `docs/phase3_gpu_benchmark_readiness_2026.md`
 
 ## Quality gates
 
@@ -80,24 +92,27 @@ The protocol is explicitly **not frozen**.
 - Existing bibliography audit: PASS (42 cited keys, no missing or duplicate keys,
   34 cited references from 2021--2026).
 - Existing frozen asset integrity: PASS (CRLF-aware for historical table hashes).
-- Protocol, provenance, role, policy, lineage, smoke-output, and integrity tests:
-  PASS (28).
+- Protocol, provenance, role, policy, lineage, smoke-output, GPU-plan, and
+  integrity tests: PASS (33/33).
+- Real-data arbitrary-label assignment invariance: PASS (60/60 across five
+  endpoints, two covariate-only tracks, and six technical/main seeds).
 - Three licensed CYP raw-file hashes: PASS.
 - Source-row cleaning reconciliation: PASS for 37,550 rows across three endpoints.
 - Grouped role count gate: PASS (135/135 cells).
 - Conformal resolution/minimum selected count: PASS (540/540 cells; minimum 152).
 - Tox21 cleaning reconciliation: PASS for all 12 endpoints and all 11,764 source
   records per endpoint.
-- Phase 2 primary count gate: 3 primary, 2 secondary, 7 calibration-limited.
+- Phase 2 primary count gate: 4 primary, 1 secondary, 7 calibration-limited.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
 - Formal endpoint/protocol freeze: BLOCKED.
 - Full GPU run: BLOCKED pending measured benchmark and user approval.
+- Seed-99 GPU component benchmark: READY, NOT RUN in this non-CUDA container.
 
 ## Known risks
 
 - Many small/imbalanced endpoints will be secondary or calibration-limited after
   four-way grouped allocation; ClinTox remains the explicit rare-class anchor.
-- The three current primary candidates are distinct Tox21 mechanisms but one NCATS
+- The four current primary candidates are distinct Tox21 mechanisms but one NCATS
   Challenge source family, insufficient for an ADMET-wide pooled claim.
 - Honest nested D-MPNN cross-fitting may require 150--400 RTX-4090 GPU-hours.
 - Recent selected-risk methods use different estimands and access regimes.
@@ -120,11 +135,11 @@ The protocol is explicitly **not frozen**.
 
 ## Next automatic action
 
-Lock the model/container environment, connect the production trainer to lineage
-records, and measure the seed-99 GPU smoke on one Tox21 primary candidate. Do not
-inspect an extension test prediction, run seeds 101--110, or create a formal
-protocol tag. If no independent source family is prospectively admitted, narrow
-the claim to the Tox21 assay family before freeze.
+Run the fail-closed environment audit and seed-99 component timing benchmark on
+the target RTX 4090, then replace the planning range with the measured projection.
+Do not inspect an extension test prediction, run seeds 101--110, or create a
+formal protocol tag. If no independent source family is prospectively admitted,
+narrow the claim to the Tox21 assay family before freeze.
 
 ## Protocol deviations
 

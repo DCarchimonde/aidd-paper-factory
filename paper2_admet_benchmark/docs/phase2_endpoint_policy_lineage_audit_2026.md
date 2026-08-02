@@ -44,7 +44,7 @@ rows reconcile to all 11,764 source records.
 | Endpoint | Clean | Class 1 | Duplicate rows | Conflict groups | Count-only status |
 |---|---:|---:|---:|---:|---|
 | NR-AR | 6,972 | 250 | 2,235 | 58 | calibration-limited |
-| NR-AhR | 6,289 | 700 | 1,732 | 61 | track-limited secondary (14/15) |
+| NR-AhR | 6,289 | 700 | 1,732 | 61 | primary candidate (15/15) |
 | NR-AR-LBD | 6,532 | 212 | 2,007 | 22 | calibration-limited |
 | NR-ER | 5,855 | 625 | 1,400 | 164 | primary candidate (15/15) |
 | NR-ER-LBD | 6,687 | 281 | 1,890 | 63 | calibration-limited |
@@ -67,6 +67,16 @@ The final count audit contains 300 endpoint/track/allocation/seed cells and 1,20
 full/selected conformal-resolution cells. Role construction is label-blind for
 scaffold and similarity-cluster tracks; labels are used only for post-allocation
 eligibility counts.
+
+The first Phase-2 checkpoint still sorted covariate groups by the largest
+within-group class count before applying its size-only role objective. A global
+class-label flip left that key unchanged, so the original permutation test did
+not detect the residual access. The corrected implementation orders scaffold and
+similarity clusters only by total group size plus seeded group-ID ties. An
+arbitrary, non-complement label permutation now leaves assignments unchanged.
+All 300 role cells and downstream precision tables were regenerated. NR-AhR
+changed from 14/15 to 15/15 and therefore became the fourth count-only primary
+candidate; no model output was generated or inspected.
 
 The Phase 0 preference `50/10/20/20` left a smallest prospective primary policy
 critical-class cell of 41. With 108 Bonferroni tests, even zero observed errors
