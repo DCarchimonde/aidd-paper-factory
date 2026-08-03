@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -43,7 +44,15 @@ class EnvironmentLockTests(unittest.TestCase):
         self.config = yaml.safe_load(self.path.read_text(encoding="utf-8"))
 
     def test_candidate_lock_is_exact_but_not_formally_frozen(self) -> None:
-        self.assertEqual(self.config["status"], "candidate_pending_rtx4090_verification")
+        self.assertEqual(
+            self.config["status"],
+            "candidate_pending_windows_rtx4060_verification",
+        )
+        self.assertEqual(self.config["platform"], "windows_amd64")
+        self.assertEqual(
+            self.config["gpu"]["device_name_contains"], "RTX 4060 Laptop GPU"
+        )
+        self.assertGreaterEqual(self.config["gpu"]["minimum_vram_gib"], 7.0)
         for value in self.config["packages"].values():
             self.assertRegex(str(value), r"^\d+\.\d+\.\d+$")
         self.assertEqual(
@@ -62,6 +71,50 @@ class EnvironmentLockTests(unittest.TestCase):
             {"torch": "2.13.0+cu130", "chemprop": "2.2.4"},
         )
         self.assertEqual(failures, ["chemprop: expected 2.3.0, observed 2.2.4"])
+
+    def test_windows_rtx4060_named_lock_matches_active_lock(self) -> None:
+        windows = yaml.safe_load(
+            (
+                P2
+                / "configs"
+                / "racer_c"
+                / "gpu_environment_windows_rtx4060.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(windows, self.config)
+
+    def test_input_hash_mismatch_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            role = root / "role.csv"
+            clean = root / "clean.csv"
+            role.write_text("role\n", encoding="utf-8")
+            clean.write_text("clean\n", encoding="utf-8")
+            config = {
+                "inputs": {
+                    "role_input_sha256": "0" * 64,
+                    "clean_sha256": "1" * 64,
+                }
+            }
+            with self.assertRaisesRegex(RuntimeError, "input hash mismatch"):
+                RUNNER.require_input_hashes(role, clean, config)
+
+    def test_chemprop_prediction_column_is_not_hard_coded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "predictions.csv"
+            path.write_text(
+                "smiles,structure_id,pred_0\nCC,s1,0.2\nCCC,s2,0.8\n",
+                encoding="utf-8",
+            )
+            values, field = RUNNER.read_chemprop_probabilities(
+                path,
+                [
+                    {"standardized_smiles": "CC", "structure_id": "s1"},
+                    {"standardized_smiles": "CCC", "structure_id": "s2"},
+                ],
+            )
+            self.assertEqual(field, "pred_0")
+            self.assertEqual(values, [0.2, 0.8])
 
 
 class BenchmarkPlanTests(unittest.TestCase):

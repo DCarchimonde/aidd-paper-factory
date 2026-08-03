@@ -15,6 +15,7 @@ ENV/
 
 # PyCharm
 .idea/
+.local/
 
 # OS
 .DS_Store

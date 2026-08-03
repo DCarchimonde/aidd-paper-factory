@@ -1,6 +1,6 @@
 # Paper 2 RACER-C Phase 3 GPU benchmark readiness
 
-Date: 2026-08-03
+Date: 2026-08-04
 Status: **implementation ready for target-GPU component timing; GPU not run**
 
 ## Phase-2 correction before GPU work
@@ -33,9 +33,10 @@ The IBM Research model is fixed to
 `pooler_output` in float32. Token sequences above 202 tokens fail before any fit;
 truncation is prohibited.
 
-This is not yet an immutable environment lock. The runtime auditor requires one
-RTX 4090, exact package versions, the expected CUDA build, `nvidia-smi`, a complete
-`pip freeze`, and the fixed model revision. Any mismatch yields `fail_closed`.
+This is not yet an immutable environment lock. The active runtime auditor requires
+the user's Windows NVIDIA GeForce RTX 4060 Laptop GPU, at least 7 GiB visible VRAM,
+exact package versions, the expected CUDA build, `nvidia-smi`, a complete `pip
+freeze`, and the fixed model revision. Any mismatch yields `fail_closed`.
 
 ## Benchmark contract
 
@@ -53,11 +54,22 @@ outer-final-fit equivalents per endpoint/track/seed cell and reported both with
 and without a 20% rerun reserve. The projection is an engineering estimate, not a
 scientific result.
 
+## Active Windows RTX-4060 Laptop execution target
+
+The user confirmed that the available target is a Windows laptop with an NVIDIA
+GeForce RTX 4060 Laptop GPU and that comparable workloads run quickly on it. This
+is now the active pre-freeze target in the default environment lock and runbook;
+the former RTX-4090 assumption is superseded. The platform adaptation fixes
+MoLFormer inference batch size at 8 but does not change scientific inputs, model
+revision, Chemprop settings, token policy, endpoint, roles, or seed. The runtime
+audit records platform and visible VRAM, while the component benchmark records
+memory peaks and fails on input-hash drift.
+
 ## Current boundary
 
 The present container has no NVIDIA device, PyTorch, Chemprop, or Transformers, so
 the GPU command was not run here. Plan generation, command construction,
 development-only lineage, exact version mismatch, token policy, and label-blind
 allocation are locally testable. Formal protocol freeze, the complete RACER-C
-production chain, and seeds 101--110 remain blocked until the RTX-4090 component
-benchmark passes and its measured budget is approved.
+production chain, and seeds 101--110 remain blocked until the Windows RTX-4060
+Laptop component benchmark passes and its measured budget is approved.

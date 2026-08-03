@@ -144,6 +144,6 @@ Relevant records:
 2. Lock exact Chemprop, MoLFormer, PyTorch, CUDA, solver, and container revisions.
 3. Instrument the production Chemprop/MoLFormer trainer with the transitive
    lineage records; keep seed 99 as the only technical seed before freeze.
-4. Measure one primary endpoint on the target RTX 4090-class GPU and replace the
+4. Measure one primary endpoint on the target RTX 4060 Laptop GPU and replace the
    current 150--400 GPU-hour estimate.
 5. Obtain user approval before the formal protocol tag and confirmatory run.

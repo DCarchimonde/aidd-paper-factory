@@ -75,6 +75,24 @@ def require_environment(path: Path, config: Mapping[str, object]) -> dict[str, o
     return row
 
 
+def require_input_hashes(
+    role_input: Path, clean: Path, config: Mapping[str, object]
+) -> dict[str, str]:
+    observed = {
+        "role_input_sha256": sha256_file(role_input),
+        "clean_sha256": sha256_file(clean),
+    }
+    expected = config["inputs"]
+    failures = [
+        f"{key}: expected {expected[key]}, observed {value}"
+        for key, value in observed.items()
+        if value != str(expected[key])
+    ]
+    if failures:
+        raise RuntimeError("benchmark input hash mismatch: " + "; ".join(failures))
+    return observed
+
+
 def development_rows(
     role_rows: list[dict[str, str]], clean_rows: list[dict[str, str]]
 ) -> list[dict[str, str]]:
@@ -131,6 +149,8 @@ def extract_molformer(
         revision=revision,
         trust_remote_code=bool(model_config["trust_remote_code"]),
     )
+    torch.cuda.empty_cache()
+    torch.cuda.reset_peak_memory_stats()
     model = AutoModel.from_pretrained(
         model_id,
         revision=revision,
@@ -141,7 +161,7 @@ def extract_molformer(
     embeddings: list[object] = []
     max_observed = 0
     started = time.perf_counter()
-    batch_size = 64
+    batch_size = int(model_config["inference_batch_size"])
     for start in range(0, len(rows), batch_size):
         batch = rows[start : start + batch_size]
         encoded = tokenizer(
@@ -171,8 +191,76 @@ def extract_molformer(
         "dimension": int(values.shape[1]),
         "max_tokens_observed": max_observed,
         "seconds": time.perf_counter() - started,
+        "batch_size": batch_size,
+        "peak_torch_allocated_gib": round(
+            torch.cuda.max_memory_allocated() / (1024**3), 3
+        ),
+        "peak_torch_reserved_gib": round(
+            torch.cuda.max_memory_reserved() / (1024**3), 3
+        ),
         "output_sha256": sha256_file(output),
     }
+
+
+def gpu_memory_used_mib() -> int | None:
+    try:
+        output = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=memory.used",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        values = [int(line.strip()) for line in output.splitlines() if line.strip()]
+        return max(values) if values else None
+    except (OSError, ValueError, subprocess.SubprocessError):
+        return None
+
+
+def run_timed_gpu_command(command: list[str]) -> tuple[float, int | None]:
+    started = time.perf_counter()
+    process = subprocess.Popen(command)
+    peak_mib = gpu_memory_used_mib()
+    while process.poll() is None:
+        observed = gpu_memory_used_mib()
+        if observed is not None:
+            peak_mib = observed if peak_mib is None else max(peak_mib, observed)
+        time.sleep(0.5)
+    if process.returncode:
+        raise subprocess.CalledProcessError(process.returncode, command)
+    return time.perf_counter() - started, peak_mib
+
+
+def read_chemprop_probabilities(
+    path: Path, expected_rows: list[dict[str, str]]
+) -> tuple[list[float], str]:
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        table = list(reader)
+        fields = reader.fieldnames or []
+    if len(table) != len(expected_rows):
+        raise AssertionError("Chemprop prediction row count mismatch")
+    if "structure_id" in fields:
+        observed_ids = [row["structure_id"] for row in table]
+        expected_ids = [row["structure_id"] for row in expected_rows]
+        if observed_ids != expected_ids:
+            raise AssertionError("Chemprop prediction row order/identity mismatch")
+    prediction_fields = [
+        field for field in fields if field not in {"smiles", "structure_id"}
+    ]
+    if len(prediction_fields) != 1:
+        raise AssertionError(
+            "expected exactly one Chemprop prediction column after preserved "
+            f"inputs, observed {prediction_fields}"
+        )
+    prediction_field = prediction_fields[0]
+    values = [float(row[prediction_field]) for row in table]
+    if not all(math.isfinite(value) and 0.0 <= value <= 1.0 for value in values):
+        raise AssertionError("Chemprop predictions are non-finite or outside [0,1]")
+    return values, prediction_field
 
 
 def chemprop_commands(
@@ -297,19 +385,13 @@ def run_chemprop(
         raise FileExistsError(
             "benchmark model/prediction output already exists; use a fresh work directory"
         )
-    started = time.perf_counter()
-    subprocess.run(train_command, check=True)
-    train_seconds = time.perf_counter() - started
-    started = time.perf_counter()
-    subprocess.run(predict_command, check=True)
-    predict_seconds = time.perf_counter() - started
-    with prediction_path.open(newline="", encoding="utf-8") as handle:
-        prediction_table = list(csv.DictReader(handle))
-    if len(prediction_table) != len(predict_rows):
-        raise AssertionError("Chemprop prediction row count mismatch")
-    values = [float(row["target"]) for row in prediction_table]
-    if not all(math.isfinite(value) and 0.0 <= value <= 1.0 for value in values):
-        raise AssertionError("Chemprop predictions are non-finite or outside [0,1]")
+    train_seconds, train_peak_gpu_memory_mib = run_timed_gpu_command(train_command)
+    predict_seconds, predict_peak_gpu_memory_mib = run_timed_gpu_command(
+        predict_command
+    )
+    values, prediction_column = read_chemprop_probabilities(
+        prediction_path, predict_rows
+    )
     return {
         "status": "pass_component_timing",
         "fit_n": len(fit),
@@ -317,6 +399,10 @@ def run_chemprop(
         "predict_n": len(predict_rows),
         "train_seconds": train_seconds,
         "predict_seconds": predict_seconds,
+        "train_peak_gpu_memory_mib": train_peak_gpu_memory_mib,
+        "predict_peak_gpu_memory_mib": predict_peak_gpu_memory_mib,
+        "prediction_column": prediction_column,
+        "finite_probability_count": len(values),
         "prediction_file_sha256": sha256_file(prediction_path),
         "probabilities_retained_only_in_ignored_workdir": True,
     }
@@ -338,6 +424,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> int:
     args = parse_args()
     config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    input_hashes = require_input_hashes(args.role_input, args.clean, config)
     role_rows = validate_role_input(read_csv(args.role_input))
     endpoint = role_rows[0]["endpoint"]
     primary_count = assert_primary(endpoint, args.decisions)
@@ -392,8 +479,8 @@ def main() -> int:
         "environment": environment,
         "molformer": molformer,
         "chemprop": chemprop,
-        "role_input_sha256": sha256_file(args.role_input),
-        "clean_input_sha256": sha256_file(args.clean),
+        "role_input_sha256": input_hashes["role_input_sha256"],
+        "clean_input_sha256": input_hashes["clean_sha256"],
         "config_sha256": sha256_file(args.config),
         "script_sha256": sha256_file(Path(__file__)),
     }

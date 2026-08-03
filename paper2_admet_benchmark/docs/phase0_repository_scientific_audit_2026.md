@@ -209,10 +209,12 @@ per cell. If `E=6`, this is 130 cells and approximately:
 - approximately 120 extra D-MPNN fits for the three-training-seed anchor
   sensitivity if only deployment models are repeated.
 
-Planning range for an RTX 4090 is 150--400 GPU-hours including a 20% rerun
-allowance, 300--900 CPU-hours, and 50--150 GB of working storage. These are
-engineering bounds, not a spending authorization. A measured smoke benchmark
-must replace them before the full run, and the user must approve the full GPU run.
+The original planning range assumed an RTX 4090 and was 150--400 GPU-hours,
+including a 20% rerun allowance, plus 300--900 CPU-hours and 50--150 GB of working
+storage. That hardware assumption is now superseded by the user's Windows RTX-4060
+Laptop target. These are historical engineering bounds, not a spending
+authorization; the measured 4060 smoke benchmark must replace them before the full
+run, and the user must approve the full GPU run.
 
 ## Phase 0 decision
 

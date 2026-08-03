@@ -56,6 +56,10 @@ def compare_versions(
     return failures
 
 
+def platform_key() -> str:
+    return f"{platform.system().lower()}_{platform.machine().lower()}"
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -102,6 +106,12 @@ def main() -> int:
             f"python: expected {config['python']}, observed {observed_python}"
         )
 
+    observed_platform = platform_key()
+    if observed_platform != str(config["platform"]).lower():
+        failures.append(
+            f"platform: expected {config['platform']}, observed {observed_platform}"
+        )
+
     torch_details: dict[str, object] = {}
     try:
         import torch
@@ -112,6 +122,14 @@ def main() -> int:
             "device_count": int(torch.cuda.device_count()),
             "device_names": [
                 torch.cuda.get_device_name(index)
+                for index in range(torch.cuda.device_count())
+            ],
+            "device_total_memory_gib": [
+                round(
+                    torch.cuda.get_device_properties(index).total_memory
+                    / (1024**3),
+                    3,
+                )
                 for index in range(torch.cuda.device_count())
             ],
         }
@@ -132,6 +150,15 @@ def main() -> int:
             failures.append(
                 f"torch CUDA build: expected {gpu_config['torch_cuda_build']}, "
                 f"observed {torch_details['cuda_build']}"
+            )
+        minimum_vram = gpu_config.get("minimum_vram_gib")
+        if minimum_vram is not None and (
+            not torch_details["device_total_memory_gib"]
+            or min(torch_details["device_total_memory_gib"]) < float(minimum_vram)
+        ):
+            failures.append(
+                f"GPU VRAM: expected at least {minimum_vram} GiB, "
+                f"observed {torch_details['device_total_memory_gib']}"
             )
     except Exception as exc:
         failures.append(f"torch runtime audit failed: {type(exc).__name__}: {exc}")
@@ -166,6 +193,7 @@ def main() -> int:
         "status": "pass" if not failures else "fail_closed",
         "lock_status": config["status"],
         "python": observed_python,
+        "platform": observed_platform,
         "packages": observed,
         "torch": torch_details,
         "molformer_model_id": config["molformer"]["model_id"],

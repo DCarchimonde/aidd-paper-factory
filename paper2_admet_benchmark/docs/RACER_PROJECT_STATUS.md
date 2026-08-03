@@ -40,8 +40,11 @@ The protocol is explicitly **not frozen**.
 - Passed a development-only seed-99 CPU nested-OOF integration smoke on 2,928
   NR-ER rows without computing a performance metric or predicting any outer role.
 - Added an exact candidate GPU environment audit, fixed MoLFormer revision and
-  token policy, a nine-fit nested benchmark plan, and a development-only
-  RTX-4090 component benchmark entry point.
+  token policy, and a nine-fit nested benchmark plan.
+- Set the user's Windows RTX-4060 Laptop GPU as the active target in the default
+  candidate lock and PowerShell runbook, preserving all scientific settings while
+  fixing MoLFormer inference batch size at 8 and recording platform, visible VRAM,
+  memory peaks, and locked input hashes.
 
 ## Commits
 
@@ -84,6 +87,8 @@ The protocol is explicitly **not frozen**.
 - `scripts/racer_c/prepare_seed99_gpu_benchmark.py`
 - `scripts/racer_c/run_seed99_gpu_component_benchmark.py`
 - `protocols/seed99_gpu_benchmark_runbook.md`
+- `protocols/seed99_gpu_benchmark_windows_rtx4060_runbook.md`
+- `configs/racer_c/gpu_environment_windows_rtx4060.yaml`
 - `docs/phase3_gpu_benchmark_readiness_2026.md`
 
 ## Quality gates
@@ -106,7 +111,8 @@ The protocol is explicitly **not frozen**.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
 - Formal endpoint/protocol freeze: BLOCKED.
 - Full GPU run: BLOCKED pending measured benchmark and user approval.
-- Seed-99 GPU component benchmark: READY, NOT RUN in this non-CUDA container.
+- Seed-99 GPU component benchmark: READY FOR LOCAL WINDOWS RTX-4060, NOT RUN in
+  this non-CUDA container.
 
 ## Known risks
 
@@ -114,7 +120,8 @@ The protocol is explicitly **not frozen**.
   four-way grouped allocation; ClinTox remains the explicit rare-class anchor.
 - The four current primary candidates are distinct Tox21 mechanisms but one NCATS
   Challenge source family, insufficient for an ADMET-wide pooled claim.
-- Honest nested D-MPNN cross-fitting may require 150--400 RTX-4090 GPU-hours.
+- The old 150--400 RTX-4090-hour planning range is provisional and must be
+  replaced by the measured RTX-4060 projection before freeze.
 - Recent selected-risk methods use different estimands and access regimes.
 - RACER-C novelty is empirical/framework-level, not a new coverage theorem.
 - Raw/clean row-level data remain intentionally ignored; committed acquisition,
@@ -136,7 +143,8 @@ The protocol is explicitly **not frozen**.
 ## Next automatic action
 
 Run the fail-closed environment audit and seed-99 component timing benchmark on
-the target RTX 4090, then replace the planning range with the measured projection.
+the user's Windows RTX-4060 Laptop GPU, then replace the planning range with the
+measured projection.
 Do not inspect an extension test prediction, run seeds 101--110, or create a
 formal protocol tag. If no independent source family is prospectively admitted,
 narrow the claim to the Tox21 assay family before freeze.
