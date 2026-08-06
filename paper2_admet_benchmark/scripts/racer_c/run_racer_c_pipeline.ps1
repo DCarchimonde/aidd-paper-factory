@@ -1,6 +1,6 @@
 [CmdletBinding()]
 param(
-    [ValidateSet("Validate", "Benchmark", "Full")]
+    [ValidateSet("Validate", "Benchmark", "FreezeReview", "Full")]
     [string]$Mode = "Benchmark",
     [switch]$ForceRerun,
     [switch]$SkipTests
@@ -69,6 +69,7 @@ $Config = Join-Path $RepoRoot "paper2_admet_benchmark\configs\racer_c\gpu_enviro
 $BenchmarkScript = Join-Path $RepoRoot "paper2_admet_benchmark\scripts\racer_c\run_seed99_gpu_component_benchmark.py"
 $EnvironmentDir = Join-Path $RepoRoot "paper2_admet_benchmark\results\racer_c_phase3_preflight\environment_windows_rtx4060"
 $Result = Join-Path $RepoRoot "paper2_admet_benchmark\results\racer_c_phase3_preflight\seed99_gpu_component_benchmark_windows_rtx4060.json"
+$FreezeReviewResult = Join-Path $RepoRoot "paper2_admet_benchmark\results\racer_c_phase4_freeze_review\formal_freeze_review_windows_rtx4060.json"
 $LogDir = Join-Path $RepoRoot "paper2_admet_benchmark\results\logs"
 $RunId = Get-Date -Format "yyyyMMdd_HHmmss"
 $Log = Join-Path $LogDir "racer_c_${Mode}_${RunId}.log"
@@ -176,10 +177,31 @@ try {
         exit 0
     }
 
+    if ($Mode -eq "FreezeReview") {
+        Invoke-Checked -Name "Prediction-free four-endpoint formal freeze review" -Command {
+            python paper2_admet_benchmark\scripts\racer_c\prepare_formal_freeze_review.py `
+                --config $Config `
+                --benchmark $Result `
+                --output $FreezeReviewResult
+        }
+        $FreezeRecord = Read-JsonFile -Path $FreezeReviewResult
+        if (
+            $null -eq $FreezeRecord -or
+            $FreezeRecord.status -ne "pass_prediction_free_formal_freeze_review" -or
+            $FreezeRecord.scientific_predictions_generated -ne $false -or
+            $FreezeRecord.track_seed_cell_count -ne 60
+        ) {
+            throw "Formal freeze-review command returned without the required prediction-free pass record."
+        }
+        Write-Host "`nFORMAL FREEZE REVIEW COMPLETE: $FreezeReviewResult" -ForegroundColor Green
+        Write-Host "No confirmatory model was fit. Explicit user approval remains required before the protocol tag or seeds 101-110."
+        exit 0
+    }
+
     if ($Mode -eq "Full") {
         $StudyDesign = Get-Content "paper2_admet_benchmark\configs\racer_c\study_design.yaml" -Raw
         if ($StudyDesign -match "protocol_status:\s*draft_pre_freeze") {
-            throw "Full confirmatory execution is blocked: the RACER-C protocol is still draft_pre_freeze. Run Benchmark first; review and freeze are required before seeds 101-110."
+            throw "Full confirmatory execution is blocked: the RACER-C protocol is still draft_pre_freeze. FreezeReview, explicit approval, and the formal protocol tag are required before seeds 101-110."
         }
         $ProductionRunner = "paper2_admet_benchmark\scripts\racer_c\run_confirmatory_racer_c.py"
         if (-not (Test-Path -LiteralPath $ProductionRunner)) {

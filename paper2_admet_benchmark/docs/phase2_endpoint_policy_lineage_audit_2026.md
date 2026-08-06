@@ -132,7 +132,7 @@ Relevant records:
 - 28 protocol, provenance, role, policy, lineage, smoke-output, and integrity tests: PASS.
 - Python compilation and `git diff --check`: PASS.
 - Tox21 acquisition/member hashes and 12 endpoint reconciliation identities: PASS.
-- 3/12 primary, 2/12 secondary, 7/12 calibration-limited: deterministic count-only decision.
+- 4/12 primary, 1/12 secondary, 7/12 calibration-limited: deterministic count-only decision.
 - Formal protocol freeze: BLOCKED.
 - Development-only seed-99 CPU lineage smoke: PASS (2,928/2,928 OOF lineages).
 - GPU smoke: NOT RUN; this container has no CUDA device or PyTorch environment.
@@ -145,5 +145,5 @@ Relevant records:
 3. Instrument the production Chemprop/MoLFormer trainer with the transitive
    lineage records; keep seed 99 as the only technical seed before freeze.
 4. Measure one primary endpoint on the target RTX 4060 Laptop GPU and replace the
-   current 150--400 GPU-hour estimate.
+   historical 150--400 GPU-hour estimate (completed in Phase 3; see the result review).
 5. Obtain user approval before the formal protocol tag and confirmatory run.

@@ -40,6 +40,10 @@ RUNNER = load_module(
 TOKEN_CONTRACT = load_module(
     "racer_molformer_token_contract", SCRIPT_DIR / "molformer_token_contract.py"
 )
+FREEZE_REVIEW = load_module(
+    "racer_prepare_formal_freeze_review",
+    SCRIPT_DIR / "prepare_formal_freeze_review.py",
+)
 
 
 class EnvironmentLockTests(unittest.TestCase):
@@ -237,7 +241,10 @@ class BenchmarkPlanTests(unittest.TestCase):
     def test_windows_one_click_runner_preserves_scientific_gates(self) -> None:
         path = SCRIPT_DIR / "run_racer_c_pipeline.ps1"
         source = path.read_text(encoding="utf-8")
-        self.assertIn('[ValidateSet("Validate", "Benchmark", "Full")]', source)
+        self.assertIn(
+            '[ValidateSet("Validate", "Benchmark", "FreezeReview", "Full")]',
+            source,
+        )
         self.assertIn("capture_gpu_environment.py", source)
         self.assertIn("Invoke-WebRequest", source)
         self.assertIn("prepare_tox21_challenge.py", source)
@@ -255,6 +262,109 @@ class BenchmarkPlanTests(unittest.TestCase):
             source.index("draft_pre_freeze"),
             source.index("run_confirmatory_racer_c.py"),
         )
+
+    def test_freeze_review_is_prediction_free_and_covers_all_primary_cells(self) -> None:
+        self.assertEqual(
+            FREEZE_REVIEW.PRIMARY_ENDPOINTS,
+            (
+                "Tox21_NR_AhR",
+                "Tox21_NR_ER",
+                "Tox21_SR_ARE",
+                "Tox21_SR_MMP",
+            ),
+        )
+        self.assertEqual(
+            len(FREEZE_REVIEW.PRIMARY_ENDPOINTS)
+            * len(FREEZE_REVIEW.TRACKS)
+            * len(FREEZE_REVIEW.SEEDS),
+            60,
+        )
+        semantics = FREEZE_REVIEW.load_primary_semantics(
+            P2 / "protocols" / "endpoint_candidate_manifest.csv"
+        )
+        self.assertEqual(set(semantics), set(FREEZE_REVIEW.PRIMARY_ENDPOINTS))
+        self.assertTrue(all(row["critical_class"] == "1" for row in semantics.values()))
+        source = (SCRIPT_DIR / "run_racer_c_pipeline.ps1").read_text(encoding="utf-8")
+        self.assertIn(
+            '[ValidateSet("Validate", "Benchmark", "FreezeReview", "Full")]',
+            source,
+        )
+        self.assertIn("prepare_formal_freeze_review.py", source)
+        self.assertIn("scientific_predictions_generated", source)
+
+    def test_freeze_review_rejects_benchmark_with_scientific_metrics(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path = root / "lock.yaml"
+            script_path = root / "runner.py"
+            benchmark_path = root / "benchmark.json"
+            config = {
+                "platform": "windows_amd64",
+                "packages": {"chemprop": "2.3.0"},
+                "gpu": {"count": 1, "torch_cuda_build": "13.0"},
+            }
+            config_path.write_text(yaml.safe_dump(config), encoding="utf-8")
+            script_path.write_text("# frozen runner\n", encoding="utf-8")
+            train_seconds = 30.0
+            row = {
+                "status": "pass_gpu_component_benchmark",
+                "seed": 99,
+                "endpoint": "Tox21_NR_ER",
+                "trainer_label_roles": ["dev"],
+                "performance_metrics_computed": True,
+                "policy_conformal_test_predictions_generated": False,
+                "config_sha256": FREEZE_REVIEW.sha256_file(config_path),
+                "script_sha256": FREEZE_REVIEW.sha256_file(script_path),
+                "dev_n": 2926,
+                "lineage_prediction_count": 976,
+                "environment": {
+                    "status": "pass",
+                    "failures": [],
+                    "platform": "windows_amd64",
+                    "packages": {"chemprop": "2.3.0"},
+                    "pip_freeze_sha256": "a" * 64,
+                    "torch": {
+                        "cuda_available": True,
+                        "device_count": 1,
+                        "cuda_build": "13.0",
+                    },
+                },
+                "chemprop": {
+                    "status": "pass_component_timing",
+                    "predict_n": 976,
+                    "finite_probability_count": 976,
+                    "train_seconds": train_seconds,
+                    "predict_seconds": 10.0,
+                    "train_peak_gpu_memory_mib": 2000,
+                },
+                "molformer": {"n": 2926, "seconds": 7.0},
+                "model_eligibility": {
+                    "selection_uses_labels": False,
+                    "source_n": 5855,
+                    "eligible_n": 5852,
+                    "excluded_n": 3,
+                },
+                "planning_projection": {
+                    "projected_primary_dmpnn_gpu_hours": train_seconds * 6 * 60 / 3600,
+                    "projected_with_20pct_rerun_reserve_gpu_hours": train_seconds
+                    * 6
+                    * 60
+                    * 1.2
+                    / 3600,
+                },
+            }
+            benchmark_path.write_text(json.dumps(row), encoding="utf-8")
+            with self.assertRaisesRegex(RuntimeError, "performance metrics were computed"):
+                FREEZE_REVIEW.validate_seed99_benchmark(
+                    benchmark_path, config_path, script_path, config
+                )
+            row["performance_metrics_computed"] = False
+            benchmark_path.write_text(json.dumps(row), encoding="utf-8")
+            reviewed = FREEZE_REVIEW.validate_seed99_benchmark(
+                benchmark_path, config_path, script_path, config
+            )
+            self.assertEqual(reviewed["status"], "pass")
+            self.assertEqual(reviewed["measured_chemprop_train_seconds"], train_seconds)
 
     def test_group_folds_ignore_arbitrary_labels(self) -> None:
         rows = [

@@ -46,6 +46,9 @@ paper2_admet_benchmark/data/processed/*
 paper2_admet_benchmark/results/models/*
 paper2_admet_benchmark/results/logs/*
 paper2_admet_benchmark/results/predictions/*
+paper2_admet_benchmark/results/racer_c_phase3_preflight/environment_windows_rtx4060/*
+paper2_admet_benchmark/results/racer_c_phase3_preflight/seed99_gpu_component_benchmark_windows_rtx4060.json
+paper2_admet_benchmark/results/racer_c_phase4_freeze_review/formal_freeze_review_windows_rtx4060.json
 paper2_admet_benchmark/results/conformal/*conformal_predictions_*.csv
 paper2_admet_benchmark/results/applicability/applicability_details_*.csv
 

@@ -4,8 +4,8 @@ Last updated: 2026-08-06
 
 ## Current phase
 
-Phase 3 target-GPU benchmark readiness after the corrected Phase-2 checkpoint.
-The protocol is explicitly **not frozen**.
+Phase 4 prediction-free formal-freeze review after a successful target-GPU
+component benchmark. The protocol is explicitly **not frozen**.
 
 ## Completed work
 
@@ -58,6 +58,13 @@ The protocol is explicitly **not frozen**.
   domain. Added a byte-locked, cross-verified, label-blind eligibility contract
   that records and removes these structures before role allocation and every
   component fit; truncation and positional-domain extension remain prohibited.
+- Completed the corrected seed-99 RTX-4060 benchmark: MoLFormer and Chemprop
+  passed, 976/976 probabilities were finite and lineage-accounted, no scientific
+  metric was computed, and no policy/conformal/test prediction was generated.
+- Replaced the historical RTX-4090 range with the measured 3.0527 primary
+  D-MPNN GPU-hour projection (3.6632 h with the frozen 20% rerun reserve).
+- Added a fail-closed `FreezeReview` mode that audits the model-domain cohort and
+  all 60 count-only primary endpoint/track/seed cells before a tag can exist.
 
 ## Commits
 
@@ -104,6 +111,8 @@ The protocol is explicitly **not frozen**.
 - `scripts/racer_c/run_racer_c_pipeline.ps1`
 - `configs/racer_c/gpu_environment_windows_rtx4060.yaml`
 - `docs/phase3_gpu_benchmark_readiness_2026.md`
+- `docs/phase3_gpu_benchmark_result_review_2026.md`
+- `scripts/racer_c/prepare_formal_freeze_review.py`
 
 ## Quality gates
 
@@ -112,7 +121,7 @@ The protocol is explicitly **not frozen**.
   34 cited references from 2021--2026).
 - Existing frozen asset integrity: PASS (CRLF-aware for historical table hashes).
 - Protocol, provenance, role, policy, lineage, smoke-output, GPU-plan, and
-  integrity tests: PASS (41/41).
+  integrity tests: PASS; the exact count is recorded by the current test run.
 - Real-data arbitrary-label assignment invariance: PASS (60/60 across five
   endpoints, two covariate-only tracks, and six technical/main seeds).
 - Three licensed CYP raw-file hashes: PASS.
@@ -124,10 +133,11 @@ The protocol is explicitly **not frozen**.
 - Phase 2 primary count gate: 4 primary, 1 secondary, 7 calibration-limited.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
 - Formal endpoint/protocol freeze: BLOCKED.
-- Full GPU run: BLOCKED pending measured benchmark and user approval.
-- Seed-99 GPU component benchmark: FIRST ATTEMPT SAFELY STOPPED before any fit on
-  the newly observed overlength condition; corrected candidate runner is ready
-  for rerun on the user's Windows RTX-4060. No performance metric was computed.
+- Full GPU run: BLOCKED pending four-endpoint freeze review, production
+  implementation, protocol tag, and user approval.
+- Seed-99 GPU component benchmark: PASS on the user's Windows RTX-4060; 976/976
+  predictions finite and lineage-accounted, with no performance metric or
+  policy/conformal/test prediction.
 
 ## Known risks
 
@@ -135,8 +145,8 @@ The protocol is explicitly **not frozen**.
   four-way grouped allocation; ClinTox remains the explicit rare-class anchor.
 - The four current primary candidates are distinct Tox21 mechanisms but one NCATS
   Challenge source family, insufficient for an ADMET-wide pooled claim.
-- The old 150--400 RTX-4090-hour planning range is provisional and must be
-  replaced by the measured RTX-4060 projection before freeze.
+- The measured 3.6632-hour figure covers the primary D-MPNN projection plus 20%
+  rerun reserve; it is not a complete wall-clock budget for every sensitivity.
 - Recent selected-risk methods use different estimands and access regimes.
 - RACER-C novelty is empirical/framework-level, not a new coverage theorem.
 - Raw/clean row-level data remain intentionally ignored; committed acquisition,
@@ -150,20 +160,19 @@ The protocol is explicitly **not frozen**.
   provenance remains unresolved);
 - a primary panel spanning an independent source family, or a prospectively
   narrowed Tox21-family claim;
-- immutable Chemprop/MoLFormer/environment lock;
+- four-endpoint MoLFormer model-domain and post-exclusion role audit;
+- immutable Chemprop/MoLFormer/environment freeze derived from the verified candidate;
 - production Chemprop/MoLFormer lineage instrumentation;
-- GPU smoke benchmark;
 - full production RACER-C implementation and confirmatory orchestrator;
 - user approval for formal protocol tag and full compute.
 
 ## Next automatic action
 
-Run the fail-closed environment audit and seed-99 component timing benchmark on
-the user's Windows RTX-4060 Laptop GPU, then replace the planning range with the
-measured projection.
-Do not inspect an extension test prediction, run seeds 101--110, or create a
-formal protocol tag. If no independent source family is prospectively admitted,
-narrow the claim to the Tox21 assay family before freeze.
+Run the single prediction-free four-endpoint `FreezeReview` gate. Then complete
+the production implementation and freeze-candidate contract tests. Do not inspect
+an extension test prediction, run seeds 101--110, or create a formal protocol tag
+without the user's explicit approval. The confirmatory claim is prospectively
+narrowed to the NCATS Tox21 2014 assay family.
 
 ## Protocol deviations
 

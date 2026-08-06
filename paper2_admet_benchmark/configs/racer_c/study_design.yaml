@@ -1,6 +1,7 @@
 protocol_status: draft_pre_freeze
 protocol_version: 0.1
 base_commit: a1d5f71790cfc7f668fee5455b2be8f88267c5ea
+claim_scope: NCATS_Tox21_2014_internal_distribution_shift_stress_test
 
 outer_role_candidates:
   - {dev: 0.50, policy: 0.10, conformal: 0.20, test: 0.20}
@@ -56,9 +57,9 @@ completed_pre_freeze_gates:
   - abstract_transitive_lineage_contract_tests
   - arbitrary_label_permutation_invariance_for_covariate_shift_roles
   - seed99_gpu_component_benchmark_plan
+  - seed99_windows_rtx4060_component_benchmark
 formal_freeze_blockers:
-  - claim_scope_and_source_family_breadth
-  - exact_software_and_model_revisions
+  - four_endpoint_model_domain_and_role_reaudit
   - production_trainer_lineage_instrumentation
-  - measured_gpu_compute_benchmark
-  - user_approval
+  - full_racer_c_and_access_matched_baseline_implementation
+  - explicit_user_approval

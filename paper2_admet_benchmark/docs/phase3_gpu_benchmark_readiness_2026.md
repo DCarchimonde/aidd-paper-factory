@@ -1,7 +1,7 @@
 # Paper 2 RACER-C Phase 3 GPU benchmark readiness
 
-Date: 2026-08-04
-Status: **implementation ready for target-GPU component timing; GPU not run**
+Date: 2026-08-04 (result update: 2026-08-06)
+Status: **superseded by the successful Phase-3 result review**
 
 ## Phase-2 correction before GPU work
 
@@ -79,11 +79,9 @@ memory peaks and fails on input-hash drift.
 
 ## Current boundary
 
-The user's Windows RTX-4060 successfully loaded CUDA, the pinned tokenizer, and
-the pinned model weights. The first actual command then stopped at the intended
-token-domain gate before any component fit. The corrected plan generation,
-command construction, development-only lineage, exact-version mismatch,
-cross-tokenizer equivalence, token eligibility, and label-blind allocation are
-locally testable. Formal protocol freeze, the complete RACER-C production chain,
-and seeds 101--110 remain blocked until the corrected Windows component benchmark
-passes and its measured budget is approved.
+The first corrected attempt stopped at the intended token-domain gate before a
+component fit. A later attempt exposed and corrected the Chemprop/Lightning
+single-GPU device-count adapter before trainer construction. The final corrected
+seed-99 run passed on 2026-08-06. Its measured budget and remaining freeze gates
+are recorded in `phase3_gpu_benchmark_result_review_2026.md`. Formal protocol
+freeze, the complete RACER-C production chain, and seeds 101--110 remain blocked.
