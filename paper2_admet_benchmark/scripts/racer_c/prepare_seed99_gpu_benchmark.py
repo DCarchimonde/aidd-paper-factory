@@ -10,6 +10,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Iterable, Mapping
 
+from molformer_token_contract import filter_model_eligible_rows
 from role_feasibility import allocate_groups, read_csv, validate_role_input
 
 
@@ -104,7 +105,11 @@ def build_plan(
     role_rows: list[dict[str, str]],
     clean_rows: list[dict[str, str]],
     primary_endpoint_count: int,
+    config: Mapping[str, object],
 ) -> dict[str, object]:
+    role_rows, clean_rows, model_eligibility = filter_model_eligible_rows(
+        role_rows, clean_rows, config
+    )
     endpoint = role_rows[0]["endpoint"]
     allocation = allocate_groups(
         role_rows,
@@ -196,6 +201,7 @@ def build_plan(
         "primary_tracks": 3,
         "primary_seeds": 5,
         "primary_endpoint_track_seed_cells": primary_endpoint_count * 3 * 5,
+        "model_eligibility": model_eligibility,
         "jobs": jobs,
     }
 
@@ -205,6 +211,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--role-input", type=Path, default=DEFAULT_ROLE_INPUT)
     parser.add_argument("--clean", type=Path, default=DEFAULT_CLEAN)
     parser.add_argument("--decisions", type=Path, default=DEFAULT_DECISIONS)
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=P2 / "configs" / "racer_c" / "gpu_environment_lock.yaml",
+    )
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     return parser.parse_args()
 
@@ -217,12 +228,16 @@ def main() -> int:
     clean_rows = read_clean(
         args.clean, {row["structure_id"] for row in role_rows}
     )
-    plan = build_plan(role_rows, clean_rows, primary_endpoint_count)
+    import yaml
+
+    config = yaml.safe_load(args.config.read_text(encoding="utf-8"))
+    plan = build_plan(role_rows, clean_rows, primary_endpoint_count, config)
     plan.update(
         {
             "role_input_sha256": sha256_file(args.role_input),
             "clean_input_sha256": sha256_file(args.clean),
             "endpoint_decisions_sha256": sha256_file(args.decisions),
+            "config_sha256": sha256_file(args.config),
             "script_sha256": sha256_file(Path(__file__)),
         }
     )

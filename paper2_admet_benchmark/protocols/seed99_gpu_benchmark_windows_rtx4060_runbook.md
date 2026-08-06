@@ -4,9 +4,10 @@ Status: **pre-freeze technical benchmark only**.
 
 This is the current approved pre-freeze runbook for the user's local laptop. It
 fixes the execution platform and MoLFormer inference batch size for the RTX 4060.
-Endpoint,
-roles, seed, model revision, token policy, Chemprop architecture, optimization,
-and scientific failure rules are unchanged.
+Endpoint, roles, seed, model revision, Chemprop architecture, and optimization
+remain unchanged. The first real run triggered the candidate token-domain gate
+before any fit; the pre-freeze token policy was consequently corrected as
+documented in `protocol_deviations.md`.
 
 The workflow may read labels only for `D_dev`. It must not generate policy,
 conformal, or test predictions, calculate a performance metric, run seeds
@@ -63,8 +64,11 @@ PyTorch 2.13.0+cu130, Chemprop 2.3.0, and the exact versions in
 `gpu_environment_windows_rtx4060.yaml`. CUDA 13.x requires an R580-or-newer
 driver; the environment audit records the observed driver and fails before a
 model load when this requirement is not met. The MoLFormer extraction batch is
-fixed at 8 for the laptop; embeddings remain float32 and truncation remains
-forbidden.
+fixed at 8 for the laptop; embeddings remain float32. The tokenizer JSON is
+byte-locked. Every source row is checked with the runtime tokenizer and an
+independent exact tokenizer contract. Structures above 202 tokens are recorded
+and excluded before role allocation and all component fits; truncation and
+positional-domain extension are forbidden.
 
 ## 3. Restore the audited NR-ER inputs
 
@@ -149,7 +153,7 @@ if ($LASTEXITCODE -ne 0) { throw "Component dry-run failed" }
 ```
 
 Stop if any command fails. Do not substitute a package, model revision, endpoint,
-track, seed, token truncation rule, or training hyperparameter after a failure.
+track, seed, token rule, or training hyperparameter after a failure.
 
 ## 5. Run the actual seed-99 component benchmark manually
 
@@ -168,8 +172,10 @@ python paper2_admet_benchmark\scripts\racer_c\run_seed99_gpu_component_benchmark
 if ($LASTEXITCODE -ne 0) { throw "GPU component benchmark failed" }
 ```
 
-This executes frozen MoLFormer embedding extraction over 2,928 NR-ER development
-rows and one representative Chemprop outer-final fit/prediction. It does not
+This audits all 5,855 NR-ER rows against the pinned 202-token MoLFormer domain,
+records and excludes three overlength structures without reading their labels,
+then executes frozen MoLFormer embedding extraction over 2,926 eligible NR-ER
+development rows and one representative Chemprop outer-final fit/prediction. It does not
 calculate AUC, Brier score, calibration, policy feasibility, conformal coverage,
 or any other paper outcome.
 

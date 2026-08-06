@@ -120,7 +120,10 @@ recalibrated separately.
    stopping rule, epoch cap, and deterministic seed policy.
 3. **Pretrained block:** frozen IBM MoLFormer embeddings plus an L2 logistic head.
    The immutable model/tokenizer revisions, pooling, max length, input SMILES, and
-   embedding dtype are frozen before use.
+   embedding dtype are frozen before use. At the pre-freeze candidate stage, the
+   pinned 202-token pretraining domain is enforced without truncation: overlength
+   structures and their hashes are reported, then removed label-blindly before
+   role allocation and every predictor-block fit so all blocks share one cohort.
 
 Probabilities are clipped to `[1e-6, 1-1e-6]` before logits. Clipping counts are
 reported. Isotonic calibration is sensitivity-only when prespecified class-count

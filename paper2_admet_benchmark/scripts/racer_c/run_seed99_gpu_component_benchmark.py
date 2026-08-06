@@ -19,6 +19,10 @@ from typing import Iterable, Mapping
 import yaml
 
 from lineage_contract import FitNode, PredictionNode, validate_prediction_lineage
+from molformer_token_contract import (
+    filter_model_eligible_rows,
+    verify_runtime_tokenizer,
+)
 from prepare_seed99_gpu_benchmark import (
     FRACTIONS,
     GROUP_COLUMN,
@@ -135,20 +139,18 @@ def split_anchor(
 
 
 def extract_molformer(
-    rows: list[dict[str, str]], config: Mapping[str, object], output: Path
+    rows: list[dict[str, str]],
+    config: Mapping[str, object],
+    tokenizer: object,
+    output: Path,
 ) -> dict[str, object]:
     import numpy as np
     import torch
-    from transformers import AutoModel, AutoTokenizer
+    from transformers import AutoModel
 
     model_config = config["molformer"]
     model_id = model_config["model_id"]
     revision = model_config["revision"]
-    tokenizer = AutoTokenizer.from_pretrained(
-        model_id,
-        revision=revision,
-        trust_remote_code=bool(model_config["trust_remote_code"]),
-    )
     torch.cuda.empty_cache()
     torch.cuda.reset_peak_memory_stats()
     model = AutoModel.from_pretrained(
@@ -429,6 +431,21 @@ def main() -> int:
     endpoint = role_rows[0]["endpoint"]
     primary_count = assert_primary(endpoint, args.decisions)
     clean_rows = read_clean(args.clean, {row["structure_id"] for row in role_rows})
+    from transformers import AutoTokenizer
+
+    tokenizer = AutoTokenizer.from_pretrained(
+        config["molformer"]["model_id"],
+        revision=config["molformer"]["revision"],
+        trust_remote_code=bool(config["molformer"]["trust_remote_code"]),
+    )
+    verify_runtime_tokenizer(
+        clean_rows,
+        tokenizer,
+        str(config["molformer"]["input_column"]),
+    )
+    role_rows, clean_rows, model_eligibility = filter_model_eligible_rows(
+        role_rows, clean_rows, config
+    )
     dev_rows = development_rows(role_rows, clean_rows)
     fit, validation, predict_rows = split_anchor(
         dev_rows, float(config["chemprop"]["internal_validation_fraction"])
@@ -436,7 +453,10 @@ def main() -> int:
     if not args.dry_run:
         environment = require_environment(args.environment_audit, config)
         molformer = extract_molformer(
-            dev_rows, config, args.work_dir / "molformer_embeddings.npy"
+            dev_rows,
+            config,
+            tokenizer,
+            args.work_dir / "molformer_embeddings.npy",
         )
     else:
         environment = {"status": "not_read_in_dry_run"}
@@ -475,6 +495,7 @@ def main() -> int:
         "policy_conformal_test_predictions_generated": False,
         "performance_metrics_computed": False,
         "dev_n": len(dev_rows),
+        "model_eligibility": model_eligibility,
         "lineage_prediction_count": len(predictions),
         "environment": environment,
         "molformer": molformer,

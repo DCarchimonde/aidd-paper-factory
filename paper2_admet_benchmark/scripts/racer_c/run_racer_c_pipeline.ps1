@@ -28,9 +28,18 @@ function Read-JsonFile {
 }
 
 function Test-PassedBenchmark {
-    param([Parameter(Mandatory = $true)][string]$Path)
+    param(
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$ConfigPath,
+        [Parameter(Mandatory = $true)][string]$ScriptPath
+    )
     $Record = Read-JsonFile -Path $Path
-    return ($null -ne $Record -and $Record.status -eq "pass_gpu_component_benchmark")
+    return (
+        $null -ne $Record -and
+        $Record.status -eq "pass_gpu_component_benchmark" -and
+        $Record.config_sha256 -eq (Get-Sha256 -Path $ConfigPath) -and
+        $Record.script_sha256 -eq (Get-Sha256 -Path $ScriptPath)
+    )
 }
 
 function Get-Sha256 {
@@ -57,6 +66,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 Set-Location $RepoRoot
 
 $Config = Join-Path $RepoRoot "paper2_admet_benchmark\configs\racer_c\gpu_environment_lock.yaml"
+$BenchmarkScript = Join-Path $RepoRoot "paper2_admet_benchmark\scripts\racer_c\run_seed99_gpu_component_benchmark.py"
 $EnvironmentDir = Join-Path $RepoRoot "paper2_admet_benchmark\results\racer_c_phase3_preflight\environment_windows_rtx4060"
 $Result = Join-Path $RepoRoot "paper2_admet_benchmark\results\racer_c_phase3_preflight\seed99_gpu_component_benchmark_windows_rtx4060.json"
 $LogDir = Join-Path $RepoRoot "paper2_admet_benchmark\results\logs"
@@ -182,7 +192,7 @@ try {
         exit 0
     }
 
-    if ((Test-PassedBenchmark -Path $Result) -and -not $ForceRerun) {
+    if ((Test-PassedBenchmark -Path $Result -ConfigPath $Config -ScriptPath $BenchmarkScript) -and -not $ForceRerun) {
         Write-Host "`nBENCHMARK ALREADY PASSED: $Result" -ForegroundColor Yellow
         Write-Host "Use -ForceRerun only when a scientifically documented rerun is required."
         exit 0
@@ -192,7 +202,7 @@ try {
         python paper2_admet_benchmark\scripts\racer_c\run_seed99_gpu_component_benchmark.py --config $Config --environment-audit "$EnvironmentDir\environment_audit.json" --work-dir $WorkDir --output $Result
     }
 
-    if (-not (Test-PassedBenchmark -Path $Result)) {
+    if (-not (Test-PassedBenchmark -Path $Result -ConfigPath $Config -ScriptPath $BenchmarkScript)) {
         throw "Benchmark command returned but the required pass record is missing."
     }
     Write-Host "`nSEED-99 GPU BENCHMARK COMPLETE: $Result" -ForegroundColor Green

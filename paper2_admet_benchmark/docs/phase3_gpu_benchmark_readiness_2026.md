@@ -34,8 +34,14 @@ still-candidate runtime; they do not alter any scientific parameter.
 The IBM Research model is fixed to
 `ibm-research/MoLFormer-XL-both-10pct` revision
 `361063d0ad524ef77cf39b08469f6be770dc550f`. Frozen embeddings use
-`pooler_output` in float32. Token sequences above 202 tokens fail before any fit;
-truncation is prohibited.
+`pooler_output` in float32. The pinned model card states that molecules above
+202 tokens were dropped during pretraining. The first real seed-99 attempt found
+three NR-ER structures above that domain (227, 239, and 242 tokens) and stopped
+before any component fit. The corrected pre-freeze contract verifies the pinned
+runtime tokenizer against an independently implemented exact regex, records the
+excluded structure and SMILES hashes, removes overlength structures before role
+allocation and every component fit, and prohibits both truncation and positional-
+domain extension.
 
 This is not yet an immutable environment lock. The active runtime auditor requires
 the user's Windows NVIDIA GeForce RTX 4060 Laptop GPU, at least 7 GiB visible VRAM,
@@ -46,8 +52,10 @@ freeze`, and the fixed model revision. Any mismatch yields `fail_closed`.
 
 The committed seed-99 plan uses only the NR-ER strict-scaffold development role:
 
-- development rows: 2,928 (class 0: 2,653; class 1: 275);
-- three outer meta-folds of 976 rows each;
+- source rows audited for model eligibility: 5,855;
+- eligible rows after the label-blind 202-token rule: 5,852;
+- development rows after eligibility and role allocation: 2,926 (class 0: 2,669; class 1: 257);
+- three outer meta-folds of 975--976 rows;
 - six inner D-MPNN fits plus three outer-final fits per full nested cell;
 - four primary endpoints, three tracks, and five main seeds, or 60 primary cells;
 - no policy/conformal/test prediction and no performance metric.
@@ -71,9 +79,11 @@ memory peaks and fails on input-hash drift.
 
 ## Current boundary
 
-The present container has no NVIDIA device, PyTorch, Chemprop, or Transformers, so
-the GPU command was not run here. Plan generation, command construction,
-development-only lineage, exact version mismatch, token policy, and label-blind
-allocation are locally testable. Formal protocol freeze, the complete RACER-C
-production chain, and seeds 101--110 remain blocked until the Windows RTX-4060
-Laptop component benchmark passes and its measured budget is approved.
+The user's Windows RTX-4060 successfully loaded CUDA, the pinned tokenizer, and
+the pinned model weights. The first actual command then stopped at the intended
+token-domain gate before any component fit. The corrected plan generation,
+command construction, development-only lineage, exact-version mismatch,
+cross-tokenizer equivalence, token eligibility, and label-blind allocation are
+locally testable. Formal protocol freeze, the complete RACER-C production chain,
+and seeds 101--110 remain blocked until the corrected Windows component benchmark
+passes and its measured budget is approved.

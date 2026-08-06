@@ -1,5 +1,5 @@
 status: candidate_pending_windows_rtx4060_verification
-lock_version: 0.2
+lock_version: 0.3
 python: 3.11.13
 platform: windows_amd64
 
@@ -30,6 +30,7 @@ packages:
 molformer:
   model_id: ibm-research/MoLFormer-XL-both-10pct
   revision: 361063d0ad524ef77cf39b08469f6be770dc550f
+  tokenizer_json_sha256: 3df1f2219653c44fac9fa03b7f788b372eb2544ecc176737bb9aca8411b471a5
   trust_remote_code: true
   deterministic_eval: true
   input_column: standardized_smiles
@@ -38,7 +39,7 @@ molformer:
   inference_batch_size: 8
   max_tokens_including_special_tokens: 202
   truncation: false
-  overlength_action: fail_closed_before_any_fit
+  overlength_action: exclude_before_role_assignment_and_all_component_fits
 
 chemprop:
   task_type: classification

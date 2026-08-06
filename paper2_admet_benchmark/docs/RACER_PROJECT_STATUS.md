@@ -52,6 +52,12 @@ The protocol is explicitly **not frozen**.
 - Added explicit NVIDIA driver capture and the CUDA-13 minimum driver contract
   (`580.00`) after a real RTX-4060 installation reported
   `cudaErrorNotSupported` with an older driver.
+- Ran the first real seed-99 MoLFormer attempt far enough to load CUDA, the pinned
+  tokenizer, and the pinned weights. It stopped before any component fit because
+  three of 5,855 NR-ER structures exceeded the model's 202-token pretraining
+  domain. Added a byte-locked, cross-verified, label-blind eligibility contract
+  that records and removes these structures before role allocation and every
+  component fit; truncation and positional-domain extension remain prohibited.
 
 ## Commits
 
@@ -106,7 +112,7 @@ The protocol is explicitly **not frozen**.
   34 cited references from 2021--2026).
 - Existing frozen asset integrity: PASS (CRLF-aware for historical table hashes).
 - Protocol, provenance, role, policy, lineage, smoke-output, GPU-plan, and
-  integrity tests: PASS (33/33).
+  integrity tests: PASS (41/41).
 - Real-data arbitrary-label assignment invariance: PASS (60/60 across five
   endpoints, two covariate-only tracks, and six technical/main seeds).
 - Three licensed CYP raw-file hashes: PASS.
@@ -119,10 +125,9 @@ The protocol is explicitly **not frozen**.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
 - Formal endpoint/protocol freeze: BLOCKED.
 - Full GPU run: BLOCKED pending measured benchmark and user approval.
-- Seed-99 GPU component benchmark: READY on the user's Windows RTX-4060 runtime
-  after PyTorch reported `CUDA available: True`; the fail-closed environment
-  audit will still verify the exact driver before model loading. NOT RUN in this
-  non-CUDA container.
+- Seed-99 GPU component benchmark: FIRST ATTEMPT SAFELY STOPPED before any fit on
+  the newly observed overlength condition; corrected candidate runner is ready
+  for rerun on the user's Windows RTX-4060. No performance metric was computed.
 
 ## Known risks
 

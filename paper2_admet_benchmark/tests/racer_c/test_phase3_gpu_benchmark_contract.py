@@ -37,6 +37,9 @@ RUNNER = load_module(
     "racer_run_gpu_component_benchmark",
     SCRIPT_DIR / "run_seed99_gpu_component_benchmark.py",
 )
+TOKEN_CONTRACT = load_module(
+    "racer_molformer_token_contract", SCRIPT_DIR / "molformer_token_contract.py"
+)
 
 
 class EnvironmentLockTests(unittest.TestCase):
@@ -63,9 +66,74 @@ class EnvironmentLockTests(unittest.TestCase):
         )
         self.assertFalse(self.config["molformer"]["truncation"])
         self.assertEqual(
-            self.config["molformer"]["overlength_action"],
-            "fail_closed_before_any_fit",
+            self.config["molformer"]["max_tokens_including_special_tokens"], 202
         )
+        self.assertEqual(
+            self.config["molformer"]["tokenizer_json_sha256"],
+            "3df1f2219653c44fac9fa03b7f788b372eb2544ecc176737bb9aca8411b471a5",
+        )
+        self.assertEqual(
+            self.config["molformer"]["overlength_action"],
+            "exclude_before_role_assignment_and_all_component_fits",
+        )
+
+    def test_token_domain_filter_is_exact_and_label_blind(self) -> None:
+        role = [
+            {
+                "endpoint": "toy",
+                "structure_id": "short",
+                "target": "0",
+                "murcko_scaffold_id": "g1",
+                "similarity_cluster_id": "c1",
+            },
+            {
+                "endpoint": "toy",
+                "structure_id": "long",
+                "target": "1",
+                "murcko_scaffold_id": "g2",
+                "similarity_cluster_id": "c2",
+            },
+        ]
+        clean = [
+            {
+                "structure_id": "short",
+                "source_record_id": "1",
+                "standardized_smiles": "CC",
+            },
+            {
+                "structure_id": "long",
+                "source_record_id": "2",
+                "standardized_smiles": "C" * 201,
+            },
+        ]
+        first_role, first_clean, first_report = (
+            TOKEN_CONTRACT.filter_model_eligible_rows(role, clean, self.config)
+        )
+        changed = [dict(row, target=str(1 - int(row["target"]))) for row in role]
+        second_role, second_clean, second_report = (
+            TOKEN_CONTRACT.filter_model_eligible_rows(changed, clean, self.config)
+        )
+        self.assertEqual([row["structure_id"] for row in first_role], ["short"])
+        self.assertEqual([row["structure_id"] for row in first_clean], ["short"])
+        self.assertEqual([row["structure_id"] for row in second_role], ["short"])
+        self.assertEqual([row["structure_id"] for row in second_clean], ["short"])
+        self.assertEqual(first_report, second_report)
+        self.assertEqual(first_report["excluded_n"], 1)
+        self.assertEqual(first_report["source_max_tokens_observed"], 203)
+        self.assertEqual(first_report["eligible_max_tokens_observed"], 4)
+        self.assertFalse(first_report["selection_uses_labels"])
+
+    def test_runtime_tokenizer_mismatch_fails_closed(self) -> None:
+        class FakeTokenizer:
+            def __call__(self, smiles, **kwargs):
+                return {"input_ids": [[0, 9, 1] for _ in smiles]}
+
+        with self.assertRaisesRegex(RuntimeError, "runtime tokenizer differs"):
+            TOKEN_CONTRACT.verify_runtime_tokenizer(
+                [{"structure_id": "s1", "standardized_smiles": "CC"}],
+                FakeTokenizer(),
+                "standardized_smiles",
+            )
 
     def test_version_mismatch_fails_closed(self) -> None:
         failures = ENVIRONMENT.compare_versions(
@@ -175,6 +243,8 @@ class BenchmarkPlanTests(unittest.TestCase):
         self.assertIn("edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900", source)
         self.assertIn("prepare_seed99_gpu_benchmark.py", source)
         self.assertIn("run_seed99_gpu_component_benchmark.py", source)
+        self.assertIn("$Record.config_sha256", source)
+        self.assertIn("$Record.script_sha256", source)
         self.assertIn("draft_pre_freeze", source)
         self.assertIn("run_confirmatory_racer_c.py", source)
         self.assertLess(
