@@ -273,6 +273,12 @@ def chemprop_commands(
     config: Mapping[str, object],
 ) -> tuple[list[str], list[str]]:
     cp = config["chemprop"]
+    devices = str(cp["devices"])
+    if not devices.isdecimal() or int(devices) < 1:
+        raise ValueError(
+            "Chemprop devices must be a positive device count; use 1 for the "
+            "single visible RTX-4060 GPU"
+        )
     train = [
         "chemprop",
         "train",
@@ -317,7 +323,7 @@ def chemprop_commands(
         "--accelerator",
         str(cp["accelerator"]),
         "--devices",
-        str(cp["devices"]),
+        devices,
         "--output-dir",
         str(model_dir),
     ]
@@ -335,7 +341,7 @@ def chemprop_commands(
         "--accelerator",
         str(cp["accelerator"]),
         "--devices",
-        str(cp["devices"]),
+        devices,
     ]
     return train, predict
 

@@ -53,6 +53,7 @@ class EnvironmentLockTests(unittest.TestCase):
             "candidate_pending_windows_rtx4060_verification",
         )
         self.assertEqual(self.config["platform"], "windows_amd64")
+        self.assertEqual(str(self.config["lock_version"]), "0.4")
         self.assertEqual(
             self.config["gpu"]["device_name_contains"], "RTX 4060 Laptop GPU"
         )
@@ -76,6 +77,9 @@ class EnvironmentLockTests(unittest.TestCase):
             self.config["molformer"]["overlength_action"],
             "exclude_before_role_assignment_and_all_component_fits",
         )
+        self.assertEqual(self.config["gpu"]["count"], 1)
+        self.assertEqual(self.config["chemprop"]["accelerator"], "gpu")
+        self.assertEqual(self.config["chemprop"]["devices"], "1")
 
     def test_token_domain_filter_is_exact_and_label_blind(self) -> None:
         role = [
@@ -299,9 +303,27 @@ class BenchmarkPlanTests(unittest.TestCase):
         )
         self.assertIn("99", train)
         self.assertIn("gpu", train)
+        self.assertEqual(train[train.index("--devices") + 1], "1")
+        self.assertEqual(predict[predict.index("--devices") + 1], "1")
         self.assertNotIn("--class-balance", train)
         self.assertIn("--splits-column", train)
         self.assertIn("--model-paths", predict)
+
+    def test_chemprop_zero_devices_fails_before_launch(self) -> None:
+        config = yaml.safe_load(
+            (P2 / "configs" / "racer_c" / "gpu_environment_lock.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        config["chemprop"]["devices"] = "0"
+        with self.assertRaisesRegex(ValueError, "positive device count"):
+            RUNNER.chemprop_commands(
+                Path("train.csv"),
+                Path("predict.csv"),
+                Path("model"),
+                Path("predictions.csv"),
+                config,
+            )
 
 
 if __name__ == "__main__":

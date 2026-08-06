@@ -1,5 +1,5 @@
 status: candidate_pending_windows_rtx4060_verification
-lock_version: 0.3
+lock_version: 0.4
 python: 3.11.13
 platform: windows_amd64
 
@@ -59,7 +59,7 @@ chemprop:
   internal_validation_fraction: 0.10
   internal_validation_assignment: label_blind_group_size_seeded
   accelerator: gpu
-  devices: "0"
+  devices: "1"
   training_regime: unweighted
 
 runtime_lock_outputs:
