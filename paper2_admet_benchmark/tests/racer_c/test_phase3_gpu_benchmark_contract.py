@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import sys
 import tempfile
 import unittest
@@ -82,6 +83,36 @@ class EnvironmentLockTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
         )
         self.assertEqual(windows, self.config)
+
+    def test_python311_requirements_match_environment_lock(self) -> None:
+        requirements_path = (
+            P2 / "environment" / "racer_c_gpu_requirements.txt"
+        )
+        requirement_versions = {}
+        for line in requirements_path.read_text(encoding="utf-8").splitlines():
+            match = re.fullmatch(r"([A-Za-z0-9_-]+)==([0-9]+(?:\.[0-9]+)+)", line)
+            if match:
+                requirement_versions[match.group(1).lower()] = match.group(2)
+
+        package_names = {
+            "chemprop": "chemprop",
+            "transformers": "transformers",
+            "rdkit": "rdkit",
+            "numpy": "numpy",
+            "scipy": "scipy",
+            "pandas": "pandas",
+            "scikit-learn": "scikit-learn",
+            "xgboost": "xgboost",
+            "pyyaml": "pyyaml",
+        }
+        expected = {
+            requirement: str(self.config["packages"][lock_name])
+            for requirement, lock_name in package_names.items()
+        }
+        self.assertEqual(requirement_versions, expected)
+        self.assertEqual(self.config["python"], "3.11.13")
+        self.assertEqual(requirement_versions["scipy"], "1.17.1")
+        self.assertEqual(requirement_versions["xgboost"], "3.2.0")
 
     def test_input_hash_mismatch_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

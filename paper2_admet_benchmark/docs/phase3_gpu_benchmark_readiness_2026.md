@@ -26,7 +26,11 @@ seed 99 and seeds 101--105. Assignments were identical in 60/60 real-data checks
 ## Candidate production environment
 
 The target candidate is Python 3.11.13, PyTorch 2.13.0 with CUDA 13.0, Chemprop
-2.3.0, Transformers 5.12.1, RDKit 2026.3.4, scikit-learn 1.9.0, and XGBoost 3.3.0.
+2.3.0, Transformers 5.12.1, RDKit 2026.3.4, SciPy 1.17.1, scikit-learn
+1.9.0, and XGBoost 3.2.0. SciPy 1.18.0 and XGBoost 3.3.0 were rejected during
+the first Windows installation attempt because both require Python 3.12 or
+newer. The replacements are installation-compatibility corrections within the
+still-candidate runtime; they do not alter any scientific parameter.
 The IBM Research model is fixed to
 `ibm-research/MoLFormer-XL-both-10pct` revision
 `361063d0ad524ef77cf39b08469f6be770dc550f`. Frozen embeddings use
