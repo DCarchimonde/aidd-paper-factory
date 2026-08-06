@@ -12,6 +12,27 @@ The workflow may read labels only for `D_dev`. It must not generate policy,
 conformal, or test predictions, calculate a performance metric, run seeds
 101--110, or create a protocol tag.
 
+## Fast path: one command after installation
+
+The fail-closed runner first verifies the ignored local NR-ER inputs. If they are
+missing, it downloads the locked official NCATS archive, verifies the archive and
+SDF hashes, deterministically rebuilds the clean/role inputs, and performs the
+label-blind NR-ER similarity clustering. It then performs the driver/package
+audit, plan generation, test suite, dry-run, actual benchmark, logging, and
+passed-result check in order:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c\run_racer_c_pipeline.ps1 -Mode Benchmark
+```
+
+It stops at the first failure. A completed benchmark is skipped on a later call
+unless `-ForceRerun` is supplied. Each fresh attempt uses a separate ignored work
+directory, so an interrupted partial fit is never mistaken for a passed run.
+
+`-Mode Full` is intentionally blocked while the protocol remains
+`draft_pre_freeze` or the production runner is absent. It cannot silently turn a
+technical seed-99 benchmark into confirmatory seeds 101--110.
+
 ## 1. Update the extension branch
 
 Open **Anaconda PowerShell Prompt**:
@@ -37,9 +58,12 @@ python -m pip install -r paper2_admet_benchmark\environment\racer_c_gpu_requirem
 ```
 
 The candidate runtime is Windows AMD64, one NVIDIA GeForce RTX 4060 Laptop GPU,
-at least 7 GiB visible VRAM, PyTorch 2.13.0+cu130, Chemprop 2.3.0, and the exact
-versions in `gpu_environment_windows_rtx4060.yaml`. The MoLFormer extraction batch
-is fixed at 8 for the laptop; embeddings remain float32 and truncation remains
+at least 7 GiB visible VRAM, an NVIDIA driver version of at least `580.00`,
+PyTorch 2.13.0+cu130, Chemprop 2.3.0, and the exact versions in
+`gpu_environment_windows_rtx4060.yaml`. CUDA 13.x requires an R580-or-newer
+driver; the environment audit records the observed driver and fails before a
+model load when this requirement is not met. The MoLFormer extraction batch is
+fixed at 8 for the laptop; embeddings remain float32 and truncation remains
 forbidden.
 
 ## 3. Restore the audited NR-ER inputs
@@ -100,7 +124,7 @@ If the two processed files already existed but the raw source folder did not,
 verify the two processed-file hashes directly; the benchmark runner independently
 rechecks them and will fail closed on any mismatch.
 
-## 4. Run the fail-closed preflight
+## 4. Run the fail-closed preflight manually (diagnostic alternative)
 
 ```powershell
 $Config = "paper2_admet_benchmark\configs\racer_c\gpu_environment_windows_rtx4060.yaml"
@@ -127,7 +151,7 @@ if ($LASTEXITCODE -ne 0) { throw "Component dry-run failed" }
 Stop if any command fails. Do not substitute a package, model revision, endpoint,
 track, seed, token truncation rule, or training hyperparameter after a failure.
 
-## 5. Run the actual seed-99 component benchmark
+## 5. Run the actual seed-99 component benchmark manually
 
 Close memory-heavy GPU applications first. The program records MoLFormer torch
 peak allocation/reservation and samples whole-device memory during Chemprop.

@@ -1,6 +1,6 @@
 # RACER extension project status
 
-Last updated: 2026-08-03
+Last updated: 2026-08-06
 
 ## Current phase
 
@@ -45,6 +45,13 @@ The protocol is explicitly **not frozen**.
   candidate lock and PowerShell runbook, preserving all scientific settings while
   fixing MoLFormer inference batch size at 8 and recording platform, visible VRAM,
   memory peaks, and locked input hashes.
+- Added a fail-closed Windows pipeline controller with `Validate`, `Benchmark`,
+  and `Full` modes. The current approved one-command path runs every seed-99
+  benchmark prerequisite and component in order; `Full` remains blocked by the
+  formal freeze and missing production runner.
+- Added explicit NVIDIA driver capture and the CUDA-13 minimum driver contract
+  (`580.00`) after a real RTX-4060 installation reported
+  `cudaErrorNotSupported` with an older driver.
 
 ## Commits
 
@@ -88,6 +95,7 @@ The protocol is explicitly **not frozen**.
 - `scripts/racer_c/run_seed99_gpu_component_benchmark.py`
 - `protocols/seed99_gpu_benchmark_runbook.md`
 - `protocols/seed99_gpu_benchmark_windows_rtx4060_runbook.md`
+- `scripts/racer_c/run_racer_c_pipeline.ps1`
 - `configs/racer_c/gpu_environment_windows_rtx4060.yaml`
 - `docs/phase3_gpu_benchmark_readiness_2026.md`
 
@@ -111,8 +119,10 @@ The protocol is explicitly **not frozen**.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
 - Formal endpoint/protocol freeze: BLOCKED.
 - Full GPU run: BLOCKED pending measured benchmark and user approval.
-- Seed-99 GPU component benchmark: READY FOR LOCAL WINDOWS RTX-4060, NOT RUN in
-  this non-CUDA container.
+- Seed-99 GPU component benchmark: READY on the user's Windows RTX-4060 runtime
+  after PyTorch reported `CUDA available: True`; the fail-closed environment
+  audit will still verify the exact driver before model loading. NOT RUN in this
+  non-CUDA container.
 
 ## Known risks
 
@@ -138,6 +148,7 @@ The protocol is explicitly **not frozen**.
 - immutable Chemprop/MoLFormer/environment lock;
 - production Chemprop/MoLFormer lineage instrumentation;
 - GPU smoke benchmark;
+- full production RACER-C implementation and confirmatory orchestrator;
 - user approval for formal protocol tag and full compute.
 
 ## Next automatic action

@@ -60,6 +60,55 @@ def platform_key() -> str:
     return f"{platform.system().lower()}_{platform.machine().lower()}"
 
 
+def numeric_version(value: str) -> tuple[int, ...]:
+    """Return a comparable numeric prefix for NVIDIA-style driver versions."""
+
+    fields = value.strip().split(".")
+    if not fields or any(not field.isdigit() for field in fields):
+        raise ValueError(f"invalid numeric version: {value!r}")
+    return tuple(int(field) for field in fields)
+
+
+def query_nvidia_smi() -> tuple[str, dict[str, object], list[str]]:
+    failures: list[str] = []
+    details: dict[str, object] = {}
+    try:
+        full_output = subprocess.run(
+            ["nvidia-smi"], check=True, capture_output=True, text=True
+        ).stdout
+        query_output = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-gpu=driver_version,name,memory.total",
+                "--format=csv,noheader,nounits",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        rows = []
+        for line in query_output.splitlines():
+            if not line.strip():
+                continue
+            fields = [field.strip() for field in line.split(",")]
+            if len(fields) != 3:
+                raise ValueError(f"unexpected nvidia-smi query row: {line!r}")
+            rows.append(
+                {
+                    "driver_version": fields[0],
+                    "device_name": fields[1],
+                    "memory_total_mib": int(fields[2]),
+                }
+            )
+        if not rows:
+            raise ValueError("nvidia-smi returned no GPU rows")
+        details = {"gpus": rows}
+        return full_output, details, failures
+    except Exception as exc:
+        failures.append(f"nvidia-smi failed: {type(exc).__name__}: {exc}")
+        return f"FAILED: {type(exc).__name__}: {exc}\n", details, failures
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -163,13 +212,23 @@ def main() -> int:
     except Exception as exc:
         failures.append(f"torch runtime audit failed: {type(exc).__name__}: {exc}")
 
-    try:
-        nvidia_smi = subprocess.run(
-            ["nvidia-smi"], check=True, capture_output=True, text=True
-        ).stdout
-    except Exception as exc:
-        nvidia_smi = f"FAILED: {type(exc).__name__}: {exc}\n"
-        failures.append("nvidia-smi failed")
+    nvidia_smi, nvidia_details, nvidia_failures = query_nvidia_smi()
+    failures.extend(nvidia_failures)
+    gpu_config = config["gpu"]
+    if nvidia_details:
+        gpu_rows = nvidia_details["gpus"]
+        minimum_driver = str(gpu_config["minimum_driver_version"])
+        for row in gpu_rows:
+            observed_driver = str(row["driver_version"])
+            try:
+                if numeric_version(observed_driver) < numeric_version(minimum_driver):
+                    failures.append(
+                        "NVIDIA driver: CUDA "
+                        f"{gpu_config['torch_cuda_build']} requires at least "
+                        f"{minimum_driver}, observed {observed_driver}"
+                    )
+            except ValueError as exc:
+                failures.append(str(exc))
 
     freeze = subprocess.run(
         [sys.executable, "-m", "pip", "freeze", "--all"],
@@ -196,6 +255,7 @@ def main() -> int:
         "platform": observed_platform,
         "packages": observed,
         "torch": torch_details,
+        "nvidia_smi": nvidia_details,
         "molformer_model_id": config["molformer"]["model_id"],
         "molformer_revision": config["molformer"]["revision"],
         "pip_freeze_sha256": sha256_bytes(freeze_bytes),

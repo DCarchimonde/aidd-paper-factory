@@ -54,6 +54,7 @@ class EnvironmentLockTests(unittest.TestCase):
             self.config["gpu"]["device_name_contains"], "RTX 4060 Laptop GPU"
         )
         self.assertGreaterEqual(self.config["gpu"]["minimum_vram_gib"], 7.0)
+        self.assertEqual(self.config["gpu"]["minimum_driver_version"], "580.00")
         for value in self.config["packages"].values():
             self.assertRegex(str(value), r"^\d+\.\d+\.\d+$")
         self.assertEqual(
@@ -72,6 +73,18 @@ class EnvironmentLockTests(unittest.TestCase):
             {"torch": "2.13.0+cu130", "chemprop": "2.2.4"},
         )
         self.assertEqual(failures, ["chemprop: expected 2.3.0, observed 2.2.4"])
+
+    def test_nvidia_driver_versions_are_compared_numerically(self) -> None:
+        self.assertLess(
+            ENVIRONMENT.numeric_version("576.80"),
+            ENVIRONMENT.numeric_version("580.00"),
+        )
+        self.assertGreaterEqual(
+            ENVIRONMENT.numeric_version("580.126.20"),
+            ENVIRONMENT.numeric_version("580.00"),
+        )
+        with self.assertRaisesRegex(ValueError, "invalid numeric version"):
+            ENVIRONMENT.numeric_version("not-a-driver")
 
     def test_windows_rtx4060_named_lock_matches_active_lock(self) -> None:
         windows = yaml.safe_load(
@@ -149,6 +162,26 @@ class EnvironmentLockTests(unittest.TestCase):
 
 
 class BenchmarkPlanTests(unittest.TestCase):
+    def test_windows_one_click_runner_preserves_scientific_gates(self) -> None:
+        path = SCRIPT_DIR / "run_racer_c_pipeline.ps1"
+        source = path.read_text(encoding="utf-8")
+        self.assertIn('[ValidateSet("Validate", "Benchmark", "Full")]', source)
+        self.assertIn("capture_gpu_environment.py", source)
+        self.assertIn("Invoke-WebRequest", source)
+        self.assertIn("prepare_tox21_challenge.py", source)
+        self.assertIn("build_similarity_clusters.py", source)
+        self.assertIn("024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b", source)
+        self.assertIn("2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0", source)
+        self.assertIn("edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900", source)
+        self.assertIn("prepare_seed99_gpu_benchmark.py", source)
+        self.assertIn("run_seed99_gpu_component_benchmark.py", source)
+        self.assertIn("draft_pre_freeze", source)
+        self.assertIn("run_confirmatory_racer_c.py", source)
+        self.assertLess(
+            source.index("draft_pre_freeze"),
+            source.index("run_confirmatory_racer_c.py"),
+        )
+
     def test_group_folds_ignore_arbitrary_labels(self) -> None:
         rows = [
             {

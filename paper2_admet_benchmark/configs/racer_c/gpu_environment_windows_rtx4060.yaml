@@ -13,6 +13,7 @@ gpu:
   device_name_contains: RTX 4060 Laptop GPU
   minimum_vram_gib: 7.0
   torch_cuda_build: "13.0"
+  minimum_driver_version: "580.00"
 
 packages:
   torch: 2.13.0
