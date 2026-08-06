@@ -87,7 +87,11 @@ def append_partition(
 
 def main() -> None:
     args = parse_args()
-    datasets = list(DATASETS) if args.datasets == "all" else [x.strip() for x in args.datasets.split(",")]
+    datasets = (
+        list(DATASETS)
+        if args.datasets == "all"
+        else [item.strip() for item in args.datasets.split(",")]
+    )
     seeds = SEEDS[: args.n_seeds]
 
     manifest_rows: list[dict] = []
@@ -254,10 +258,19 @@ def main() -> None:
             mean_same_size_candidates=("n_same_size_candidates", "mean"),
             mean_size_matched_target_gap=("size_matched_target_gap", "mean"),
             mean_target_balanced_target_gap=("target_balanced_target_gap", "mean"),
+            mean_target_gap_absolute_reduction=("target_gap_absolute_reduction", "mean"),
+            mean_target_gap_relative_reduction=("target_gap_relative_reduction", "mean"),
+            mean_same_size_gap_median=("same_size_gap_median", "mean"),
+            mean_size_baseline_empirical_cdf=("size_baseline_empirical_cdf", "mean"),
+            mean_balanced_min_tie_fraction=("balanced_min_tie_fraction", "mean"),
         )
     )
 
-    suffix = f"{args.acyclic_mode}_{args.n_seeds}s_{args.n_candidates}c"
+    dataset_tag = "all" if args.datasets == "all" else "-".join(datasets)
+    suffix = (
+        f"{dataset_tag}_{args.acyclic_mode}_"
+        f"{args.n_seeds}s_{args.n_candidates}c"
+    )
     paths = {
         "manifest": OUT_DIR / f"split_manifest_v3_{suffix}.csv",
         "audit": OUT_DIR / f"split_audit_v3_{suffix}.csv",
