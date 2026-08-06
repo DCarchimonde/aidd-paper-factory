@@ -91,11 +91,54 @@ def as_bool(series: pd.Series) -> pd.Series:
     return series.astype(str).str.strip().str.lower().eq("true")
 
 
+def normalize_seed(value: object) -> str:
+    """Return a stable seed key across CSV integer/float/string inference."""
+    text = str(value).strip()
+    if text.lower() in {"", "nan", "none", "<na>"}:
+        return ""
+    try:
+        number = float(text)
+    except ValueError:
+        return text
+    if number.is_integer():
+        return str(int(number))
+    return text
+
+
+def normalize_hash(value: object) -> str:
+    return str(value).strip().lower()
+
+
+def manifest_partition_hash(group: pd.DataFrame) -> str:
+    """Recompute the production partition hash from manifest test rows."""
+    test = group.loc[
+        group["assignment"].astype(str).str.strip().eq("test"),
+        ["row_index", "canonical_smiles"],
+    ].copy()
+    test["row_index_numeric"] = pd.to_numeric(test["row_index"], errors="raise").astype(int)
+    test = test.sort_values("row_index_numeric", kind="mergesort")
+    payload = "\n".join(
+        f"{int(row.row_index_numeric)}\t{str(row.canonical_smiles)}"
+        for row in test.itertuples(index=False)
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
 def source_paths(spec: FreezeSpec) -> dict[str, Path]:
     return {
         key: SOURCE_DIR / f"{prefix}_{spec.suffix}.csv"
         for key, prefix in FILE_PREFIXES.items()
     }
+
+
+def read_csv_as_text(path: Path) -> pd.DataFrame:
+    """Read audit artifacts without lossy mixed-type inference."""
+    return pd.read_csv(
+        path,
+        dtype=str,
+        keep_default_na=False,
+        low_memory=False,
+    )
 
 
 def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
@@ -105,9 +148,9 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
                 f"Missing production artifact for {spec.label}: {path}"
             )
 
-    manifest = pd.read_csv(paths["manifest"], keep_default_na=False)
-    pairs = pd.read_csv(paths["pairs"], keep_default_na=False)
-    uniqueness = pd.read_csv(paths["uniqueness"], keep_default_na=False)
+    manifest = read_csv_as_text(paths["manifest"])
+    pairs = read_csv_as_text(paths["pairs"])
+    uniqueness = read_csv_as_text(paths["uniqueness"])
 
     required_manifest = {
         "dataset",
@@ -136,6 +179,12 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
     if missing_pairs:
         raise KeyError(f"{paths['pairs']} missing columns: {sorted(missing_pairs)}")
 
+    manifest["_seed_key"] = manifest["partition_seed"].map(normalize_seed)
+    manifest["_hash_key"] = manifest["partition_hash"].map(normalize_hash)
+    pairs["_seed_key"] = pairs["partition_seed"].map(normalize_seed)
+    pairs["_size_hash_key"] = pairs["size_partition_hash"].map(normalize_hash)
+    pairs["_balanced_hash_key"] = pairs["balanced_partition_hash"].map(normalize_hash)
+
     if set(manifest["dataset"]) != set(spec.datasets):
         raise AssertionError(
             f"Manifest dataset mismatch for {spec.label}: "
@@ -147,9 +196,18 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
         raise AssertionError(
             f"Unexpected pair count for {spec.label}: {len(pairs)}"
         )
+    if pairs[["dataset", "_seed_key"]].duplicated().any():
+        duplicates = pairs.loc[
+            pairs[["dataset", "_seed_key"]].duplicated(keep=False),
+            ["dataset", "partition_seed"],
+        ]
+        raise AssertionError(
+            "Duplicate dataset/partition_seed rows in pairs table:\n"
+            + duplicates.to_string(index=False)
+        )
     if not as_bool(pairs["exact_size_match"]).all():
         raise AssertionError(f"Non-exact paired test sizes remain in {spec.label}")
-    if not pairs["requested_candidates"].astype(int).eq(
+    if not pd.to_numeric(pairs["requested_candidates"], errors="raise").astype(int).eq(
         spec.candidate_budget
     ).all():
         raise AssertionError(f"Candidate-budget mismatch for {spec.label}")
@@ -172,7 +230,12 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
         clean_path = DATA_DIR / f"{dataset.lower()}_clean_v2.csv"
         if not clean_path.exists():
             raise FileNotFoundError(f"Missing clean_v2 file: {clean_path}")
-        clean = pd.read_csv(clean_path, keep_default_na=False)
+        clean = pd.read_csv(
+            clean_path,
+            dtype={"canonical_smiles": str},
+            keep_default_na=False,
+            low_memory=False,
+        )
         clean_smiles = set(clean["canonical_smiles"].astype(str))
         n_total = len(clean)
         dataset_manifest = manifest.loc[manifest["dataset"].eq(dataset)].copy()
@@ -185,7 +248,7 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
         }
         for protocol, expected_count in protocol_expected_counts.items():
             subset = dataset_manifest.loc[dataset_manifest["protocol"].eq(protocol)]
-            actual_count = subset[["partition_seed", "partition_hash"]].drop_duplicates().shape[0]
+            actual_count = subset[["_seed_key", "_hash_key"]].drop_duplicates().shape[0]
             if actual_count != expected_count:
                 raise AssertionError(
                     f"{dataset}/{protocol} has {actual_count} partitions; "
@@ -193,7 +256,7 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
                 )
 
         grouped = dataset_manifest.groupby(
-            ["protocol", "partition_seed", "partition_hash"],
+            ["protocol", "_seed_key", "_hash_key"],
             dropna=False,
             sort=False,
         )
@@ -203,7 +266,8 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
                     f"{dataset}/{protocol}/{seed} has {len(group)} rows; "
                     f"expected {n_total}"
                 )
-            if group["row_index"].nunique() != n_total:
+            row_indices = pd.to_numeric(group["row_index"], errors="raise").astype(int)
+            if row_indices.nunique() != n_total:
                 raise AssertionError(
                     f"Duplicate or missing row_index in {dataset}/{protocol}/{seed}"
                 )
@@ -215,13 +279,22 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
                 raise AssertionError(
                     f"Empty train or test assignment in {dataset}/{protocol}/{seed}"
                 )
+
+            recomputed_hash = manifest_partition_hash(group)
+            if recomputed_hash != partition_hash:
+                raise AssertionError(
+                    f"Manifest hash recomputation mismatch in "
+                    f"{dataset}/{protocol}/seed={seed}: "
+                    f"stored={partition_hash}, recomputed={recomputed_hash}"
+                )
+
             unique_partition_rows.append(
                 {
                     "freeze_label": spec.label,
                     "dataset": dataset,
                     "protocol": protocol,
                     "partition_seed": seed,
-                    "partition_hash": str(partition_hash),
+                    "partition_hash": partition_hash,
                     "n_total": n_total,
                     "n_train": int(group["assignment"].eq("train").sum()),
                     "n_test": int(group["assignment"].eq("test").sum()),
@@ -229,28 +302,30 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
             )
 
         for _, pair in pairs.loc[pairs["dataset"].eq(dataset)].iterrows():
-            seed = str(pair["partition_seed"])
+            seed = pair["_seed_key"]
             size_hashes = dataset_manifest.loc[
                 dataset_manifest["protocol"].eq("size_matched_scaffold")
-                & dataset_manifest["partition_seed"].astype(str).eq(seed),
-                "partition_hash",
+                & dataset_manifest["_seed_key"].eq(seed),
+                "_hash_key",
             ].unique()
             balanced_hashes = dataset_manifest.loc[
                 dataset_manifest["protocol"].eq("target_balanced_scaffold")
-                & dataset_manifest["partition_seed"].astype(str).eq(seed),
-                "partition_hash",
+                & dataset_manifest["_seed_key"].eq(seed),
+                "_hash_key",
             ].unique()
-            if len(size_hashes) != 1 or str(size_hashes[0]) != str(
-                pair["size_partition_hash"]
-            ):
+            if len(size_hashes) != 1 or size_hashes[0] != pair["_size_hash_key"]:
                 raise AssertionError(
-                    f"Size hash mismatch in {dataset}, seed={seed}"
+                    f"Size hash mismatch in {dataset}, seed={seed}: "
+                    f"manifest={size_hashes.tolist()}, pair={pair['_size_hash_key']}"
                 )
-            if len(balanced_hashes) != 1 or str(balanced_hashes[0]) != str(
-                pair["balanced_partition_hash"]
+            if (
+                len(balanced_hashes) != 1
+                or balanced_hashes[0] != pair["_balanced_hash_key"]
             ):
                 raise AssertionError(
-                    f"Balanced hash mismatch in {dataset}, seed={seed}"
+                    f"Balanced hash mismatch in {dataset}, seed={seed}: "
+                    f"manifest={balanced_hashes.tolist()}, "
+                    f"pair={pair['_balanced_hash_key']}"
                 )
 
     if set(uniqueness["dataset"]) != set(spec.datasets):
@@ -261,12 +336,8 @@ def verify_spec(spec: FreezeSpec, paths: dict[str, Path]) -> dict:
         "partition_table": partition_table,
         "n_manifest_rows": int(len(manifest)),
         "n_pairs": int(len(pairs)),
-        "n_unique_size_partitions": int(
-            pairs["size_partition_hash"].astype(str).nunique()
-        ),
-        "n_unique_balanced_partitions": int(
-            pairs["balanced_partition_hash"].astype(str).nunique()
-        ),
+        "n_unique_size_partitions": int(pairs["_size_hash_key"].nunique()),
+        "n_unique_balanced_partitions": int(pairs["_balanced_hash_key"].nunique()),
     }
 
 
@@ -297,6 +368,8 @@ def main() -> None:
         verification[spec.label] = result
 
         destination_dir = FREEZE_DIR / spec.label
+        if destination_dir.exists():
+            shutil.rmtree(destination_dir)
         destination_dir.mkdir(parents=True, exist_ok=True)
         for artifact_type, source_path in paths.items():
             frozen_copy = ""
