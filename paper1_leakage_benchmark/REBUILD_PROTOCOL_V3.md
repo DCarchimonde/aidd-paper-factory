@@ -31,18 +31,28 @@ For each partition seed:
 
 The size-matched and target-balanced partitions must have identical test-set sizes, disjoint train/test scaffolds, complete molecule coverage, and recorded SHA256 partition hashes.
 
-## Candidate-budget stopping rule
+## Candidate-budget audit and stopping rule
 
-The candidate budget is evaluated before model training. Classification datasets are considered operationally plateaued once their target-balanced gap is unchanged across at least two increasing budgets and at least 100 same-size candidates are available.
-
-For ESOL and FreeSolv under `single_group`, evaluate budgets `3000, 5000, 10000, 20000` with the same three audit seeds. Stop escalation at 20000 regardless of the result. The final production budget is the smallest tested budget satisfying both criteria relative to the next larger budget:
+Candidate budgets are audited before model training. A single adjacent-budget plateau is not sufficient because a larger nested candidate pool can improve again after a temporary plateau. A lower budget is considered stable only when both of the following hold relative to every larger audited budget:
 
 - mean target-balanced gap changes by no more than 5% relative; and
 - absolute mean target-balanced gap changes by no more than 0.02 target units.
 
-If no budget satisfies both criteria, use 20000 and report the full budget-sensitivity analysis without claiming numerical convergence.
+Classification datasets were operationally stable from 300 candidates onward and had at least 100 same-size candidates per audit seed. The frozen production budget for BACE, BBBP, ClinTox, and HIV is therefore 300 candidates per partition seed.
 
-For the ESOL/FreeSolv `singleton` sensitivity, evaluate `100, 300, 500, 1000, 3000, 5000`; apply the same stopping rule.
+For ESOL and FreeSolv under `single_group`, budgets `3000, 5000, 10000, 20000` did not establish stability before the predeclared cap. The frozen production budget is therefore 20000 candidates per partition seed. The manuscript must report the budget-sensitivity analysis and must not claim numerical convergence.
+
+For the ESOL/FreeSolv `singleton` sensitivity, the apparent 500-to-1000 plateau did not remain stable at 3000 and 5000 candidates. The frozen sensitivity budget is therefore the predeclared cap of 5000 candidates per partition seed, again without a convergence claim.
+
+No further candidate-budget escalation is permitted after this freeze.
+
+## Frozen production runs
+
+- Main classification analysis: BACE, BBBP, ClinTox, and HIV; `single_group`; 20 partition seeds; 300 candidates per seed.
+- Main regression analysis: ESOL and FreeSolv; `single_group`; 20 partition seeds; 20000 candidates per seed.
+- Acyclic-definition sensitivity: ESOL and FreeSolv; `singleton`; 20 partition seeds; 5000 candidates per seed.
+
+All three runs must be produced from `clean_v2`, recorded in separate files, and frozen by SHA256 before model training.
 
 ## Statistical unit
 
