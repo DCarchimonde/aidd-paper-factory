@@ -60,7 +60,10 @@ All three runs must be produced from `clean_v2`, recorded in separate files, and
 - Duplicate partitions are not treated as independent observations.
 - Candidate-pool members are optimization diagnostics, not independent samples.
 - Model stochasticity is separated from partition stochasticity through distinct `partition_seed` and `model_seed` fields.
-- Prediction inference is performed at the unique-partition level after averaging repeated model seeds within each partition-model combination.
+- Main production fits use one fixed stochastic-model seed (`17`) across all partitions so model randomness does not covary with partition identity.
+- Additional model seeds (`29`, `43`) are used only in a predeclared sensitivity audit on partition seeds `42, 123, 2024, 2026, 3407` for RF/XGB and the paired size-matched/target-balanced protocols.
+- Neither model-seed sensitivity runs nor candidate-pool members increase the partition-level inferential sample size.
+- Prediction inference is performed at the unique-partition level.
 
 ## Frozen claims pending rerun
 
