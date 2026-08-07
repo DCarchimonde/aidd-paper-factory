@@ -109,6 +109,27 @@ class ProductionRunnerTests(unittest.TestCase):
         self.assertIn("aggregate completeness failure", source)
         self.assertIn("test_metrics_computed\": False", source)
 
+    def test_protocol_tag_allows_only_recorded_post_freeze_repair(self) -> None:
+        frozen = "a" * 40
+        head = "b" * 40
+        approved = "\n".join(sorted(runner.APPROVED_POST_FREEZE_PATHS))
+        with mock.patch.object(
+            runner,
+            "git_output",
+            side_effect=[head, frozen, "", approved],
+        ):
+            audit = runner.verify_protocol_tag(False)
+        self.assertEqual(audit["head"], head)
+        self.assertEqual(audit["tag_commit"], frozen)
+
+        with mock.patch.object(
+            runner,
+            "git_output",
+            side_effect=[head, frozen, "", "paper2_admet_benchmark/configs/racer_c/production_lock_v1.yaml"],
+        ):
+            with self.assertRaisesRegex(RuntimeError, "scientific or unrecorded files"):
+                runner.verify_protocol_tag(False)
+
     def test_overnight_wrapper_is_keep_awake_resumable_and_fail_closed(self) -> None:
         source = (SCRIPT_DIR / "run_racer_c_overnight.ps1").read_text(encoding="utf-8")
         self.assertIn("SetThreadExecutionState", source)
