@@ -1,11 +1,13 @@
 # RACER extension project status
 
-Last updated: 2026-08-06
+Last updated: 2026-08-07
 
 ## Current phase
 
-Phase 4 prediction-free formal-freeze review after a successful target-GPU
-component benchmark. The protocol is explicitly **not frozen**.
+Phase 4 production freeze candidate after a successful target-GPU component
+benchmark and prediction-free four-endpoint formal review. The user approved the
+v1.0 protocol tag and confirmatory run on 2026-08-07; no confirmatory result had
+been inspected at the time the executable production lock was committed.
 
 ## Completed work
 
@@ -132,9 +134,8 @@ component benchmark. The protocol is explicitly **not frozen**.
   records per endpoint.
 - Phase 2 primary count gate: 4 primary, 1 secondary, 7 calibration-limited.
 - Count-only policy precision audit: PASS; selected allocation `50/20/15/15`.
-- Formal endpoint/protocol freeze: BLOCKED.
-- Full GPU run: BLOCKED pending four-endpoint freeze review, production
-  implementation, protocol tag, and user approval.
+- Formal endpoint/protocol freeze: READY FOR TAG `paper2-racer-protocol-freeze-v1.0`.
+- Full GPU run: READY after the tag resolves to the checked-out production commit.
 - Seed-99 GPU component benchmark: PASS on the user's Windows RTX-4060; 976/976
   predictions finite and lineage-accounted, with no performance metric or
   policy/conformal/test prediction.
@@ -158,21 +159,15 @@ component benchmark. The protocol is explicitly **not frozen**.
 
 - exact Veith-to-TDC binary transformation (polarity is supported, transformation
   provenance remains unresolved);
-- a primary panel spanning an independent source family, or a prospectively
-  narrowed Tox21-family claim;
-- four-endpoint MoLFormer model-domain and post-exclusion role audit;
-- immutable Chemprop/MoLFormer/environment freeze derived from the verified candidate;
-- production Chemprop/MoLFormer lineage instrumentation;
-- full production RACER-C implementation and confirmatory orchestrator;
-- user approval for formal protocol tag and full compute.
+- external-source breadth beyond the prospectively narrowed NCATS Tox21-family claim.
 
 ## Next automatic action
 
-Run the single prediction-free four-endpoint `FreezeReview` gate. Then complete
-the production implementation and freeze-candidate contract tests. Do not inspect
-an extension test prediction, run seeds 101--110, or create a formal protocol tag
-without the user's explicit approval. The confirmatory claim is prospectively
-narrowed to the NCATS Tox21 2014 assay family.
+Create and verify the formal v1.0 tag, then run the resumable overnight production
+entrypoint. The 60-cell primary denominator is four endpoints by three tracks by
+seeds 101--105. Seeds 106--110 remain separately labelled anchor extras for Tracks
+A/B and are not silently added to the primary denominator. The confirmatory claim
+is prospectively narrowed to the NCATS Tox21 2014 assay family.
 
 ## Protocol deviations
 

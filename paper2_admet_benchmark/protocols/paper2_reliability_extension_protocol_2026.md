@@ -1,9 +1,16 @@
 # Paper 2 prospectively frozen reliability extension protocol
 
-Version: **draft 0.1 (not frozen)**  
-Date opened: 2026-08-01  
-Base commit: `a1d5f71790cfc7f668fee5455b2be8f88267c5ea`  
+Version: **1.0 (freeze candidate approved; frozen by tag)**
+
+Date opened: 2026-08-01
+
+Base commit: `a1d5f71790cfc7f668fee5455b2be8f88267c5ea`
+
 Branch: `paper2-reliability-extension-2026`
+
+Freeze tag: `paper2-racer-protocol-freeze-v1.0`
+
+User approval: 2026-08-07, after the prediction-free 60-cell formal review passed
 
 ## 1. Status and firewall
 
@@ -17,7 +24,8 @@ their frozen assets. No extension test prediction may be generated before:
 4. leakage tests pass; and
 5. the user approves the formal protocol tag.
 
-All work before that tag is development. Deviations after the tag are recorded in
+The five prerequisites above passed before any extension test prediction. All work
+before the tag is development. Deviations after the tag are recorded in
 `protocol_deviations.md` before affected results are inspected whenever possible.
 
 ## 2. Scientific objective
@@ -301,12 +309,13 @@ always reported.
 - Major estimand, endpoint, or algorithm change after freeze: pause and obtain user
   approval before new confirmatory results.
 
-## 17. Pre-freeze blockers
+## 17. Freeze completion record
 
-- populate raw and cleaned hashes and label semantics;
-- execute grouped role-feasibility and precision simulations;
-- lock exact package/model revisions and hyperparameters;
-- implement and pass lineage/leakage tests;
-- benchmark one anchor on the available GPU and replace planning estimates;
-- freeze critical classes and margins;
-- obtain user approval for the protocol tag and full GPU run.
+Before the v1.0 tag, the project populated raw/clean hashes and label semantics,
+completed grouped role and precision audits, locked package/model revisions and
+all executable hyperparameters, passed leakage/lineage and production contract
+tests, benchmarked the D-MPNN and MoLFormer components on the target RTX 4060,
+and passed the four-endpoint prediction-free review for all 60 main cells. The
+user then explicitly approved the protocol tag and confirmatory GPU run on
+2026-08-07. Exact executable choices not fully determined by the draft prose are
+frozen in `configs/racer_c/production_lock_v1.yaml`.

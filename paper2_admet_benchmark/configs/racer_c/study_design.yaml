@@ -1,5 +1,7 @@
-protocol_status: draft_pre_freeze
-protocol_version: 0.1
+protocol_status: frozen_v1.0_user_approved
+protocol_version: 1.0
+freeze_tag: paper2-racer-protocol-freeze-v1.0
+production_lock: production_lock_v1.yaml
 base_commit: a1d5f71790cfc7f668fee5455b2be8f88267c5ea
 claim_scope: NCATS_Tox21_2014_internal_distribution_shift_stress_test
 
@@ -59,7 +61,4 @@ completed_pre_freeze_gates:
   - seed99_gpu_component_benchmark_plan
   - seed99_windows_rtx4060_component_benchmark
 formal_freeze_blockers:
-  - four_endpoint_model_domain_and_role_reaudit
-  - production_trainer_lineage_instrumentation
-  - full_racer_c_and_access_matched_baseline_implementation
-  - explicit_user_approval
+  - none

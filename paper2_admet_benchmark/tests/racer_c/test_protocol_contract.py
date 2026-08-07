@@ -11,12 +11,14 @@ P2 = ROOT / "paper2_admet_benchmark"
 
 
 class ProtocolContractTests(unittest.TestCase):
-    def test_protocol_is_explicitly_not_frozen(self) -> None:
+    def test_protocol_records_v1_freeze_approval(self) -> None:
         text = (P2 / "protocols/paper2_reliability_extension_protocol_2026.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("draft 0.1 (not frozen)", text)
+        self.assertIn("1.0 (freeze candidate approved; frozen by tag)", text)
         self.assertIn("user approves the formal protocol tag", text)
+        self.assertIn("paper2-racer-protocol-freeze-v1.0", text)
+        self.assertIn("2026-08-07", text)
 
     def test_endpoint_manifest_has_required_columns_and_unique_endpoints(self) -> None:
         path = P2 / "protocols/endpoint_candidate_manifest.csv"

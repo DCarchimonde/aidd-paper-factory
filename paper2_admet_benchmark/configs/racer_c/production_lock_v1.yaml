@@ -1,0 +1,113 @@
+lock_status: frozen_candidate_user_approved
+protocol_version: "1.0"
+freeze_tag: paper2-racer-protocol-freeze-v1.0
+formal_review_status: pass_prediction_free_formal_freeze_review
+formal_review_required_cells: 60
+
+primary_endpoints: [Tox21_NR_AhR, Tox21_NR_ER, Tox21_SR_ARE, Tox21_SR_MMP]
+tracks: [random_grouped, strict_scaffold, similarity_cluster]
+main_split_seeds: [101, 102, 103, 104, 105]
+anchor_extra_split_seeds: [106, 107, 108, 109, 110]
+outer_roles: {dev: 0.50, policy: 0.20, conformal: 0.15, test: 0.15}
+development_meta_folds: 3
+inner_folds: 2
+training_seed: 1701
+probability_clip_epsilon: 1.0e-6
+
+ecfp:
+  radius: 2
+  n_bits: 2048
+  chirality: false
+  logistic: {C: 1.0, solver: liblinear, max_iter: 1000}
+  random_forest:
+    n_estimators: 200
+    max_features: sqrt
+    min_samples_leaf: 1
+    class_weight: null
+    n_jobs: -1
+  xgboost:
+    n_estimators: 300
+    max_depth: 6
+    learning_rate: 0.05
+    subsample: 1.0
+    colsample_bytree: 1.0
+    reg_lambda: 1.0
+    tree_method: hist
+    n_jobs: 4
+  mlp:
+    hidden_layer_sizes: [256, 64]
+    activation: relu
+    alpha: 0.0001
+    batch_size: 128
+    learning_rate_init: 0.001
+    max_iter: 100
+    early_stopping: true
+    validation_fraction: 0.10
+    n_iter_no_change: 10
+
+platt: {C: 1.0, solver: lbfgs, max_iter: 1000}
+stacker: {C: 1.0, penalty: l2, solver: lbfgs, max_iter: 1000}
+unrestricted_stacker: {C: 1.0, penalty: l2, solver: lbfgs, max_iter: 1000}
+local_loss_neighbors: 20
+bri:
+  estimator: HistGradientBoostingRegressor
+  loss: squared_error
+  learning_rate: 0.05
+  max_iter: 100
+  max_leaf_nodes: 7
+  min_samples_leaf: 20
+  l2_regularization: 1.0
+  monotonic_cst: [-1, 1, 1, 1]
+
+attenuation:
+  t_max_candidates: [1.0, 1.5, 2.0]
+  coverage_shortfall_margin: 0.02
+  selection: endpoint_equal_mean_across_tracks_and_main_seeds
+  development_evaluation: leave_meta_fold_out_mondrian
+
+gate:
+  threshold_grid: [0.50, 0.60, 0.70, 0.80, 0.90, 1.00]
+  class_retention_lower_bound_minimum: 0.50
+  critical_selected_base_error_upper_bound_maximum: 0.10
+  familywise_alpha: 0.05
+  minimum_policy_count_per_true_class: 25
+  minimum_selected_critical_count: 25
+
+conformal:
+  alpha: 0.10
+  finite_sample_quantile: ceil_n_plus_1_times_one_minus_alpha
+  insufficient_cell_threshold: positive_infinity
+  selected_domain_uses_frozen_gate: true
+
+rcp:
+  transformation: conditional_true_score_quantile_ratio
+  fit_role: dev_honest_oof
+  quantile: 0.90
+  features: [absolute_stacker_margin, heterogeneous_logit_variance, ecfp_distance, local_oof_brier_loss]
+  estimator: HistGradientBoostingRegressor
+  learning_rate: 0.05
+  max_iter: 100
+  max_leaf_nodes: 7
+  min_samples_leaf: 20
+  l2_regularization: 1.0
+  quantile_floor: 0.001
+  calibration: separate_class_conditional_on_D_conf
+
+core_methods:
+  - ECFP_marginal_LAC
+  - ECFP_Mondrian_LAC
+  - heterogeneous_Mondrian
+  - stacking_Mondrian
+  - unrestricted_reliability_stacking_Mondrian
+  - RACER_score_no_gate
+  - stacking_RACER_gate_selected_Mondrian
+  - full_RACER_C
+  - RCP_class_conditional
+
+failure_policy:
+  attempts_per_cell: 2
+  retain_failures: true
+  never_drop_failed_cells: true
+  resume_only_after_hash_validation: true
+  aggregate_requires_all_primary_cells: true
+  aggregate_requires_all_core_methods: true
