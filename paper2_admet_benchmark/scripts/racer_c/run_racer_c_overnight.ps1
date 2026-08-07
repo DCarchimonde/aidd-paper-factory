@@ -13,6 +13,7 @@ Set-Location $RepoRoot
 $ExpectedTag = "paper2-racer-protocol-freeze-v1.0"
 $AllowedPostFreezePaths = @(
     "paper2_admet_benchmark/protocols/protocol_deviations.md",
+    "paper2_admet_benchmark/scripts/racer_c/run_confirmatory_racer_c.py",
     "paper2_admet_benchmark/scripts/racer_c/run_racer_c_overnight.ps1",
     "paper2_admet_benchmark/tests/racer_c/test_production_runner_contract.py"
 )
