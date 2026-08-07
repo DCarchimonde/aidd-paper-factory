@@ -11,6 +11,11 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot "..\..\..")).Path
 Set-Location $RepoRoot
 
 $ExpectedTag = "paper2-racer-protocol-freeze-v1.0"
+$AllowedPostFreezePaths = @(
+    "paper2_admet_benchmark/protocols/protocol_deviations.md",
+    "paper2_admet_benchmark/scripts/racer_c/run_racer_c_overnight.ps1",
+    "paper2_admet_benchmark/tests/racer_c/test_production_runner_contract.py"
+)
 $SummaryPath = Join-Path $RepoRoot `
     "paper2_admet_benchmark\results\racer_c_confirmatory_v1\run_summary.json"
 $RegistryPath = Join-Path $RepoRoot `
@@ -29,9 +34,27 @@ $Head = (git rev-parse HEAD).Trim()
 if ($LASTEXITCODE -ne 0) {
     throw "Cannot resolve the checked-out Git commit."
 }
-$Tags = @(git tag --points-at HEAD)
-if ($LASTEXITCODE -ne 0 -or $Tags -notcontains $ExpectedTag) {
-    throw "HEAD $Head is not tagged $ExpectedTag; confirmatory predictions are blocked."
+$TagTarget = (git rev-list -n 1 $ExpectedTag).Trim()
+if ($LASTEXITCODE -ne 0 -or -not $TagTarget) {
+    throw "Cannot resolve the frozen protocol tag $ExpectedTag."
+}
+git merge-base --is-ancestor $TagTarget $Head
+if ($LASTEXITCODE -ne 0) {
+    throw "HEAD $Head does not descend from frozen protocol tag $ExpectedTag ($TagTarget)."
+}
+$PostFreezePaths = @(git diff --name-only "$TagTarget..$Head" --)
+if ($LASTEXITCODE -ne 0) {
+    throw "Cannot audit post-freeze changes after $ExpectedTag."
+}
+$UnexpectedPostFreezePaths = @(
+    $PostFreezePaths | Where-Object { $AllowedPostFreezePaths -notcontains $_ }
+)
+if ($UnexpectedPostFreezePaths.Count -gt 0) {
+    throw (
+        "Scientific or unrecorded files changed after $ExpectedTag; " +
+        "confirmatory predictions are blocked: " +
+        ($UnexpectedPostFreezePaths -join ", ")
+    )
 }
 
 # Prevent Windows display/system sleep for this process lifetime. The prior power
@@ -44,7 +67,7 @@ public static class RacerExecutionState {
     public static extern uint SetThreadExecutionState(uint esFlags);
 }
 "@
-$ES_CONTINUOUS = [uint32]0x80000000
+$ES_CONTINUOUS = [Convert]::ToUInt32("80000000", 16)
 $ES_SYSTEM_REQUIRED = [uint32]0x00000001
 $ES_DISPLAY_REQUIRED = [uint32]0x00000002
 $KeepAwake = $ES_CONTINUOUS -bor $ES_SYSTEM_REQUIRED -bor $ES_DISPLAY_REQUIRED
