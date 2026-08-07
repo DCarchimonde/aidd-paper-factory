@@ -112,7 +112,12 @@ class ProductionRunnerTests(unittest.TestCase):
     def test_overnight_wrapper_is_keep_awake_resumable_and_fail_closed(self) -> None:
         source = (SCRIPT_DIR / "run_racer_c_overnight.ps1").read_text(encoding="utf-8")
         self.assertIn("SetThreadExecutionState", source)
+        self.assertNotIn("[uint32]0x80000000", source)
+        self.assertIn('[Convert]::ToUInt32("80000000", 16)', source)
         self.assertIn("paper2-racer-protocol-freeze-v1.0", source)
+        self.assertIn("git merge-base --is-ancestor", source)
+        self.assertIn("$AllowedPostFreezePaths", source)
+        self.assertIn("protocol_deviations.md", source)
         self.assertIn("-Mode Full", source)
         self.assertIn("MaximumPasses = 3", source)
         self.assertIn("primary_cell_count -eq 60", source)
