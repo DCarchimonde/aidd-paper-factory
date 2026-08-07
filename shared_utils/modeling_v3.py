@@ -26,7 +26,9 @@ from sklearn.metrics import (
 
 FP_RADIUS = 2
 FP_BITS = 2048
-STOCHASTIC_MODEL_SEEDS = (17, 29, 43)
+PRODUCTION_STOCHASTIC_MODEL_SEED = 17
+SENSITIVITY_STOCHASTIC_MODEL_SEEDS = (29, 43)
+MODEL_SEED_SENSITIVITY_PARTITION_SEEDS = (42, 123, 2024, 2026, 3407)
 DETERMINISTIC_MODEL_SEED = 0
 
 
@@ -103,12 +105,18 @@ def model_names(task_type: str) -> tuple[str, ...]:
     raise ValueError(f"Unsupported task type: {task_type}")
 
 
-def model_seeds(model_name: str) -> tuple[int, ...]:
+def production_model_seed(model_name: str) -> int:
     if model_name in {"LR", "Ridge"}:
-        return (DETERMINISTIC_MODEL_SEED,)
+        return DETERMINISTIC_MODEL_SEED
     if model_name in {"RF", "XGB"}:
-        return STOCHASTIC_MODEL_SEEDS
+        return PRODUCTION_STOCHASTIC_MODEL_SEED
     raise ValueError(f"Unknown model: {model_name}")
+
+
+def sensitivity_model_seeds(model_name: str) -> tuple[int, ...]:
+    if model_name not in {"RF", "XGB"}:
+        return ()
+    return SENSITIVITY_STOCHASTIC_MODEL_SEEDS
 
 
 def _xgb_classifier(*, model_seed: int, scale_pos_weight: float):
