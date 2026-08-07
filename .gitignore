@@ -36,7 +36,7 @@ Thumbs.db
 *.gz
 *.7z
 
-# Raw and processed molecule data should stay local
+# Raw, processed, split, and model-run artifacts should stay local
 paper1_leakage_benchmark/data/raw/*
 paper1_leakage_benchmark/data/processed/*
 paper1_leakage_benchmark/data/processed_v2/*
@@ -44,6 +44,7 @@ paper1_leakage_benchmark/results/models/*
 paper1_leakage_benchmark/results/split_rebuild_v2/*
 paper1_leakage_benchmark/results/split_rebuild_v3/*
 paper1_leakage_benchmark/results/frozen_v3/*
+paper1_leakage_benchmark/results/model_rerun_v3/*
 paper2_admet_benchmark/data/raw/*
 paper2_admet_benchmark/data/processed/*
 paper2_admet_benchmark/results/models/*
