@@ -87,6 +87,34 @@ $ExpectedArchiveSha256 = "024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a
 $ExpectedSdfSha256 = "d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206"
 $ExpectedCleanSha256 = "2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0"
 $ExpectedRoleSha256 = "edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900"
+$FreezePrimaryEndpoints = @(
+    "Tox21_NR_AhR",
+    "Tox21_NR_ER",
+    "Tox21_SR_ARE",
+    "Tox21_SR_MMP"
+)
+$CommittedManifestDir = Join-Path $RepoRoot "paper2_admet_benchmark\data\manifests\racer_c"
+
+function Ensure-LockedTox21Source {
+    New-Item -ItemType Directory -Force $SourceDir | Out-Null
+    if (-not (Test-Path -LiteralPath $Archive -PathType Leaf)) {
+        $PartialArchive = "${Archive}.partial"
+        if (Test-Path -LiteralPath $PartialArchive) {
+            throw "An incomplete prior download exists; remove it only after inspection: $PartialArchive"
+        }
+        Write-Host "Downloading locked NCATS Tox21 archive..."
+        Invoke-WebRequest -Uri $SourceUrl -OutFile $PartialArchive
+        Assert-LockedFile -Path $PartialArchive -ExpectedSha256 $ExpectedArchiveSha256
+        Move-Item -LiteralPath $PartialArchive -Destination $Archive
+    }
+    Assert-LockedFile -Path $Archive -ExpectedSha256 $ExpectedArchiveSha256
+
+    if (-not (Test-Path -LiteralPath $SourceSdf -PathType Leaf)) {
+        New-Item -ItemType Directory -Force $ExtractDir | Out-Null
+        Expand-Archive -LiteralPath $Archive -DestinationPath $ExtractDir -Force
+    }
+    Assert-LockedFile -Path $SourceSdf -ExpectedSha256 $ExpectedSdfSha256
+}
 
 New-Item -ItemType Directory -Force $LogDir | Out-Null
 Start-Transcript -LiteralPath $Log -Force | Out-Null
@@ -111,44 +139,176 @@ try {
     )
 
     if (-not ($CleanReady -and $RoleReady)) {
-        if ((Test-Path -LiteralPath $CleanInput -PathType Leaf) -and -not $CleanReady) {
-            throw "Existing clean input has the wrong SHA256; refusing to overwrite it: $CleanInput"
+        if ($Mode -eq "FreezeReview") {
+            Write-Host (
+                "NR-ER is not ready; recovery is deferred to the staged " +
+                "four-endpoint freeze-input gate."
+            ) -ForegroundColor Yellow
         }
-        if ((Test-Path -LiteralPath $RoleInput -PathType Leaf) -and -not $RoleReady) {
-            throw "Existing role input has the wrong SHA256; refusing to overwrite it: $RoleInput"
-        }
-
-        New-Item -ItemType Directory -Force $SourceDir | Out-Null
-        if (-not (Test-Path -LiteralPath $Archive -PathType Leaf)) {
-            $PartialArchive = "${Archive}.partial"
-            if (Test-Path -LiteralPath $PartialArchive) {
-                throw "An incomplete prior download exists; remove it only after inspection: $PartialArchive"
+        else {
+            if ((Test-Path -LiteralPath $CleanInput -PathType Leaf) -and -not $CleanReady) {
+                throw "Existing clean input has the wrong SHA256; refusing to overwrite it: $CleanInput"
             }
-            Write-Host "Downloading locked NCATS Tox21 archive..."
-            Invoke-WebRequest -Uri $SourceUrl -OutFile $PartialArchive
-            Assert-LockedFile -Path $PartialArchive -ExpectedSha256 $ExpectedArchiveSha256
-            Move-Item -LiteralPath $PartialArchive -Destination $Archive
-        }
-        Assert-LockedFile -Path $Archive -ExpectedSha256 $ExpectedArchiveSha256
+            if ((Test-Path -LiteralPath $RoleInput -PathType Leaf) -and -not $RoleReady) {
+                throw "Existing role input has the wrong SHA256; refusing to overwrite it: $RoleInput"
+            }
 
-        if (-not (Test-Path -LiteralPath $SourceSdf -PathType Leaf)) {
-            New-Item -ItemType Directory -Force $ExtractDir | Out-Null
-            Expand-Archive -LiteralPath $Archive -DestinationPath $ExtractDir -Force
-        }
-        Assert-LockedFile -Path $SourceSdf -ExpectedSha256 $ExpectedSdfSha256
+            Ensure-LockedTox21Source
 
-        Invoke-Checked -Name "Deterministic NCATS Tox21 cleaning" -Command {
-            python paper2_admet_benchmark\scripts\racer_c\prepare_tox21_challenge.py --archive $Archive --sdf $SourceSdf --manifest-dir $RuntimeManifestDir
-        }
-        Invoke-Checked -Name "Label-blind NR-ER similarity clustering" -Command {
-            python paper2_admet_benchmark\scripts\racer_c\build_similarity_clusters.py --endpoints Tox21_NR_ER --manifest-dir $RuntimeManifestDir
+            Invoke-Checked -Name "Deterministic NCATS Tox21 cleaning" -Command {
+                python paper2_admet_benchmark\scripts\racer_c\prepare_tox21_challenge.py --archive $Archive --sdf $SourceSdf --manifest-dir $RuntimeManifestDir
+            }
+            Invoke-Checked -Name "Label-blind NR-ER similarity clustering" -Command {
+                python paper2_admet_benchmark\scripts\racer_c\build_similarity_clusters.py --endpoints Tox21_NR_ER --manifest-dir $RuntimeManifestDir
+            }
         }
     }
     else {
         Write-Host "Locked processed inputs already exist; data restoration skipped."
     }
-    Assert-LockedFile -Path $CleanInput -ExpectedSha256 $ExpectedCleanSha256
-    Assert-LockedFile -Path $RoleInput -ExpectedSha256 $ExpectedRoleSha256
+    if ($Mode -ne "FreezeReview") {
+        Assert-LockedFile -Path $CleanInput -ExpectedSha256 $ExpectedCleanSha256
+        Assert-LockedFile -Path $RoleInput -ExpectedSha256 $ExpectedRoleSha256
+    }
+
+    if ($Mode -eq "FreezeReview") {
+        Write-Host "`n==> Verify all four primary freeze inputs" -ForegroundColor Cyan
+        $PrimaryInputRecords = @()
+        $PrimaryInputMismatches = @()
+        foreach ($Endpoint in $FreezePrimaryEndpoints) {
+            $ManifestPath = Join-Path $CommittedManifestDir "${Endpoint}_cleaning.json"
+            $Manifest = Read-JsonFile -Path $ManifestPath
+            if ($null -eq $Manifest) {
+                throw "Missing committed cleaning manifest: $ManifestPath"
+            }
+            if ($Manifest.endpoint -ne $Endpoint) {
+                throw "Cleaning manifest endpoint mismatch: expected=$Endpoint observed=$($Manifest.endpoint)"
+            }
+            if ($Manifest.similarity_cluster_status -ne "complete") {
+                throw "Committed role input is not cluster-complete for $Endpoint"
+            }
+            foreach ($HashField in @(
+                "cleaned_byte_sha256",
+                "rejections_byte_sha256",
+                "role_input_byte_sha256"
+            )) {
+                if ([string]($Manifest.$HashField) -notmatch "^[0-9a-f]{64}$") {
+                    throw "Invalid $HashField in committed manifest for $Endpoint"
+                }
+            }
+
+            $Record = [PSCustomObject]@{
+                Endpoint = $Endpoint
+                CleanPath = Join-Path $ProcessedDir "${Endpoint}_clean.csv"
+                RejectionPath = Join-Path $ProcessedDir "${Endpoint}_rejections.csv"
+                RolePath = Join-Path $ProcessedDir "role_inputs\${Endpoint}_role_input.csv"
+                CleanSha256 = [string]$Manifest.cleaned_byte_sha256
+                RejectionSha256 = [string]$Manifest.rejections_byte_sha256
+                RoleSha256 = [string]$Manifest.role_input_byte_sha256
+            }
+            $PrimaryInputRecords += $Record
+
+            $Checks = @(
+                [PSCustomObject]@{
+                    Path = $Record.CleanPath
+                    Expected = $Record.CleanSha256
+                    Label = "clean"
+                }
+                [PSCustomObject]@{
+                    Path = $Record.RejectionPath
+                    Expected = $Record.RejectionSha256
+                    Label = "rejections"
+                }
+                [PSCustomObject]@{
+                    Path = $Record.RolePath
+                    Expected = $Record.RoleSha256
+                    Label = "cluster-complete role"
+                }
+            )
+            foreach ($Check in $Checks) {
+                $Observed = if (Test-Path -LiteralPath $Check.Path -PathType Leaf) {
+                    Get-Sha256 -Path $Check.Path
+                }
+                else {
+                    "missing"
+                }
+                if ($Observed -ne $Check.Expected) {
+                    $PrimaryInputMismatches += (
+                        "{0} {1}: expected={2} observed={3}" -f `
+                        $Endpoint, $Check.Label, $Check.Expected, $Observed
+                    )
+                }
+            }
+        }
+
+        if ($PrimaryInputMismatches.Count -gt 0) {
+            Write-Host "Primary freeze inputs require deterministic recovery:" -ForegroundColor Yellow
+            $PrimaryInputMismatches | ForEach-Object { Write-Host "  $_" }
+            Ensure-LockedTox21Source
+
+            # Rebuild away from the live processed directory. Nothing is replaced until
+            # all four clean, rejection, and cluster-complete role files match the
+            # committed manifests byte-for-byte.
+            $RecoveryRoot = Join-Path $RepoRoot (
+                "paper2_admet_benchmark\results\racer_c_phase4_freeze_review\input_recovery_attempt_${RunId}"
+            )
+            $StagedProcessedDir = Join-Path $RecoveryRoot "staged_processed"
+            $StagedManifestDir = Join-Path $RecoveryRoot "staged_manifests"
+            $BackupDir = Join-Path $RecoveryRoot "replaced_input_backup"
+            New-Item -ItemType Directory -Force $StagedProcessedDir | Out-Null
+            New-Item -ItemType Directory -Force $StagedManifestDir | Out-Null
+            New-Item -ItemType Directory -Force $BackupDir | Out-Null
+
+            Invoke-Checked -Name "Deterministic staged Tox21 rebuild" -Command {
+                python paper2_admet_benchmark\scripts\racer_c\prepare_tox21_challenge.py `
+                    --archive $Archive `
+                    --sdf $SourceSdf `
+                    --processed-dir $StagedProcessedDir `
+                    --manifest-dir $StagedManifestDir
+            }
+            $PrimaryEndpointCsv = $FreezePrimaryEndpoints -join ","
+            Invoke-Checked -Name "Label-blind staged clustering for all four primary endpoints" -Command {
+                python paper2_admet_benchmark\scripts\racer_c\build_similarity_clusters.py `
+                    --endpoints $PrimaryEndpointCsv `
+                    --processed-dir $StagedProcessedDir `
+                    --manifest-dir $StagedManifestDir
+            }
+
+            foreach ($Record in $PrimaryInputRecords) {
+                $StagedCleanPath = Join-Path $StagedProcessedDir "$($Record.Endpoint)_clean.csv"
+                $StagedRejectionPath = Join-Path $StagedProcessedDir "$($Record.Endpoint)_rejections.csv"
+                $StagedRolePath = Join-Path $StagedProcessedDir "role_inputs\$($Record.Endpoint)_role_input.csv"
+                Assert-LockedFile -Path $StagedCleanPath -ExpectedSha256 $($Record.CleanSha256)
+                Assert-LockedFile -Path $StagedRejectionPath -ExpectedSha256 $($Record.RejectionSha256)
+                Assert-LockedFile -Path $StagedRolePath -ExpectedSha256 $($Record.RoleSha256)
+            }
+
+            foreach ($Record in $PrimaryInputRecords) {
+                $StagedCleanPath = Join-Path $StagedProcessedDir "$($Record.Endpoint)_clean.csv"
+                $StagedRejectionPath = Join-Path $StagedProcessedDir "$($Record.Endpoint)_rejections.csv"
+                $StagedRolePath = Join-Path $StagedProcessedDir "role_inputs\$($Record.Endpoint)_role_input.csv"
+                $EndpointBackupDir = Join-Path $BackupDir $Record.Endpoint
+                New-Item -ItemType Directory -Force $EndpointBackupDir | Out-Null
+                foreach ($LivePath in @($Record.CleanPath, $Record.RejectionPath, $Record.RolePath)) {
+                    if (Test-Path -LiteralPath $LivePath -PathType Leaf) {
+                        Copy-Item -LiteralPath $LivePath -Destination $EndpointBackupDir -Force
+                    }
+                }
+                New-Item -ItemType Directory -Force (Split-Path -Parent $Record.CleanPath) | Out-Null
+                New-Item -ItemType Directory -Force (Split-Path -Parent $Record.RolePath) | Out-Null
+                Copy-Item -LiteralPath $StagedCleanPath -Destination $Record.CleanPath -Force
+                Copy-Item -LiteralPath $StagedRejectionPath -Destination $Record.RejectionPath -Force
+                Copy-Item -LiteralPath $StagedRolePath -Destination $Record.RolePath -Force
+            }
+            Write-Host "Verified recovery complete; replaced files were preserved at $BackupDir"
+        }
+
+        foreach ($Record in $PrimaryInputRecords) {
+            Assert-LockedFile -Path $($Record.CleanPath) -ExpectedSha256 $($Record.CleanSha256)
+            Assert-LockedFile -Path $($Record.RejectionPath) -ExpectedSha256 $($Record.RejectionSha256)
+            Assert-LockedFile -Path $($Record.RolePath) -ExpectedSha256 $($Record.RoleSha256)
+        }
+    }
 
     Invoke-Checked -Name "Python and CUDA driver diagnostic" -Command {
         python -c "import json, platform, subprocess, torch; print(json.dumps({'python': platform.python_version(), 'torch': torch.__version__, 'torch_cuda_build': torch.version.cuda, 'cuda_available': torch.cuda.is_available(), 'device_count': torch.cuda.device_count()}, sort_keys=True)); subprocess.run(['nvidia-smi', '--query-gpu=driver_version,name,memory.total', '--format=csv,noheader,nounits'], check=True)"

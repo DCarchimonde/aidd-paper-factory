@@ -292,6 +292,50 @@ class BenchmarkPlanTests(unittest.TestCase):
         self.assertIn("prepare_formal_freeze_review.py", source)
         self.assertIn("scientific_predictions_generated", source)
 
+    def test_freeze_review_recovers_all_primary_inputs_before_review(self) -> None:
+        source = (SCRIPT_DIR / "run_racer_c_pipeline.ps1").read_text(encoding="utf-8")
+        for endpoint in (
+            "Tox21_NR_AhR",
+            "Tox21_NR_ER",
+            "Tox21_SR_ARE",
+            "Tox21_SR_MMP",
+        ):
+            self.assertIn(f'"{endpoint}"', source)
+        self.assertIn('$FreezePrimaryEndpoints -join ","', source)
+        self.assertIn("--processed-dir $StagedProcessedDir", source)
+        self.assertIn("--manifest-dir $StagedManifestDir", source)
+        self.assertIn("replaced_input_backup", source)
+        self.assertIn("rejections_byte_sha256", source)
+        self.assertIn("role_input_byte_sha256", source)
+        self.assertIn("similarity_cluster_status", source)
+
+        staged_role_gate = (
+            "Assert-LockedFile -Path $StagedRolePath -ExpectedSha256 $($Record.RoleSha256)"
+        )
+        live_role_write = (
+            "Copy-Item -LiteralPath $StagedRolePath -Destination $Record.RolePath -Force"
+        )
+        self.assertIn(staged_role_gate, source)
+        self.assertIn(live_role_write, source)
+        self.assertLess(source.index(staged_role_gate), source.index(live_role_write))
+
+    def test_freeze_review_does_not_accept_unclustered_role_hashes(self) -> None:
+        source = (SCRIPT_DIR / "run_racer_c_pipeline.ps1").read_text(encoding="utf-8")
+        self.assertNotIn(
+            "41db4cbf9f1f4d704404950916e9d10d897f99b78b15ae2e183a3bedd31597ba",
+            source,
+        )
+        self.assertIn(
+            "461c99d4a658c5e1eaee3ad4159761e8ef2bc2fa9041386be8b68dff4461178b",
+            (
+                P2
+                / "data"
+                / "manifests"
+                / "racer_c"
+                / "Tox21_NR_AhR_cleaning.json"
+            ).read_text(encoding="utf-8"),
+        )
+
     def test_freeze_review_rejects_benchmark_with_scientific_metrics(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
