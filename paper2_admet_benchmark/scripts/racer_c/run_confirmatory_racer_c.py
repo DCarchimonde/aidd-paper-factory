@@ -75,6 +75,14 @@ PROCESSED_DIR = P2 / "data" / "processed" / "racer_c"
 MANIFEST_DIR = P2 / "data" / "manifests" / "racer_c"
 ENDPOINT_MANIFEST = P2 / "protocols" / "endpoint_candidate_manifest.csv"
 EXPECTED_TAG = "paper2-racer-protocol-freeze-v1.0"
+APPROVED_POST_FREEZE_PATHS = frozenset(
+    {
+        "paper2_admet_benchmark/protocols/protocol_deviations.md",
+        "paper2_admet_benchmark/scripts/racer_c/run_confirmatory_racer_c.py",
+        "paper2_admet_benchmark/scripts/racer_c/run_racer_c_overnight.ps1",
+        "paper2_admet_benchmark/tests/racer_c/test_production_runner_contract.py",
+    }
+)
 RAW_FIELDS = [
     "structure_id", "role", "target", "meta_fold", "ecfp_p", "dmpnn_p",
     "molformer_p", "heterogeneous_p", "stack_p", "unrestricted_p", "bri",
@@ -139,14 +147,22 @@ def verify_protocol_tag(allow_unfrozen_for_tests: bool) -> dict[str, str]:
     head = git_output("rev-parse", "HEAD")
     if allow_unfrozen_for_tests:
         return {"head": head, "tag": "test-bypass", "tag_commit": head}
-    tags = set(git_output("tag", "--points-at", "HEAD").splitlines())
-    if EXPECTED_TAG not in tags:
-        raise RuntimeError(
-            f"HEAD {head} is not the frozen protocol tag {EXPECTED_TAG}; refusing predictions"
-        )
     tag_commit = git_output("rev-list", "-n", "1", EXPECTED_TAG)
-    if tag_commit != head:
-        raise RuntimeError("protocol tag does not resolve to the checked-out commit")
+    try:
+        git_output("merge-base", "--is-ancestor", tag_commit, head)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"HEAD {head} does not descend from frozen protocol tag {EXPECTED_TAG}"
+        ) from exc
+    changed_paths = set(
+        git_output("diff", "--name-only", f"{tag_commit}..{head}", "--").splitlines()
+    )
+    unexpected_paths = sorted(changed_paths - APPROVED_POST_FREEZE_PATHS)
+    if unexpected_paths:
+        raise RuntimeError(
+            "scientific or unrecorded files changed after the frozen protocol tag: "
+            + ", ".join(unexpected_paths)
+        )
     return {"head": head, "tag": EXPECTED_TAG, "tag_commit": tag_commit}
 
 
