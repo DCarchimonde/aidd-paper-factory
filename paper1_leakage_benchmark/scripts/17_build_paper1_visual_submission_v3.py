@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PAPER_DIR = ROOT / "paper1_leakage_benchmark"
 LATEX_DIR = ROOT / "paper1_latex"
-FIG_SCRIPT = PAPER_DIR / "scripts" / "16_build_manuscript_assets_v3.py"
+FIG_SCRIPT = PAPER_DIR / "scripts" / "18_build_manuscript_assets_v3_final.py"
 BUILD_DIR = LATEX_DIR / "build_visual_v3"
 
 EXPECTED_FIGURES = [
