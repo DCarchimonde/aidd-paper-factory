@@ -1,0 +1,19 @@
+{
+  "active_cells_by_view": {
+    "component_and_stack_logits": 30,
+    "ecfp_bits": 0,
+    "physchem_descriptors": 24
+  },
+  "audit_row_count": 90,
+  "reasons": {
+    "component_and_stack_logits:active": 30,
+    "ecfp_bits:class_ess+source_ess+weight_clipping": 7,
+    "ecfp_bits:weight_clipping": 23,
+    "physchem_descriptors:active": 24,
+    "physchem_descriptors:balance": 4,
+    "physchem_descriptors:class_ess": 1,
+    "physchem_descriptors:class_ess+balance": 1
+  },
+  "status": "public_development_only",
+  "final_labels_downloaded_or_parsed": false
+}

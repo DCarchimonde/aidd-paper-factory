@@ -106,3 +106,26 @@ Run the isolated numerical/contract tests with:
 ```bash
 python -m unittest discover -s paper2_admet_benchmark/tests/racer_c3 -v
 ```
+
+## RACER-C4 independent validation candidate
+
+RACER-C3 did not pass its freeze gate and remains retrospective. RACER-C4/TAME
+is a separate safety-first candidate built around two label-free transport
+views, explicit effective-sample-size/balance audits, a baseline-containing
+protected-label consensus envelope, and a fail-closed final-label firewall.
+
+The public Tox21 leaderboard batch is development-only. The independent EPA
+batch uses fresh seeds 211--215; its labels cannot be parsed until every final
+prediction is hashed into a promotion record. Exact method, source, gate, and
+non-claim boundaries are in:
+
+- `configs/racer_c4/prospective_lock_v1.yaml`;
+- `docs/racer_c4_algorithm_specification_v1.md`;
+- `docs/racer_c4_prior_art_boundary.md`; and
+- `protocols/racer_c4_independent_epa_validation_protocol.md`.
+
+Windows one-command reproduction after `git pull`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c4\run_racer_c4_overnight.ps1
+```
