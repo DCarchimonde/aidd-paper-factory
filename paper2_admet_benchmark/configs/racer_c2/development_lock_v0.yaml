@@ -1,0 +1,78 @@
+lock_status: development_only_not_frozen
+algorithm: RACER-C2
+algorithm_version: "2.0-dev.2"
+parent_algorithm: RACER-C-v1.0
+parent_confirmatory_status: completed_negative_policy_feasibility_result
+known_v1_test_reuse: prohibited_as_confirmatory
+result_namespace: racer_c2_development
+
+allowed_development_label_roles: [dev]
+training_seed: 2701
+
+candidate_error_model_ablation:
+  status: excluded_from_primary_family_after_honest_development_selected_zero_weight
+  estimator: HistGradientBoostingRegressor
+  loss: squared_error
+  learning_rate: 0.05
+  max_iter: 80
+  max_leaf_nodes: 7
+  min_samples_leaf: 20
+  l2_regularization: 1.0
+  monotonic_direction: all_increasing_risk
+  target: one_if_observed_label_differs_from_candidate_label
+  class_balanced_target_weights: true
+  deployment: mean_of_development_meta_fold_models
+
+score_family:
+  primary_mechanism: candidate_label_exponential_reliability_tilting
+  t_max_candidates: [1.0, 1.5, 2.0]
+  gamma_0_candidates: [0.0, 0.1, 0.25]
+  gamma_1_candidates: [-0.1, 0.0]
+  gamma_interpretation:
+    positive: penalize_candidate_as_reliability_risk_rises
+    negative: protect_candidate_as_reliability_risk_rises
+  critical_class: 1
+  counterfactual_blend_candidates: [0.0]
+  counterfactual_module_role: rejected_optional_ablation_not_primary
+  selection_tracks: [strict_scaffold, similarity_cluster]
+  negative_control_tracks: [random_grouped]
+  expected_selection_cells: 40
+  selection_role: honest_development_oof_only
+  selection_objective: endpoint_cell_equal_mean_macro_csy
+  mean_coverage_shortfall_margin: 0.01
+  minimum_cell_class_coverage: 0.85
+  tie_break: [smaller_counterfactual_blend, smaller_total_absolute_tilt, smaller_t_max]
+  mandatory_safe_fallback:
+    {t_max: 1.0, gamma_0: 0.0, gamma_1: 0.0, counterfactual_blend: 0.0}
+
+conformal:
+  alpha: 0.10
+  calibration: class_conditional_mondrian
+  finite_sample_quantile: ceil_n_plus_1_times_one_minus_alpha
+  insufficient_cell_threshold: positive_infinity
+  calibration_role_order: after_score_selection_before_policy_certificate
+
+action_certificate:
+  estimand: final_set_states_not_base_hard_classification
+  candidate_constraints:
+    class_conditional_coverage_floor: pending_precision_audit
+    class_conditional_wrong_singleton_ceiling: 0.10
+    class_conditional_empty_exposure_ceiling: pending_precision_audit
+    critical_class_csy_floor: pending_precision_audit
+  confidence_method: simultaneous_one_sided_clopper_pearson
+  threshold_grid_tests: 0
+  fail_policy: fail_closed_without_relaxation
+
+prospective_validation:
+  status: not_selected_not_authorized
+  v1_primary_endpoints: retrospective_development_only
+  v1_main_seeds: retrospective_development_only
+  candidate_new_endpoints: pending_provenance_semantics_license_and_count_audit
+  test_predictions_allowed: false
+  required_before_test:
+    - endpoint_and_license_freeze
+    - exact_label_semantics_freeze
+    - count_and_precision_audit
+    - comparator_access_and_estimand_audit
+    - implementation_and_leakage_tests
+    - user_approved_protocol_tag

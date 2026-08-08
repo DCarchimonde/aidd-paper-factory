@@ -82,3 +82,20 @@ MVP requirements:
 - at least 5 random seeds where applicable;
 - baseline models: LR/Ridge, Random Forest, XGBoost, MLP on ECFP;
 - performance, calibration, conformal, applicability-domain, and selective-prediction analyses.
+
+## RACER extension status
+
+- **RACER-C v1.0:** prospectively frozen and executed on 60 primary cells. The
+  run completed, but its predicted-class policy gate was infeasible in all 60
+  cells. Its code, tag, and raw results remain immutable.
+- **RACER-C2:** a separate development-only method line under
+  `scripts/racer_c2/`. It replaces predicted-class routing with
+  candidate-label exponential reliability tilting, retains an exact
+  stacking-Mondrian fallback, and certifies final conformal set states directly.
+  The first learned counterfactual-score draft was rejected after honest
+  development selected zero weight. RACER-C2 is not frozen and has no authorized
+  prospective test panel yet.
+
+The known v1 Tox21 outcomes may be used only for v2 architecture development and
+failure analysis. A new confirmatory claim requires untouched endpoints and a new
+user-approved protocol tag.
