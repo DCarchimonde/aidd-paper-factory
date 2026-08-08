@@ -1,66 +1,237 @@
-\section{Complete Paired Robustness Results}
-\label{sec:si-paired-results}
+\section{Audited Molecular-Data Construction}
+\label{sec:si-cleaning}
 
-Table~\ref{tab:paired-effects} reports the complete 20-seed paired results underlying the paired-effects analysis in the main manuscript. Positive reduction means that the target-balanced generalization gap was smaller than the ordinary scaffold gap. The $p$ values are from two-sided Wilcoxon signed-rank tests followed by Holm correction across all 18 comparisons.
+The primary molecular universe was rebuilt before any v3 split search. Canonical molecular identity, duplicate handling, conflict exclusion, and row lineage were fixed by the audited cleaning policy. Table~\ref{tab:si-cleaning} summarizes the resulting data. Classification conflict groups were canonical molecular identities associated with both binary labels and were excluded in full. Regression duplicates were aggregated by arithmetic mean and retained with lineage information.
 
 \begin{table}[H]
 \centering
-\caption{Complete paired generalization-gap effects across 20 seeds.}
-\label{tab:paired-effects}
+\caption{Audited raw-to-clean data construction.}
+\label{tab:si-cleaning}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Task & Raw rows & Invalid/missing & Conflicting groups & Final rows \\
+\midrule
+BACE & Classification & 1513 & 0 & 0 & 1513 \\
+BBBP & Classification & 2050 & 11 & 10 & 1965 \\
+ClinTox & Classification & 1484 & 4 & 19 & 1442 \\
+HIV & Classification & 41127 & 7 & 0 & 41120 \\
+ESOL & Regression & 1128 & 0 & -- & 1117 \\
+FreeSolv & Regression & 642 & 0 & -- & 642 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The SHA-256 digests of the final \texttt{clean\_v2} files were:
+\begin{itemize}
+\item BACE: \texttt{4f2595bfa9981d69eb79d11acc4f88a6d8e1d9940769c79eeb2a8d31b47cf7c2};
+\item BBBP: \texttt{ea65c8a7c23226b32a02d17c4518787f4eeac3ffd3ea4db8641c4d1157f84e09};
+\item ClinTox: \texttt{3f064b9e905af74a7354a8e7b0069953a1a5efed1c97df08cfafb04d32e6a64f};
+\item HIV: \texttt{2e2e6ffe01b8f95687bfe377c6c3577e8a06a12c3318c6b250afe10f6a809939};
+\item ESOL: \texttt{6a3c51838ec3f2777999acdc3f4f3d1e0872fa8a9fb45b7accb6e12f5efe31e8};
+\item FreeSolv: \texttt{8a7df402c12f21378b1165167aaa76ec05c40a03b57c43b3f3eac8673f80f95f}.
+\end{itemize}
+
+\section{Candidate-Budget Audit}
+\label{sec:si-budget}
+
+The target-balanced partition is selected from a finite target-blind candidate pool, making candidate budget a benchmark-construction parameter. Classification was frozen at 300 candidates per partition seed. The regression single-group searches did not satisfy the pre-specified joint absolute-and-relative stability criterion by the largest audited budget and were capped at 20,000 candidates. The singleton acyclic sensitivity used the separately frozen 5,000-candidate budget.
+
+\begin{table}[H]
+\centering
+\caption{Extended single-group budget audit for the two regression datasets. Values are mean target-balanced absolute train--test target-mean gaps across the three audit seeds.}
+\label{tab:si-budget-single}
+\begin{tabular}{lrrrr}
+\toprule
+Dataset & 3,000 candidates & 5,000 & 10,000 & 20,000 \\
+\midrule
+ESOL & 0.034622 & 0.018366 & 0.010563 & 0.001787 \\
+FreeSolv & 1.076491 & 1.044452 & 0.787491 & 0.686528 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Singleton acyclic budget audit. Temporary adjacent plateaus were not interpreted as convergence because larger budgets continued to improve the selected target gap.}
+\label{tab:si-budget-singleton}
+\begin{tabular}{lrrrrrr}
+\toprule
+Dataset & 100 & 300 & 500 & 1,000 & 3,000 & 5,000 \\
+\midrule
+ESOL & 0.003687 & 0.001535 & 0.000600 & 0.000600 & 0.000301 & 0.000194 \\
+FreeSolv & 0.019467 & 0.006230 & 0.005645 & 0.005416 & 0.001609 & 0.000471 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{Frozen Partition Integrity}
+\label{sec:si-partitions}
+
+The production manifest freeze passed before predictive fitting. Every main size-matched and target-balanced dataset contained 20 requested and 20 unique partition hashes. The paired scaffold protocols had identical test size within every seed (Table~\ref{tab:si-partition-integrity}). The deterministic legacy scaffold reference is not used as an inferential replicate.
+
+\begin{table}[H]
+\centering
+\caption{Production partition integrity for the primary scaffold contrast.}
+\label{tab:si-partition-integrity}
+\begin{tabular}{lrrrr}
+\toprule
+Dataset & Size unique & Balanced unique & Size $n_{\rm test}$ & Balanced $n_{\rm test}$ \\
+\midrule
+BACE & 20 & 20 & 303 & 303 \\
+BBBP & 20 & 20 & 393 & 393 \\
+ClinTox & 20 & 20 & 288 & 288 \\
+HIV & 20 & 20 & 8224 & 8224 \\
+ESOL & 20 & 20 & 223 & 223 \\
+FreeSolv & 20 & 20 & 128 & 128 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The frozen production registry recorded the partition-registry SHA-256 as \texttt{d216233840549bee6daed153157c7ff6fc0c32d542b188de9aa15bdef916b14e} and the artifact-registry SHA-256 as \texttt{429146c74e1fd87cda078f9db3968bee1b328597c325be6672132977b4c47d37}. The freeze was created on branch \texttt{paper1-rebuild-v3} at commit \texttt{7d1b4aa15454c08d0764171c07e6aafd59b98227}.
+
+\section{Complete Primary Partition-Level Inference}
+\label{sec:si-primary}
+
+Table~\ref{tab:si-primary-results} reports the complete 18-cell primary family. Classification effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$; regression effects are RMSE$_{\rm size}-$RMSE$_{\rm balanced}$, so positive values always favor target balancing. Each row is based on 20 unique paired partitions and 10,000 paired bootstrap replicates. Holm correction was applied across all 18 cells.
+
+\begin{table}[H]
+\centering
+\caption{Complete primary exact-size paired inference.}
+\label{tab:si-primary-results}
 \scriptsize
 \resizebox{\textwidth}{!}{%
-\begin{tabular}{lllrrrr}
+\begin{tabular}{lllrrrrrl}
 \toprule
-Dataset & Model & Metric & Ordinary gap & Balanced gap & Mean reduction & Holm-adjusted $p$ \\
+Dataset & Model & Metric & Size mean & Balanced mean & Mean effect & 95\% CI & Holm $P$ & Inference \\
 \midrule
-BACE & Logistic regression & ROC--AUC & 0.0952 & 0.0769 & 0.0183 & 0.0887 \\
-BACE & Random forest & ROC--AUC & 0.0621 & 0.0738 & -0.0117 & 0.1063 \\
-BACE & XGBoost & ROC--AUC & 0.0659 & 0.0856 & -0.0197 & 0.0292 \\
-BBBP & Logistic regression & ROC--AUC & 0.1406 & 0.0565 & 0.0841 & $<0.0001$ \\
-BBBP & Random forest & ROC--AUC & 0.1097 & 0.0761 & 0.0336 & $<0.0001$ \\
-BBBP & XGBoost & ROC--AUC & 0.0984 & 0.0863 & 0.0121 & 0.1063 \\
-ClinTox & Logistic regression & ROC--AUC & 0.1019 & 0.0472 & 0.0547 & 0.0028 \\
-ClinTox & Random forest & ROC--AUC & 0.0818 & 0.0076 & 0.0741 & $<0.0001$ \\
-ClinTox & XGBoost & ROC--AUC & 0.0066 & 0.0270 & -0.0204 & 0.0292 \\
-HIV & Logistic regression & ROC--AUC & 0.0362 & 0.1052 & -0.0690 & $<0.0001$ \\
-HIV & Random forest & ROC--AUC & 0.0450 & 0.1008 & -0.0558 & $<0.0001$ \\
-HIV & XGBoost & ROC--AUC & 0.0150 & 0.0923 & -0.0774 & $<0.0001$ \\
-ESOL & Random forest & RMSE & 1.0073 & 0.5047 & 0.5027 & 0.0332 \\
-ESOL & Ridge & RMSE & -0.0258 & 0.7225 & -0.7484 & 0.0006 \\
-ESOL & XGBoost & RMSE & 0.9607 & 0.3578 & 0.6029 & $<0.0001$ \\
-FreeSolv & Random forest & RMSE & 0.9321 & -0.1208 & 1.0529 & $<0.0001$ \\
-FreeSolv & Ridge & RMSE & 0.6885 & 0.5980 & 0.0905 & $<0.0001$ \\
-FreeSolv & XGBoost & RMSE & 1.1290 & 0.1807 & 0.9482 & $<0.0001$ \\
+BACE & LR & AUC & 0.878731 & 0.859458 & -0.019273 & [-0.033177,-0.005349] & 0.113228 & Inconclusive \\
+BACE & RF & AUC & 0.890529 & 0.877843 & -0.012686 & [-0.023676,-0.001047] & 0.524323 & Inconclusive \\
+BACE & XGB & AUC & 0.887719 & 0.870691 & -0.017028 & [-0.030376,-0.002816] & 0.293060 & Inconclusive \\
+BBBP & LR & AUC & 0.877137 & 0.877032 & -0.000105 & [-0.019428,0.020107] & 1.000000 & Inconclusive \\
+BBBP & RF & AUC & 0.915206 & 0.904228 & -0.010979 & [-0.025270,0.003310] & 1.000000 & Inconclusive \\
+BBBP & XGB & AUC & 0.898292 & 0.889520 & -0.008772 & [-0.026168,0.008961] & 1.000000 & Inconclusive \\
+ClinTox & LR & AUC & 0.830370 & 0.805943 & -0.024427 & [-0.047786,0.000739] & 0.399895 & Inconclusive \\
+ClinTox & RF & AUC & 0.825904 & 0.823983 & -0.001921 & [-0.036388,0.036791] & 1.000000 & Inconclusive \\
+ClinTox & XGB & AUC & 0.849354 & 0.833589 & -0.015765 & [-0.048206,0.016547] & 1.000000 & Inconclusive \\
+HIV & LR & AUC & 0.761767 & 0.756893 & -0.004874 & [-0.019068,0.008715] & 1.000000 & Inconclusive \\
+HIV & RF & AUC & 0.814614 & 0.817130 & 0.002516 & [-0.008476,0.013652] & 1.000000 & Inconclusive \\
+HIV & XGB & AUC & 0.783836 & 0.777432 & -0.006404 & [-0.018190,0.005331] & 1.000000 & Inconclusive \\
+ESOL & RF & RMSE & 1.785666 & 1.492654 & 0.293012 & [0.186289,0.395728] & 0.002350 & Balanced better \\
+ESOL & Ridge & RMSE & 1.806607 & 1.701294 & 0.105313 & [0.045118,0.162278] & 0.047508 & Balanced better \\
+ESOL & XGB & RMSE & 1.628789 & 1.401548 & 0.227241 & [0.141863,0.310597] & 0.002003 & Balanced better \\
+FreeSolv & RF & RMSE & 3.964923 & 2.815956 & 1.148966 & [0.833916,1.464147] & 0.000162 & Balanced better \\
+FreeSolv & Ridge & RMSE & 3.511496 & 2.511191 & 1.000305 & [0.725973,1.264108] & 0.000103 & Balanced better \\
+FreeSolv & XGB & RMSE & 3.518691 & 2.720284 & 0.798407 & [0.506442,1.087763] & 0.001312 & Balanced better \\
 \bottomrule
 \end{tabular}%
 }
 \end{table}
 
-\section{Model Ranking Stability}
-\label{sec:si-rankings}
+The primary family therefore contained 12 inconclusive cells, six target-balanced-better cells, and no target-balanced-worse cell. All six supported cells were regression tasks under the primary single-group acyclic convention.
 
-Split choice can change not only absolute performance estimates but also model rankings. Figure~\ref{fig:ranking-stability} summarizes the top-ranked model under each partitioning protocol. A change in the top-ranked model indicates that a leaderboard-style conclusion depends on the validation design.
+\section{Acyclic-Scaffold Semantics Sensitivity}
+\label{sec:si-acyclic}
 
-\begin{figure}[H]
+Table~\ref{tab:si-acyclic} reports the singleton sensitivity. Positive effects favor target balancing. These Wilcoxon values are descriptive and were not added to the 18-cell primary multiplicity family.
+
+\begin{table}[H]
 \centering
-\includegraphics[width=\textwidth]{figureS1_model_ranking_stability.png}
-\caption{Top-ranked model by dataset and partitioning protocol. Changes across protocols show that comparative model conclusions can depend on test-set construction.}
-\label{fig:ranking-stability}
-\end{figure}
+\caption{Regression sensitivity to singleton treatment of acyclic molecules.}
+\label{tab:si-acyclic}
+\begin{tabular}{llrrrrr}
+\toprule
+Dataset & Model & Size RMSE & Balanced RMSE & Mean effect & 95\% CI & $P$ \\
+\midrule
+ESOL & RF & 1.431771 & 1.387339 & 0.044431 & [-0.047905,0.148586] & 0.728506 \\
+ESOL & Ridge & 1.511951 & 1.451170 & 0.060781 & [0.008517,0.113905] & 0.039989 \\
+ESOL & XGB & 1.307505 & 1.271721 & 0.035784 & [-0.020732,0.099179] & 0.570597 \\
+FreeSolv & RF & 2.678612 & 2.773021 & -0.094409 & [-0.436877,0.241168] & 0.728506 \\
+FreeSolv & Ridge & 2.259153 & 2.344278 & -0.085125 & [-0.385294,0.222601] & 0.728506 \\
+FreeSolv & XGB & 2.258110 & 2.291647 & -0.033536 & [-0.344963,0.273297] & 0.898317 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-\section{Sensitivity Cases}
-\label{sec:si-sensitivity}
+\section{Disconnected-Component Structural Audit}
+\label{sec:si-fragment-audit}
 
-Figure~\ref{fig:outlier-sensitivity} retains cases in which target balancing changed the generalization gap strongly or changed its direction. These cases are diagnostically useful because they identify interactions between partition composition and model behaviour rather than a universal effect of balancing.
+All clean-v2 SMILES parsed successfully in the post hoc RDKit audit. The warning that motivated this check was traced to valid disconnected representations containing isolated explicit hydrogen atoms rather than to parser failure. The broader audit nevertheless identified non-trivial multi-component representation sensitivity in BBBP, ClinTox, and HIV (Table~\ref{tab:si-fragment-audit}).
 
-\begin{figure}[H]
+\begin{table}[H]
 \centering
-\includegraphics[width=0.92\textwidth]{figureS2_outlier_sensitivity_cases.png}
-\caption{Sensitivity cases from the split audit. Positive values indicate reduction of the ordinary scaffold gap after target balancing; negative values indicate a larger target-balanced gap or a direction change.}
-\label{fig:outlier-sensitivity}
-\end{figure}
+\caption{Multi-component and deterministic dominant-fragment audit. Similarity is the Morgan Tanimoto coefficient between the source-faithful complete record and the selected dominant fragment.}
+\label{tab:si-fragment-audit}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrrrrr}
+\toprule
+Dataset & Multi-component & Scaffold changed & Mean similarity & Sim. $<0.95$ & Sim. $<0.90$ & Duplicate groups & Duplicate rows & Conflict groups \\
+\midrule
+BACE & 0 & 0 & 1.0000 & 0 & 0 & 0 & 0 & 0 \\
+BBBP & 105 & 5 & 0.9390 & 35 & 18 & 9 & 18 & 1 \\
+ClinTox & 14 & 1 & 0.9250 & 7 & 5 & 6 & 12 & 1 \\
+HIV & 3086 & 235 & 0.9285 & 852 & 640 & 157 & 327 & 17 \\
+ESOL & 0 & 0 & 1.0000 & 0 & 0 & 0 & 0 & 0 \\
+FreeSolv & 0 & 0 & 1.0000 & 0 & 0 & 0 & 0 & 0 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
 
-\section{Reproducibility Notes}
+The most frequent disconnected components included chloride, sodium-containing fragments, halide counterions, sulfate/sulfonate-related species, proton fragments, organic acids, and several larger molecular or metal-complex components. Because the ``largest fragment'' rule is not guaranteed to recover a chemically authoritative parent for all such records, the transformed representation was treated only as a sensitivity perturbation.
+
+\section{Dominant-Fragment Classification Sensitivity}
+\label{sec:si-dominant}
+
+The affected classification datasets were remapped to one deterministic dominant fragment. Consistent duplicate mappings were collapsed and conflicting-label fragment identities were excluded in full. The final transformed data were resplit from scratch with 20 partition seeds and a 300-candidate budget. All 360 planned model jobs completed. Table~\ref{tab:si-dominant} reports the separate nine-cell sensitivity family.
+
+\begin{table}[H]
+\centering
+\caption{Dominant-fragment representation sensitivity. Effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$. Holm correction was performed across these nine sensitivity cells only.}
+\label{tab:si-dominant}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llrrrrrl}
+\toprule
+Dataset & Model & Size AUC & Balanced AUC & Mean effect & 95\% CI & Holm $P$ & Inference \\
+\midrule
+BBBP & LR & 0.875335 & 0.890493 & 0.015158 & [-0.009090,0.040940] & 1.0000 & Inconclusive \\
+BBBP & RF & 0.906892 & 0.909292 & 0.002400 & [-0.012117,0.017804] & 1.0000 & Inconclusive \\
+BBBP & XGB & 0.890872 & 0.897460 & 0.006587 & [-0.011780,0.026904] & 1.0000 & Inconclusive \\
+ClinTox & LR & 0.814548 & 0.797772 & -0.016776 & [-0.048411,0.013900] & 1.0000 & Inconclusive \\
+ClinTox & RF & 0.829490 & 0.828568 & -0.000922 & [-0.030419,0.026610] & 1.0000 & Inconclusive \\
+ClinTox & XGB & 0.849858 & 0.853263 & 0.003404 & [-0.027099,0.031351] & 1.0000 & Inconclusive \\
+HIV & LR & 0.758928 & 0.764142 & 0.005214 & [-0.008782,0.018657] & 1.0000 & Inconclusive \\
+HIV & RF & 0.817390 & 0.816320 & -0.001070 & [-0.014650,0.013127] & 1.0000 & Inconclusive \\
+HIV & XGB & 0.782736 & 0.787282 & 0.004546 & [-0.010907,0.019498] & 1.0000 & Inconclusive \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+All nine inferential labels agreed with the source-faithful primary analysis, but the mean-effect sign agreed in only two of nine cells (ClinTox--LR and ClinTox--RF). Thus, seven of nine point-estimate directions reversed under the representation perturbation despite unchanged inferential conclusions.
+
+\section{Model and Computational Completeness}
+\label{sec:si-completeness}
+
+The frozen production suite contained 1,338 expected model jobs across the main classification analysis, main regression analysis, and acyclic singleton sensitivity. The completeness gate reported 1,338/1,338 current jobs, with no missing, stale, or invalid job. The dominant-fragment sensitivity added 360/360 completed jobs. Across both stages, 1,698 pre-specified model fits entered the audit outputs. Model seeds were separated from partition seeds; LR/ridge were deterministic under the fixed implementation, while production RF/XGB fits used model seed 17.
+
+\section{Reproducibility and Artifact Map}
 \label{sec:si-reproducibility}
 
-The complete workflow and machine-readable outputs are retained in the public repository. The 20-seed predictive analysis is implemented in \path{paper1_leakage_benchmark/scripts/robustness_20seeds.py}; the 5,000-draw random-scaffold audit is implemented in \path{paper1_leakage_benchmark/scripts/balanced_split_null_audit.py}; and the paired robustness figure is generated by \path{paper1_leakage_benchmark/scripts/plot_robustness20_figure.py}. The corresponding raw, paired, summary, diagnostic, null-assignment, and percentile tables are stored under \path{paper1_leakage_benchmark/results/tables/}. Fixed fingerprints, hyperparameters, seed values, and output names are encoded in the scripts so that the reported results can be regenerated without manual intervention.
+The Paper 1 v3 workflow is organized as an auditable sequence rather than a set of result-specific scripts. Key components are:
+\begin{itemize}
+\item \path{shared_utils/cleaning_policy_v2.py}: canonical molecular cleaning, duplicate decisions, and lineage;
+\item \path{shared_utils/scaffold_identity.py}: canonical scaffold identities, acyclic sentinel policy, split assertions, and partition hashing;
+\item \path{shared_utils/split_candidate_pool_v3.py}: fixed-budget target-blind candidate generation and exact-size paired selection;
+\item \path{paper1_leakage_benchmark/scripts/05_audit_candidate_pool_splits_v3.py}: split construction and candidate-pool diagnostics;
+\item \path{paper1_leakage_benchmark/scripts/06_audit_candidate_budget_v3.py}: candidate-budget audit;
+\item \path{paper1_leakage_benchmark/scripts/07_freeze_manifests_v3.py}: production-manifest and artifact freezing;
+\item \path{paper1_leakage_benchmark/scripts/09_run_models_v3.py}: manifest-driven predictive fitting;
+\item \path{paper1_leakage_benchmark/scripts/11_audit_model_completeness_v3.py}: production completeness gate;
+\item \path{paper1_leakage_benchmark/scripts/12_analyze_partition_effects_v3.py}: partition-level primary and acyclic-sensitivity inference;
+\item \path{paper1_leakage_benchmark/scripts/13_audit_rdkit_hydrogen_warnings_v3.py}: isolated-hydrogen audit;
+\item \path{paper1_leakage_benchmark/scripts/14_audit_multifragment_standardization_v3.py}: multi-component structural audit;
+\item \path{paper1_leakage_benchmark/scripts/15_run_parent_fragment_sensitivity_v3.py}: frozen dominant-fragment classification sensitivity pipeline;
+\item \path{paper1_leakage_benchmark/scripts/16_build_manuscript_assets_v3.py}: figures generated directly from authoritative v3 result tables.
+\end{itemize}
+
+The authoritative experimental protocols are recorded in \path{paper1_leakage_benchmark/REBUILD_PROTOCOL_V3.md}, \path{paper1_leakage_benchmark/MODEL_PROTOCOL_V3.md}, and the frozen dominant-fragment sensitivity protocol. Machine-readable manifests, registries, summary tables, and job metadata preserve the mapping from molecular records to every reported partition and fitted result.
