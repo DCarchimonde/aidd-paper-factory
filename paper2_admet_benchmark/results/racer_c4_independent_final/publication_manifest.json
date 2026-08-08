@@ -1,0 +1,11 @@
+{
+  "branch": "paper2-racer-c4-development-2026",
+  "local_pre_label_commit": "4b117fefa648d082ee0d2fada4188a7d90642115",
+  "local_pre_label_tree": "0c18eee3f3f5b5b7e5e80338b0b377c1f855f336",
+  "publication_method": "github_app_atomic_tree_commit",
+  "remote_base_commit": "de9a0b42e2ff05366c9519c0807de83b3312c398",
+  "remote_pre_label_commit": "188a57d39fb9200d85b3baaa4484c810c365e3fd",
+  "remote_pre_label_tree": "0c18eee3f3f5b5b7e5e80338b0b377c1f855f336",
+  "sealed_predictions_sha256": "28fa2e130d2906e9468403bac555c9a688610272d5e3a89cc89607c7030f672c",
+  "tree_equivalence_verified": true
+}

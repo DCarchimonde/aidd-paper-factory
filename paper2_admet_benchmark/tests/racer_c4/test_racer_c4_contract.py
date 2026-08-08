@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import json
 import re
 import unittest
 from pathlib import Path
@@ -89,6 +91,26 @@ class RacerC4ContractTests(unittest.TestCase):
         self.assertIn('[string]$CondaEnv = "aidd_paper"', wrapper)
         self.assertIn("SetThreadExecutionState", wrapper)
         self.assertIn("--mode full --scope $Scope", wrapper)
+
+    def test_committed_final_report_matches_sealed_integrity_record(self) -> None:
+        result = P2 / "results" / "racer_c4_independent_final"
+        report_path = result / "final_report.json"
+        promotion_path = result / "promotion_record.json"
+        manifest = json.loads(
+            (result / "integrity_manifest.json").read_text(encoding="utf-8")
+        )
+        digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+        self.assertEqual(digest(report_path), manifest["final_report_sha256"])
+        self.assertEqual(digest(promotion_path), manifest["promotion_record_sha256"])
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        promotion = json.loads(promotion_path.read_text(encoding="utf-8"))
+        self.assertTrue(report["predictions_sealed_before_final_labels"])
+        self.assertTrue(report["final_labels_opened_after_promotion"])
+        self.assertFalse(report["scientific_superiority_claim_authorized"])
+        self.assertEqual(
+            promotion["sealed_predictions_sha256"],
+            manifest["sealed_predictions_sha256"],
+        )
 
 
 if __name__ == "__main__":

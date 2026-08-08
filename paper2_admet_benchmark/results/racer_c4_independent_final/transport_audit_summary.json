@@ -1,0 +1,14 @@
+{
+  "active_cells_by_view": {
+    "component_and_stack_logits": 60,
+    "ecfp_bits": 0,
+    "physchem_descriptors": 60
+  },
+  "cell_count": 60,
+  "reasons": {
+    "component_and_stack_logits:active": 60,
+    "ecfp_bits:class_ess+source_ess+weight_clipping+balance": 60,
+    "physchem_descriptors:active": 60
+  },
+  "status": "complete_final_label_blind_transport_audit"
+}

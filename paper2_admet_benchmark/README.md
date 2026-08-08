@@ -129,3 +129,9 @@ Windows one-command reproduction after `git pull`:
 ```powershell
 powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c4\run_racer_c4_overnight.ps1
 ```
+
+The sealed independent EPA run is complete. On the six-endpoint primary panel,
+minimum class coverage improved by 1.3649 percentage points (frozen hierarchical
+bootstrap 95% interval: +0.5827 to +1.9696 points) while mean MacroCSY changed
+by -1.6067 points, inside the frozen -5-point non-inferiority margin. Aggregate
+results and integrity hashes are under `results/racer_c4_independent_final/`.

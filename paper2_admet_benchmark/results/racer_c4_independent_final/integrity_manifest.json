@@ -1,0 +1,13 @@
+{
+  "final_metrics_sha256": "a2dcbf76db0aa2852a3b6ac3d93f89f08faf1acc932d737905cb65b18baeff66",
+  "final_paired_sha256": "c263897708aa38c064af9769ddd8dadf24bfa56ee92f510d695b1a0dc30e802f",
+  "final_report_sha256": "dd4f7782a2600e3415e4b63760d2af9d55e32d8a54209d17f15f8d4c9d1a7ee2",
+  "final_summary_sha256": "1d74338c6f164f057023556f4949cc0ae43e42212a2a016a3cf4d3ea14f8f0e2",
+  "git_head": "4b117fefa648d082ee0d2fada4188a7d90642115",
+  "lock_sha256": "d6ec91d327da66ee05d1f254a7bcbbf5c34738031ad76c89ed0c0ba16d14d79b",
+  "prediction_identity_sha256": "f284109cddd157c2788234d53e6474979ea3c6fbedf0ce330585b4f9a8a6f2aa",
+  "promotion_record_sha256": "61c270e86a122a64fc34a4e2da51cc77d681537d53070fd221e52a6a7e3435a5",
+  "sealed_predictions_sha256": "28fa2e130d2906e9468403bac555c9a688610272d5e3a89cc89607c7030f672c",
+  "status": "complete",
+  "target_label_permutation_would_not_change_predictions": true
+}
