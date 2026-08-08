@@ -1,0 +1,78 @@
+lock_status: retrospective_extension_fixed
+algorithm: RACER-C2
+algorithm_version: "2.0-dev.2"
+study_role: post_hoc_retrospective_algorithm_extension
+source_study: RACER-C-v1.0
+source_study_status: completed_confirmatory_primary_study
+source_panel_already_known: true
+confirmatory_claim_authorized: false
+
+expected_source:
+  endpoints: [Tox21_NR_AhR, Tox21_NR_ER, Tox21_SR_ARE, Tox21_SR_MMP]
+  tracks: [random_grouped, strict_scaffold, similarity_cluster]
+  seeds: [101, 102, 103, 104, 105]
+  cell_count: 60
+  source_method_count: 9
+  source_method_cell_count: 540
+
+scope:
+  primary_development_tracks: [strict_scaffold, similarity_cluster]
+  negative_control_tracks: [random_grouped]
+
+conformal:
+  alpha: 0.10
+  calibration_role: conformal
+  calibration: class_conditional_mondrian
+  finite_sample_quantile: ceil_n_plus_1_times_one_minus_alpha
+
+fixed_method_family:
+  - method: Stacking_Mondrian_fallback
+    role: exact_safe_fallback
+    t_max: 1.0
+    gamma_0: 0.0
+    gamma_1: 0.0
+    counterfactual_blend: 0.0
+  - method: RACER_score_no_tilt
+    role: parent_score_ablation
+    t_max: 1.5
+    gamma_0: 0.0
+    gamma_1: 0.0
+    counterfactual_blend: 0.0
+  - method: RACER_C2_gamma0_only
+    role: label_0_tilt_ablation
+    t_max: 1.5
+    gamma_0: 0.1
+    gamma_1: 0.0
+    counterfactual_blend: 0.0
+  - method: RACER_C2_gamma1_only
+    role: label_1_tilt_ablation
+    t_max: 1.5
+    gamma_0: 0.0
+    gamma_1: -0.1
+    counterfactual_blend: 0.0
+  - method: RACER_C2_full
+    role: selected_candidate_algorithm
+    t_max: 1.5
+    gamma_0: 0.1
+    gamma_1: -0.1
+    counterfactual_blend: 0.0
+
+primary_method: RACER_C2_full
+primary_comparators: [Stacking_Mondrian_fallback, RACER_score_no_tilt]
+
+policy_certificate_diagnostic:
+  role: retrospective_diagnostic_not_a_test_gate
+  familywise_alpha: 0.05
+  wrong_singleton_ceiling: 0.10
+  minimum_true_class_n: 25
+  coverage_floor: null
+  empty_exposure_ceiling: null
+  critical_class: 1
+  critical_csy_floor: null
+
+paired_cluster_bootstrap:
+  iterations: 4000
+  seed: 2701
+  cluster: endpoint_by_track
+  confidence_level: 0.95
+

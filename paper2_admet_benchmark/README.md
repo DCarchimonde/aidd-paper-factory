@@ -93,8 +93,22 @@ MVP requirements:
   candidate-label exponential reliability tilting, retains an exact
   stacking-Mondrian fallback, and certifies final conformal set states directly.
   The first learned counterfactual-score draft was rejected after honest
-  development selected zero weight. RACER-C2 is not frozen and has no authorized
-  prospective test panel yet.
+  development selected zero weight. Its additive retrospective runner reuses
+  the completed 60-cell v1 probability artifacts and adds the fixed C2 method,
+  its exact fallback, and three ablations without retraining any base model or
+  rerunning the 540 old method results. RACER-C2 is not frozen and has no
+  authorized prospective test panel yet.
+
+Run the additive CPU-only experiment from the RACER-C2 branch on Windows:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File `
+  paper2_admet_benchmark\scripts\racer_c2\run_racer_c2_increment.ps1
+```
+
+The command reproduces the development-only selection and then writes the new
+results under `results/racer_c2_retrospective_extension_v0/`. The v1 source
+directory is hash-verified before and after evaluation and remains read-only.
 
 The known v1 Tox21 outcomes may be used only for v2 architecture development and
 failure analysis. A new confirmatory claim requires untouched endpoints and a new

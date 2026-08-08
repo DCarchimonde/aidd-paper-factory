@@ -170,6 +170,17 @@ show improved actionability without loss of class-specific reliability. The
 current evidence can support method development, not a superiority claim or a
 claim of being the first reliability-weighted conformal method.
 
+### Retrospective additive evaluation
+
+`scripts/racer_c2/run_retrospective_extension.py` applies the one globally
+selected configuration to the completed v1 60-cell artifacts. It recalibrates
+only the fixed C2 candidate scores on each existing conformal role and evaluates
+the final sets using the already unsealed v1 test labels. It does not retrain a
+base learner or rerun any of the 540 parent-method results. The fixed comparison
+family is stacking-Mondrian, the v1 no-gate reliability score, both one-label
+tilt ablations, and full RACER-C2. These outputs are post-hoc development
+evidence regardless of their numerical result.
+
 ## 9. Required prospective evaluation
 
 The known Tox21 v1 panel may be used to reject designs and estimate compute only.

@@ -31,6 +31,10 @@ AUDIT = load_module(
     "racer_c2_development_audit",
     P2 / "scripts" / "racer_c2" / "run_development_audit.py",
 )
+RETROSPECTIVE = load_module(
+    "racer_c2_retrospective_extension",
+    P2 / "scripts" / "racer_c2" / "run_retrospective_extension.py",
+)
 
 
 class CandidateLabelScoreTests(unittest.TestCase):
@@ -270,6 +274,113 @@ class DevelopmentSelectionTests(unittest.TestCase):
         rejected = next(row for row in summary if row["gamma_0"] == 0.1)
         self.assertFalse(rejected["feasible"])
         self.assertEqual(rejected["class_1_candidate_minimum_coverage"], 0.84)
+
+
+class RetrospectiveExtensionTests(unittest.TestCase):
+    def test_cell_name_contract(self) -> None:
+        self.assertEqual(
+            RETROSPECTIVE.parse_cell_name(
+                "Tox21_NR_AhR__strict_scaffold__seed103"
+            ),
+            ("Tox21_NR_AhR", "strict_scaffold", 103),
+        )
+        with self.assertRaises(ValueError):
+            RETROSPECTIVE.parse_cell_name("malformed")
+
+    def test_source_output_separation_is_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            source = Path(temporary) / "v1"
+            source.mkdir()
+            RETROSPECTIVE.assert_separate_output(source, Path(temporary) / "v2")
+            with self.assertRaises(ValueError):
+                RETROSPECTIVE.assert_separate_output(source, source)
+            with self.assertRaises(ValueError):
+                RETROSPECTIVE.assert_separate_output(source, source / "new")
+
+    def test_test_label_recovery_requires_complete_old_method_matrix(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "test_predictions.csv"
+            rows = [
+                {
+                    "structure_id": structure_id,
+                    "target": target,
+                    "method": method,
+                    "state": "Accept(0)",
+                }
+                for structure_id, target in (("a", 0), ("b", 1))
+                for method in ("old_a", "old_b")
+            ]
+            RETROSPECTIVE.write_csv(
+                path, rows, ("structure_id", "target", "method", "state")
+            )
+            labels, methods = RETROSPECTIVE.recover_test_labels(path, 2)
+            self.assertEqual(labels, {"a": 0, "b": 1})
+            self.assertEqual(methods, ("old_a", "old_b"))
+            rows.pop()
+            RETROSPECTIVE.write_csv(
+                path, rows, ("structure_id", "target", "method", "state")
+            )
+            with self.assertRaises(RuntimeError):
+                RETROSPECTIVE.recover_test_labels(path, 2)
+
+    def test_cluster_bootstrap_is_deterministic(self) -> None:
+        rows = [
+            {"cluster": "a", "difference": 0.1},
+            {"cluster": "a", "difference": 0.2},
+            {"cluster": "b", "difference": -0.1},
+            {"cluster": "b", "difference": 0.0},
+        ]
+        first = RETROSPECTIVE.bootstrap_cluster_mean_ci(rows, 250, 77, 0.95)
+        second = RETROSPECTIVE.bootstrap_cluster_mean_ci(rows, 250, 77, 0.95)
+        self.assertEqual(first, second)
+        self.assertLessEqual(first[0], first[1])
+
+    def test_metric_row_uses_final_set_states(self) -> None:
+        targets = np.asarray([0, 0, 1, 1])
+        sets = np.asarray(
+            [[1, 0], [1, 1], [0, 1], [1, 0]], dtype=bool
+        )
+        row = RETROSPECTIVE.metric_row(
+            "endpoint",
+            "track",
+            101,
+            "cell",
+            "method",
+            "role",
+            "test",
+            targets,
+            sets,
+            {0: 0.5, 1: 0.6},
+        )
+        self.assertEqual(row["singleton_n"], 3)
+        self.assertAlmostEqual(row["singleton_rate"], 0.75)
+        self.assertAlmostEqual(row["ambiguity_rate"], 0.25)
+        self.assertEqual(row["class_1_wrong_singleton_n"], 1)
+
+    def test_fixed_retrospective_lock_preserves_disclosure_and_fallback(self) -> None:
+        lock = RETROSPECTIVE.load_lock(
+            P2 / "configs" / "racer_c2" / "retrospective_extension_lock_v0.yaml"
+        )
+        self.assertFalse(lock["confirmatory_claim_authorized"])
+        fallback = next(
+            row
+            for row in lock["fixed_method_family"]
+            if row["method"] == "Stacking_Mondrian_fallback"
+        )
+        self.assertEqual(
+            RETROSPECTIVE.configuration(fallback),
+            CORE.ScoreConfiguration(1.0, 0.0, 0.0, 0.0),
+        )
+
+    def test_windows_increment_runner_reuses_v1_without_retraining(self) -> None:
+        wrapper = (
+            P2 / "scripts" / "racer_c2" / "run_racer_c2_increment.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn("source_cell_count -ne 60", wrapper)
+        self.assertIn("source_method_cell_count -ne 540", wrapper)
+        self.assertIn("base_models_retrained -ne $false", wrapper)
+        self.assertIn("old_methods_rerun -ne $false", wrapper)
+        self.assertIn("run_retrospective_extension.py", wrapper)
 
 
 class DevelopmentFirewallTests(unittest.TestCase):
