@@ -1,0 +1,109 @@
+lock_status: retrospective_architecture_candidate_not_freeze_ready
+algorithm: RACER-C3
+algorithm_long_name: frontier_activated_asymmetric_candidate_expert_conformal_prediction
+algorithm_version: "3.0-dev.0"
+parent_algorithm: RACER-C-v1.0
+replaces_racer_c2_as_primary_candidate: true
+parent_confirmatory_status: completed_negative_policy_feasibility_result
+known_v1_panel_role: retrospective_architecture_development_only
+known_v1_test_reuse_as_confirmatory: prohibited
+result_namespace: racer_c3_development
+
+candidate_experts:
+  class_0:
+    support: one_minus_equal_weight_logit_mean_probability
+    probability_views: [ecfp_p, dmpnn_p, molformer_p]
+  class_1:
+    support: crossfitted_shared_candidate_correctness_probability
+    estimator: LogisticRegression
+    C: 0.1
+    max_iter: 2500
+    class_balance: equal_mass_over_candidate_label_by_correctness_cells
+    features:
+      - candidate_logits_for_five_probability_views
+      - first_three_candidate_probability_mean_min_max_spread
+      - disagreement
+      - ecfp_distance
+      - local_oof_brier_loss
+      - bri
+      - risk_percentile
+      - risk_by_candidate_stack_nonconformity
+      - candidate_label_indicator_and_risk_interactions
+    fitting: development_meta_fold_crossfit_then_fold_model_ensemble
+  risk_temperature:
+    class_0_t_max: 1.5
+    class_1_t_max: 1.5
+    risk_source: fixed_development_reference_risk_percentile
+  hard_predicted_class_branch: prohibited
+
+frontier_route:
+  scope: one_route_for_conformal_plus_deployment_union
+  uses_labels: false
+  permutation_invariant_union: true
+  development_scaffold_reference: development_role_only
+  overlap_fraction_definition: molecule_weighted_union_scaffolds_seen_in_development
+  overlap_fraction_max: 0.05
+  median_ecfp_distance_min: 0.57
+  minimum_valid_union_n: 100
+  missing_or_insufficient_action: fallback
+  activation_logic: overlap_at_most_threshold_and_distance_at_least_threshold
+  thresholds_selected_from_unlabeled_track_separation_only: true
+
+fallback:
+  method: RACER-C-v1-no-gate
+  probability: stack_p
+  t_max: 1.5
+  exact_identity_required: true
+
+conformal:
+  fallback_alpha_by_class: {0: 0.10, 1: 0.10}
+  frontier_alpha_by_class: {0: 0.10, 1: 0.095}
+  critical_class: 1
+  critical_class_alpha_is_more_conservative: true
+  calibration: class_conditional_mondrian
+  finite_sample_quantile: ceil_n_plus_1_times_one_minus_alpha
+  insufficient_class_threshold: positive_infinity
+  full_population_sets: true
+  allowed_states: [Accept_0, Accept_1, Ambiguous, Defer_empty]
+
+retrospective_signal:
+  source: already_opened_racer_c_v1_panel
+  architecture_was_chosen_after_outer_outcomes_were_known: true
+  primary_comparator: RACER_score_no_gate
+  chemical_shift_cell_count: 40
+  strict_scaffold_cell_count: 20
+  random_negative_control_cell_count: 20
+  routed_mean_macro_csy_delta_pp:
+    strict_scaffold: 0.2097
+    similarity_cluster: 0.0000
+    random_grouped: 0.0000
+    all_60_cells: 0.0699
+  strict_scaffold_frontier_diagnostics:
+    cell_wins_ties_losses: [10, 0, 10]
+    class_0_coverage_delta_pp: 0.4272
+    class_1_coverage_delta_pp: -0.5736
+    class_0_csy_delta_pp: -0.7037
+    class_1_csy_delta_pp: 1.1232
+    endpoint_cluster_bootstrap_macro_csy_interval_crosses_zero: true
+  freeze_gate_passed: false
+  selection_adjusted_inference_available: false
+  scientific_superiority_claim_authorized: false
+
+prospective_validation:
+  status: endpoints_not_selected_protocol_not_frozen
+  test_predictions_allowed: false
+  known_v1_endpoints: retrospective_only
+  required_before_test:
+    - untouched_endpoint_provenance_license_and_label_semantics_audit
+    - role_count_and_precision_audit
+    - exact_comparator_implementation_or_access_audit
+    - implementation_lineage_and_test_label_permutation_tests
+    - freeze_of_primary_estimand_hierarchy_and_multiplicity
+    - prediction_free_formal_review
+    - user_approved_protocol_tag
+
+failure_policy:
+  retain_all_failed_endpoints_seeds_and_certificates: true
+  no_post_outcome_threshold_or_expert_change: true
+  fallback_is_not_evidence_of_frontier_superiority: true
+  prospective_failure_must_be_reported: true

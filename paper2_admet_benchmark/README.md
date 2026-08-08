@@ -82,3 +82,27 @@ MVP requirements:
 - at least 5 random seeds where applicable;
 - baseline models: LR/Ridge, Random Forest, XGBoost, MLP on ECFP;
 - performance, calibration, conformal, applicability-domain, and selective-prediction analyses.
+
+## Post-v1 RACER-C3 development
+
+The isolated branch `paper2-racer-c3-development-2026` contains a new
+development-only algorithm candidate under `scripts/racer_c3/`. It has **not
+passed its architecture freeze gate**. RACER-C3 uses
+candidate-label-specific experts at a verified chemical frontier, an unlabeled
+permutation-invariant batch route, class-conditional calibration, and an exact
+fallback to the completed v1 no-gate RACER score.
+
+The four-endpoint v1 panel was already known when this architecture was chosen.
+Accordingly, `results/racer_c3_development/` is retrospective development
+evidence and cannot support a superiority claim. The algorithm specification,
+prior-art boundary, and prospective firewall are in:
+
+- `docs/racer_c3_algorithm_specification_v0.1.md`;
+- `docs/racer_c3_prior_art_boundary.md`; and
+- `protocols/racer_c3_prospective_protocol_draft.md`.
+
+Run the isolated numerical/contract tests with:
+
+```bash
+python -m unittest discover -s paper2_admet_benchmark/tests/racer_c3 -v
+```
