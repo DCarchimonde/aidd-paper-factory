@@ -1,5 +1,132 @@
 \section{Results}
 
-\input{sections/results_chemometrics_target}
-\input{sections/results_chemometrics_performance}
-\input{sections/results_chemometrics_similarity}
+\subsection{The paired design removed test-size differences from the primary contrast}
+
+The rebuilt split protocol produced 20 requested and 20 unique size-matched scaffold partitions, and 20 requested and 20 unique target-balanced scaffold partitions, for every primary dataset. No duplicate partition hash was used as an independent statistical replicate. Within each partition seed, the paired scaffold protocols had exactly the same test-set size. The resulting paired test sizes were 303 for BACE, 393 for BBBP, 288 for ClinTox, 8,224 for HIV, 223 for ESOL, and 128 for FreeSolv (Table~\ref{tab:paired-size}). Thus, the primary performance contrast is not attributable to unequal test-set cardinality.
+
+\begin{table}[H]
+\centering
+\caption{Integrity of the primary exact-size paired scaffold design. Each protocol contains 20 unique partition hashes.}
+\label{tab:paired-size}
+\begin{tabular}{lrrrr}
+\toprule
+Dataset & Clean $N$ & Size-matched $n_{\mathrm{test}}$ & Target-balanced $n_{\mathrm{test}}$ & Unique pairs \\
+\midrule
+BACE & 1513 & 303 & 303 & 20 \\
+BBBP & 1965 & 393 & 393 & 20 \\
+ClinTox & 1442 & 288 & 288 & 20 \\
+HIV & 41120 & 8224 & 8224 & 20 \\
+ESOL & 1117 & 223 & 223 & 20 \\
+FreeSolv & 642 & 128 & 128 & 20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Candidate-budget auditing showed why search effort had to be treated as part of the benchmark protocol. For the classification tasks, 300 target-blind candidates provided the frozen production budget. In contrast, under the primary single-group treatment of acyclic molecules, the mean target gap continued to improve for ESOL from 0.0346 at 3,000 candidates to 0.00179 at 20,000 candidates, and for FreeSolv from 1.076 at 3,000 candidates to 0.687 at 20,000 candidates. Neither regression series satisfied the pre-specified stability rule by the largest audited budget. The production budget was therefore capped rather than increased until an apparently desirable partition was obtained. Figure~\ref{fig:audit-framework} summarizes the resulting audit sequence.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{figure1_audit_framework_v3.pdf}
+\caption{Chemometric benchmark-audit framework. A source-faithful molecular universe is cleaned and assigned explicit scaffold semantics before target-blind candidate partitions are generated. The primary contrast is formed by an exact-size target-blind scaffold baseline and a target-balanced candidate selected from the same candidate pool. Candidate budgets and molecule-level manifests are frozen before model fitting. Protocol sensitivities then test whether the resulting claim survives alternative acyclic-scaffold and disconnected-component representations.}
+\label{fig:audit-framework}
+\end{figure}
+
+\subsection{Target balancing did not provide a reproducible classification advantage}
+
+Across BACE, BBBP, ClinTox, and HIV, none of the 12 classification dataset--model cells met the joint criterion for a target-balanced performance advantage after correction across the 18-cell primary family (Table~\ref{tab:primary-results}; Figure~\ref{fig:primary-effects}). The mean AUC contrast was negative in 11 of the 12 cells and positive only for HIV--RF, but the magnitudes were small and the corrected inferential conclusion was inconclusive in every classification cell.
+
+BACE showed the largest consistent negative point estimates: mean AUC effects were $-0.0193$ for LR, $-0.0127$ for RF, and $-0.0170$ for XGB. Their bootstrap intervals lay below zero, but the corresponding Holm-adjusted $P$ values were 0.113, 0.524, and 0.293, respectively, so none satisfied the pre-specified joint decision rule. BBBP, ClinTox, and HIV likewise showed no corrected evidence of a systematic gain from reducing the target-mean mismatch. The result separates two questions that are easily conflated: the split search can make the target distributions more similar by construction, but that does not imply improved classification performance.
+
+\subsection{Regression performance improved strongly under the primary single-group scaffold semantics}
+
+The regression tasks produced a different pattern. All six ESOL and FreeSolv dataset--model cells favored target balancing under the primary convention that all acyclic molecules share the \texttt{\_\_ACYCLIC\_\_} scaffold identity (Table~\ref{tab:primary-results}; Figure~\ref{fig:primary-effects}). For ESOL, the mean RMSE reductions were 0.293 for RF, 0.105 for ridge regression, and 0.227 for XGB, with Holm-adjusted $P$ values of 0.00235, 0.0475, and 0.00200. For FreeSolv, the corresponding reductions were substantially larger: 1.149 for RF, 1.000 for ridge regression, and 0.798 for XGB, all with Holm-adjusted $P<0.0014$.
+
+\begin{table}[H]
+\centering
+\caption{Primary exact-size paired performance contrast. For classification, effect $=$ AUC$_{\mathrm{balanced}}-$AUC$_{\mathrm{size}}$; for regression, effect $=$ RMSE$_{\mathrm{size}}-$RMSE$_{\mathrm{balanced}}$. Positive effects therefore favor target balancing for both task types. Holm correction was applied across all 18 cells.}
+\label{tab:primary-results}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lllrrrrl}
+\toprule
+Dataset & Model & Metric & Size matched & Target balanced & Effect (95\% CI) & Holm $P$ & Inference \\
+\midrule
+BACE & LR & AUC & 0.8787 & 0.8595 & $-0.0193$ ($-0.0332,-0.00535$) & 0.1132 & Inconclusive \\
+BACE & RF & AUC & 0.8905 & 0.8778 & $-0.0127$ ($-0.0237,-0.00105$) & 0.5243 & Inconclusive \\
+BACE & XGB & AUC & 0.8877 & 0.8707 & $-0.0170$ ($-0.0304,-0.00282$) & 0.2931 & Inconclusive \\
+BBBP & LR & AUC & 0.8771 & 0.8770 & $-0.0001$ ($-0.0194,0.0201$) & 1.0000 & Inconclusive \\
+BBBP & RF & AUC & 0.9152 & 0.9042 & $-0.0110$ ($-0.0253,0.00331$) & 1.0000 & Inconclusive \\
+BBBP & XGB & AUC & 0.8983 & 0.8895 & $-0.0088$ ($-0.0262,0.00896$) & 1.0000 & Inconclusive \\
+ClinTox & LR & AUC & 0.8304 & 0.8059 & $-0.0244$ ($-0.0478,0.00074$) & 0.3999 & Inconclusive \\
+ClinTox & RF & AUC & 0.8259 & 0.8240 & $-0.0019$ ($-0.0364,0.0368$) & 1.0000 & Inconclusive \\
+ClinTox & XGB & AUC & 0.8494 & 0.8336 & $-0.0158$ ($-0.0482,0.0165$) & 1.0000 & Inconclusive \\
+HIV & LR & AUC & 0.7618 & 0.7569 & $-0.0049$ ($-0.0191,0.00872$) & 1.0000 & Inconclusive \\
+HIV & RF & AUC & 0.8146 & 0.8171 & $0.0025$ ($-0.00848,0.0137$) & 1.0000 & Inconclusive \\
+HIV & XGB & AUC & 0.7838 & 0.7774 & $-0.0064$ ($-0.0182,0.00533$) & 1.0000 & Inconclusive \\
+\midrule
+ESOL & RF & RMSE & 1.7857 & 1.4927 & $0.2930$ ($0.186,0.396$) & 0.00235 & Balanced better \\
+ESOL & Ridge & RMSE & 1.8066 & 1.7013 & $0.1053$ ($0.0451,0.162$) & 0.04751 & Balanced better \\
+ESOL & XGB & RMSE & 1.6288 & 1.4015 & $0.2272$ ($0.142,0.311$) & 0.00200 & Balanced better \\
+FreeSolv & RF & RMSE & 3.9649 & 2.8160 & $1.1490$ ($0.834,1.464$) & 0.000162 & Balanced better \\
+FreeSolv & Ridge & RMSE & 3.5115 & 2.5112 & $1.0003$ ($0.726,1.264$) & 0.000103 & Balanced better \\
+FreeSolv & XGB & RMSE & 3.5187 & 2.7203 & $0.7984$ ($0.506,1.088$) & 0.00131 & Balanced better \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{figure2_primary_effects_v3.pdf}
+\caption{Primary paired target-balance effects across 18 dataset--model cells. Points show mean paired effects over 20 unique partition pairs and horizontal bars show paired-bootstrap 95\% intervals. The effect sign is oriented so that positive values favor target balancing for both classification and regression. Corrected inference, rather than interval sign alone, follows the joint bootstrap-plus-Holm decision rule described in Methods.}
+\label{fig:primary-effects}
+\end{figure}
+
+\subsection{The regression advantage depended strongly on acyclic-scaffold semantics}
+
+The primary regression result did not survive unchanged when the structural meaning of an empty Bemis--Murcko scaffold was altered. Under the singleton convention, the mean ESOL RMSE reductions shrank from 0.293, 0.105, and 0.227 to 0.044, 0.061, and 0.036 for RF, ridge, and XGB, respectively (Figure~\ref{fig:acyclic-sensitivity}). Only the descriptive ridge interval remained entirely above zero. For FreeSolv, all three mean effects changed sign: $-0.094$ for RF, $-0.085$ for ridge, and $-0.034$ for XGB, and every bootstrap interval crossed zero.
+
+This sensitivity is important because the predictive models, endpoint values, partition seeds, and paired selection logic were otherwise unchanged. The large primary regression gains are therefore not appropriately interpreted as a task-wide law that target balancing improves regression. They are conditional on the grouping semantics used to define structural novelty among acyclic molecules.
+
+\begin{table}[H]
+\centering
+\caption{Acyclic singleton scaffold sensitivity. Positive RMSE effects favor target balancing. Wilcoxon $P$ values are descriptive for this protocol sensitivity and are not added to the primary 18-cell family.}
+\label{tab:acyclic-sensitivity}
+\begin{tabular}{llrrrr}
+\toprule
+Dataset & Model & Size RMSE & Balanced RMSE & Mean effect (95\% CI) & Wilcoxon $P$ \\
+\midrule
+ESOL & RF & 1.4318 & 1.3873 & $0.0444$ ($-0.0479,0.1486$) & 0.7285 \\
+ESOL & Ridge & 1.5120 & 1.4512 & $0.0608$ ($0.00852,0.1139$) & 0.0400 \\
+ESOL & XGB & 1.3075 & 1.2717 & $0.0358$ ($-0.0207,0.0992$) & 0.5706 \\
+FreeSolv & RF & 2.6786 & 2.7730 & $-0.0944$ ($-0.4369,0.2412$) & 0.7285 \\
+FreeSolv & Ridge & 2.2592 & 2.3443 & $-0.0851$ ($-0.3853,0.2226$) & 0.7285 \\
+FreeSolv & XGB & 2.2581 & 2.2916 & $-0.0335$ ($-0.3450,0.2733$) & 0.8983 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{figure3_acyclic_sensitivity_v3.pdf}
+\caption{Dependence of the regression effect on acyclic-scaffold semantics. The primary single-group convention places all acyclic molecules in one scaffold group; the sensitivity convention treats them as singleton groups. Effects are RMSE$_{\mathrm{size}}-$RMSE$_{\mathrm{balanced}}$, so positive values favor target balancing. The large primary gains are substantially attenuated under the singleton convention.}
+\label{fig:acyclic-sensitivity}
+\end{figure}
+
+\subsection{Disconnected-component representation changed point estimates but not classification inference}
+
+The structural audit identified multi-component source-faithful records in 105 BBBP molecules (5.34\%), 14 ClinTox molecules (0.97\%), and 3,086 HIV molecules (7.50\%). Selecting the deterministic dominant fragment changed the Bemis--Murcko scaffold for 5, 1, and 235 of these records, respectively. The full-record versus dominant-fragment Morgan similarity was below 0.90 for 18 BBBP, 5 ClinTox, and 640 HIV records. Importantly, dominant-fragment mapping also collapsed distinct source records onto common fragment identities; one BBBP, one ClinTox, and 17 HIV fragment groups carried conflicting binary labels and were excluded from this sensitivity dataset. These observations confirmed that single-fragment selection is not a lossless formatting operation.
+
+All 360 pre-specified dominant-fragment model jobs completed. Across the nine BBBP, ClinTox, and HIV dataset--model cells, every paired-bootstrap interval included zero and every Holm-adjusted Wilcoxon $P$ value for the nine-cell sensitivity family was 1.0. Thus, all nine classification inferences remained inconclusive. The point estimates were nevertheless representation-sensitive: seven of the nine mean effects changed sign relative to the source-faithful primary analysis (Figure~\ref{fig:fragment-sensitivity}). For example, BBBP--RF changed from $-0.0110$ to $+0.0024$, ClinTox--XGB from $-0.0158$ to $+0.0034$, and HIV--LR from $-0.0049$ to $+0.0052$.
+
+The appropriate robustness conclusion is therefore asymmetric: the \emph{absence of a statistically supported classification advantage} was stable to the dominant-fragment perturbation, whereas the direction and magnitude of the point estimates were not.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.96\textwidth]{figure4_dominant_fragment_sensitivity_v3.pdf}
+\caption{Source-faithful versus dominant-fragment classification effects for the nine affected dataset--model cells. Lines connect the mean paired effect obtained under the primary representation and the dominant-fragment sensitivity representation. Seven of nine mean-effect signs reverse, while all nine sensitivity inferences remain inconclusive.}
+\label{fig:fragment-sensitivity}
+\end{figure}
+
+\subsection{Benchmark claims were protocol-conditioned rather than model-intrinsic}
+
+Taken together, the experiments reveal three distinct levels of stability. First, target-distribution balance is an controllable property of a scaffold-disjoint benchmark, but balancing it does not guarantee a classification benefit. Second, a strong regression benefit can appear under one defensible scaffold semantics and weaken sharply under another. Third, classification-level inference can remain stable while the sign of the estimated effect changes under a reasonable molecular representation perturbation. A molecular benchmark score, or even a split-induced score difference, is therefore incompletely specified without the protocol that generated the test population.
