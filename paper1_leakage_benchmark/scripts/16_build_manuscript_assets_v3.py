@@ -276,7 +276,7 @@ def figure1_framework() -> None:
             if j == count - 1:
                 col = COLORS["mint"]
                 ec = COLORS["teal"]
-            rounded_box(ax, (x0 + j * 0.045, yy, 0.032, 0.07), 0.032, 0.07, "", col, ec, radius=0.008)
+            rounded_box(ax, (x0 + j * 0.045, yy), 0.032, 0.07, "", col, ec, radius=0.008)
     ax.text(0.02, 0.16, "More candidates create more opportunities\nfor an extreme low-gap split.", transform=ax.transAxes, fontsize=9.0)
     rounded_box(ax, (0.12, 0.02), 0.75, 0.10, "Budget audited and frozen before model outcomes", COLORS["orange_pale"], COLORS["orange"], fontsize=8.5, weight="bold")
 
