@@ -8,8 +8,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PAPER_DIR = ROOT / "paper1_leakage_benchmark"
 LATEX_DIR = ROOT / "paper1_latex"
-FIG_SCRIPT = PAPER_DIR / "scripts" / "18_build_manuscript_assets_v3_final.py"
-BUILD_DIR = LATEX_DIR / "build_visual_v3"
+FIG_SCRIPT = PAPER_DIR / "scripts" / "19_build_manuscript_assets_v3_round2.py"
+BUILD_DIR = LATEX_DIR / "build_visual_v3_round2"
 
 EXPECTED_FIGURES = [
     "figure1_audit_framework_v3.pdf",
@@ -46,18 +46,15 @@ def compile_with_latexmk() -> bool:
         return False
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     for source in ("main.tex", "supplementary.tex"):
-        run(
-            [
-                latexmk,
-                "-pdf",
-                "-interaction=nonstopmode",
-                "-halt-on-error",
-                "-file-line-error",
-                f"-outdir={BUILD_DIR.name}",
-                source,
-            ],
-            cwd=LATEX_DIR,
-        )
+        run([
+            latexmk,
+            "-pdf",
+            "-interaction=nonstopmode",
+            "-halt-on-error",
+            "-file-line-error",
+            f"-outdir={BUILD_DIR.name}",
+            source,
+        ], cwd=LATEX_DIR)
     return True
 
 
@@ -71,13 +68,11 @@ def compile_with_pdflatex() -> None:
         )
 
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", "main.tex"], cwd=LATEX_DIR)
-    if bibtex:
-        run([bibtex, "main"], cwd=LATEX_DIR)
-    else:
+    if not bibtex:
         raise RuntimeError("pdflatex was found but bibtex was not; main manuscript bibliography cannot be rebuilt.")
+    run([bibtex, "main"], cwd=LATEX_DIR)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", "main.tex"], cwd=LATEX_DIR)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", "main.tex"], cwd=LATEX_DIR)
-
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", "supplementary.tex"], cwd=LATEX_DIR)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "-file-line-error", "supplementary.tex"], cwd=LATEX_DIR)
 
@@ -90,33 +85,26 @@ def compile_with_pdflatex() -> None:
 
 
 def verify_pdfs() -> None:
-    outputs = [BUILD_DIR / "main.pdf", BUILD_DIR / "supplementary.pdf"]
-    for path in outputs:
-        if not path.exists():
-            raise FileNotFoundError(f"Missing compiled PDF: {path}")
-        size_mb = path.stat().st_size / (1024 * 1024)
-        if size_mb <= 0:
-            raise RuntimeError(f"Compiled PDF is empty: {path}")
-        print(f"OK: {path} ({size_mb:.2f} MiB)")
+    for path in (BUILD_DIR / "main.pdf", BUILD_DIR / "supplementary.pdf"):
+        if not path.exists() or path.stat().st_size <= 0:
+            raise FileNotFoundError(f"Missing or empty compiled PDF: {path}")
+        print(f"OK: {path} ({path.stat().st_size / (1024 * 1024):.2f} MiB)")
 
 
 def main() -> None:
     print("=" * 78)
-    print("PAPER 1 V3 — VISUAL REFRESH + FULL MANUSCRIPT BUILD")
+    print("PAPER 1 V3 — ROUND-2 FIGURE + LAYOUT POLISH")
     print("=" * 78)
-    print("This run does not refit models or alter frozen partitions/statistical results.")
-
+    print("No models are refit. Frozen partitions, statistics, and reported numerical results are unchanged.")
     build_figures()
-
     if compile_with_latexmk():
         print("\nLaTeX build completed with latexmk.")
     else:
         print("\nlatexmk not found; using pdflatex/bibtex fallback.")
         compile_with_pdflatex()
-
     verify_pdfs()
     print("\n" + "=" * 78)
-    print("PAPER 1 VISUAL SUBMISSION BUILD: PASS")
+    print("PAPER 1 ROUND-2 VISUAL BUILD: PASS")
     print(f"Main manuscript: {BUILD_DIR / 'main.pdf'}")
     print(f"Supporting information: {BUILD_DIR / 'supplementary.pdf'}")
     print("=" * 78)
