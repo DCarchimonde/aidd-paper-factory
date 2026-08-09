@@ -1,110 +1,97 @@
 \section{Materials and Methods}
 
-\subsection{Datasets and audited molecular preprocessing}
+\subsection{Datasets and audited molecular identity}
 
-Six public molecular-property datasets distributed through the MoleculeNet/DeepChem ecosystem were analysed: BACE, BBBP, ClinTox, and HIV for binary classification, and ESOL and FreeSolv for regression \citep{wu2018moleculenet}. The six tasks were selected to span classification and regression, small and large sample sizes, and heterogeneous molecular structure rather than to constitute an exhaustive survey of molecular benchmarks.
+Six public molecular-property datasets distributed through the MoleculeNet/DeepChem ecosystem were analysed: BACE, BBBP, ClinTox, and HIV for binary classification, and ESOL and FreeSolv for regression \citep{wu2018moleculenet}. Source SMILES were parsed and canonicalized with RDKit \citep{rdkit}. Invalid structures and non-numeric targets were excluded with row-level lineage. Molecular identity was defined by canonical isomeric SMILES. Consistent classification duplicates were collapsed; canonical identities carrying conflicting binary labels were excluded in full. Regression duplicates were aggregated by arithmetic mean while retaining source counts, ranges, and lineage. No duplicate canonical identity remained in the clean datasets. The closed raw-to-clean accounting, including duplicate and conflict rows, is reported in Supporting Information Table~\ref{tab:si-cleaning-accounting}.
 
-All preprocessing was rebuilt before split generation. Source SMILES were parsed and canonicalized with RDKit \citep{rdkit}. Rows with invalid or missing molecular structures or non-numeric targets were excluded with row-level lineage. Molecular identity was then defined by canonical SMILES. For classification, repeated canonical molecules with a consistent binary label were collapsed to one record, whereas groups containing both labels were excluded in full. For regression, repeated canonical molecules were retained as one molecular identity with the arithmetic mean of the available target values; source target ranges and lineage were stored. No duplicate canonical molecular identities remained in the resulting \texttt{clean\_v2} datasets.
-
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Audited datasets used for the primary analysis. Conflict groups refer to canonical molecular identities associated with both binary labels and were excluded in full.}
+\caption{Audited molecular-property datasets used in the primary analysis.}
 \label{tab:dataset-summary}
-\begin{tabular}{llrrrr}
+\begin{tabular}{llrr}
 \toprule
-Dataset & Task & Raw rows & Invalid/missing & Conflict groups & Final $N$ \\
+Dataset & Task & Raw rows & Final unique molecules \\
 \midrule
-BACE & Classification & 1513 & 0 & 0 & 1513 \\
-BBBP & Classification & 2050 & 11 & 10 & 1965 \\
-ClinTox & Classification & 1484 & 4 & 19 & 1442 \\
-HIV & Classification & 41127 & 7 & 0 & 41120 \\
-ESOL & Regression & 1128 & 0 & -- & 1117 \\
-FreeSolv & Regression & 642 & 0 & -- & 642 \\
+BACE & Classification & 1513 & 1513 \\
+BBBP & Classification & 2050 & 1965 \\
+ClinTox & Classification & 1484 & 1442 \\
+HIV & Classification & 41127 & 41120 \\
+ESOL & Regression & 1128 & 1117 \\
+FreeSolv & Regression & 642 & 642 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The complete cleaning decisions, source-row lineage, and SHA-256 digests of the cleaned datasets were retained as reproducibility artifacts. The primary analysis deliberately preserved disconnected molecular components present in the source-faithful canonical records; the consequence of an alternative single-fragment representation was tested separately rather than incorporated post hoc into the primary cleaning policy.
+The primary analysis preserved disconnected components present in the source-faithful canonical records. A deterministic dominant-fragment representation was evaluated only as a pre-specified sensitivity perturbation.
 
-\subsection{Canonical scaffold identity and acyclic molecules}
+\subsection{Scaffold identity and acyclic semantics}
 
-Bemis--Murcko scaffolds were recomputed from the canonical molecular representation with chirality excluded from the scaffold identifier \citep{bemis1996properties}. A scaffold split was required to assign every molecule exactly once and to have zero train--test scaffold overlap.
+Bemis--Murcko scaffolds were recomputed from the canonical representation with chirality excluded from the scaffold identifier \citep{bemis1996properties}. Every scaffold partition was required to assign each molecule exactly once and to have zero train--test scaffold overlap. Because an acyclic molecule has an empty Bemis--Murcko framework, the primary convention maps every empty framework to the explicit sentinel \texttt{\_\_ACYCLIC\_\_}, placing all acyclic molecules in one scaffold group. The regression sensitivity instead assigns each acyclic molecule a molecule-specific scaffold identity. These conventions encode different meanings of structural novelty and are analysed separately.
 
-Acyclic molecules require an explicit convention because their Bemis--Murcko framework is empty. In the primary analysis, every empty framework was mapped to the non-empty sentinel \texttt{\_\_ACYCLIC\_\_}, so all acyclic molecules formed one scaffold group (\emph{single-group} convention). This prevents missing/empty scaffold identifiers from being silently dropped by tabular grouping operations. For the regression sensitivity analysis, an alternative \emph{singleton} convention assigned a distinct scaffold identifier to every acyclic molecule. The two conventions represent different structural meanings of ``unseen scaffold'' and were analysed as a protocol sensitivity rather than selected according to downstream model performance.
+\subsection{Exact-size paired target-mean selection}
 
-\subsection{Paired target-balance scaffold audit}
+All primary paired scaffold partitions targeted 20\% of the cleaned dataset for testing. Let $G_1,\ldots,G_m$ denote complete scaffold groups and $n^*=\operatorname{round}(0.2N)$. For each pre-specified partition seed $s$, a fixed-budget target-blind candidate pool $\mathcal{C}_s$ was generated by random scaffold-group permutations. Groups were accumulated until the target size was crossed; removing the final group was allowed when it was at least as close to $n^*$. Duplicate scaffold subsets were removed, and target values were not used during candidate generation.
 
-All main paired scaffold partitions targeted $20\%$ of the cleaned dataset for testing. Let $G_1,\ldots,G_m$ denote complete scaffold groups and let $n^*=\operatorname{round}(0.2N)$. For each pre-specified partition seed $s$, a fixed-budget target-blind candidate pool $\mathcal{C}_s$ was generated. Each candidate was obtained from a random permutation of scaffold groups: groups were accumulated until the target size was crossed, after which removing the final group was allowed if it was at least as close to $n^*$. Duplicate scaffold subsets were removed. Target values were not used during candidate generation.
-
-For candidate $c$, let $n_c$ be its test-set size. The size deviation was
+For candidate $c$ with test size $n_c$, size deviation was
 \begin{equation}
  d_{\mathrm{size}}(c)=\frac{|n_c-n^*|}{\max(n^*,1)}.
  \label{eq:size-deviation}
 \end{equation}
-The \emph{size-matched scaffold baseline} $c_s^{\mathrm{size}}$ was the candidate with minimum $d_{\mathrm{size}}$; ties were resolved by a deterministic hash-based ranking that used no target information.
-
-The target contrast was then defined only within the subset
+The target-blind size-matched baseline $c_s^{\mathrm{size}}$ minimized $d_{\mathrm{size}}$, with deterministic hash-based tie resolution. Target-aware selection was then restricted to
 \begin{equation}
- \mathcal{M}_s=\{c\in\mathcal{C}_s:n_c=n_{c_s^{\mathrm{size}}}\}.
+ \mathcal{M}_s=\{c\in\mathcal{C}_s:n_c=n_{c_s^{\mathrm{size}}}\},
 \end{equation}
-For each eligible candidate, target-distribution mismatch was measured by the absolute difference between training and test target means,
+so the paired candidate necessarily had the same test-set cardinality. Within $\mathcal{M}_s$, the selection criterion was the absolute train--test target-mean gap
 \begin{equation}
- d_y(c)=\left|\bar y_{\mathrm{train}}(c)-\bar y_{\mathrm{test}}(c)\right|.
+ d_y(c)=\left|\bar y_{\mathrm{train}}(c)-\bar y_{\mathrm{test}}(c)\right|,
  \label{eq:target-gap}
 \end{equation}
-The \emph{target-balanced scaffold} candidate was
+and the target-mean-balanced candidate was
 \begin{equation}
- c_s^{\mathrm{bal}}=\arg\min_{c\in\mathcal{M}_s}d_y(c),
+ c_s^{\mathrm{bal}}=\arg\min_{c\in\mathcal{M}_s}d_y(c).
  \label{eq:paired-balance}
 \end{equation}
-with deterministic hash-based resolution of exact ties. By construction, $c_s^{\mathrm{size}}$ and $c_s^{\mathrm{bal}}$ have identical $n_{\mathrm{test}}$, are drawn from the same target-blind candidate pool, obey the same scaffold-disjointness rule, and differ only through target-informed selection within the exact-size candidate subset. The distribution of $d_y$ within $\mathcal{M}_s$ was retained as a descriptive matched-budget control distribution; it was not treated as an independent inferential null because $c_s^{\mathrm{bal}}$ is selected as an extremum from that distribution.
+Thus, the paired protocols share the dataset, partition seed, target-blind candidate pool, scaffold rule, candidate budget, and exact test size. They do not necessarily share the same molecular or scaffold composition; such collateral changes are measured explicitly and are not described as controlled covariates.
 
-\subsection{Candidate-search budget audit and stopping policy}
+\subsection{Candidate-search budget and partition freezing}
 
-Search budget is itself a benchmark-construction parameter: larger candidate pools offer more opportunities to obtain an unusually well-balanced partition. We therefore audited candidate budgets before predictive model outcomes were examined. A lower budget was considered stable only when its mean balanced target gap satisfied both an absolute-change threshold of 0.02 target units and a relative-change threshold of 5\% with respect to every larger audited budget. The classification tasks satisfied the frozen criterion from 300 candidates, which was therefore used for BACE, BBBP, ClinTox, and HIV.
+Search budget was audited before predictive outcomes because a larger candidate pool provides more opportunities to find an extreme low-gap partition. A lower budget was considered stable only when its mean selected target-mean gap changed by no more than 0.02 target units and 5\% relative to every larger audited budget. Classification tasks were frozen at 300 candidates per partition seed. ESOL and FreeSolv under the primary single-group convention did not satisfy the stopping criterion by 20,000 candidates, so 20,000 was retained as a predeclared cap without a convergence claim. The singleton regression sensitivity used a separately frozen 5,000-candidate cap.
 
-For ESOL and FreeSolv under the primary single-group acyclic convention, target balance continued to improve through the largest audited budget. The production budget was therefore capped at 20,000 candidates per partition seed, with no claim of numerical convergence. Under the singleton acyclic sensitivity, a budget of 5,000 candidates was frozen; temporary adjacent-budget plateaus were not interpreted as convergence. No candidate-budget escalation was performed after predictive results were observed.
+Twenty partition seeds were fixed before model fitting: 42, 123, 2024, 2026, 3407, 7, 19, 71, 101, 211, 307, 401, 503, 601, 701, 809, 907, 1009, 1201, and 1429. Every materialized partition was stored as a molecule-level manifest containing molecular identity, scaffold, target, assignment, and a SHA-256-derived partition identifier. Exact duplicate partition hashes were never treated as independent replicates.
 
-\subsection{Reference partitions, seeds, and partition freezing}
+\subsection{Predictive models, metrics, and inferential unit}
 
-Two additional protocols were retained as references rather than as the main causal contrast. \emph{Random observation} partitions sampled molecules at the observation level; classification partitions were stratified. A deterministic \emph{legacy scaffold} partition reproduced the conventional greedy group-allocation style and was used descriptively to show how an unmatched scaffold rule can alter test size. Neither reference enters the primary size-matched versus target-balanced paired effect.
+All models used the same radius-2, 2048-bit Morgan fingerprint \citep{rogers2010extended}. Classification models were logistic regression (LR), random forest (RF), and XGBoost (XGB); regression models were ridge regression, RF, and XGB. Hyperparameters were fixed before production fitting and are reported in the reproducibility protocol and Supporting Information. Scikit-learn and XGBoost implementations were used \citep{pedregosa2011scikit,breiman2001random,chen2016xgboost}. Stochastic RF/XGB production fits used model seed 17 throughout; LR/ridge were deterministic under the fixed configuration.
 
-Twenty partition seeds were fixed before model fitting: 42, 123, 2024, 2026, 3407, 7, 19, 71, 101, 211, 307, 401, 503, 601, 701, 809, 907, 1009, 1201, and 1429. Every materialized partition was stored as a molecule-level manifest containing dataset, protocol, partition seed, canonical SMILES, scaffold, target, assignment, and a partition hash. The hash was computed from the sorted test-set row identities and canonical SMILES. Before model training, manifests, cleaned datasets, split-pair tables, and protocol metadata were frozen with SHA-256 checksums. Exact duplicate partition hashes were never treated as independent replicates.
+ROC--AUC was the primary classification metric, with average precision, $F_1$, accuracy, balanced accuracy, and Brier score retained as supporting metrics. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting metrics. Supporting-metric effects are reported in Figure~\ref{fig:si-supporting-metrics} rather than promoted to additional primary hypothesis families.
 
-\subsection{Molecular representation and predictive models}
-
-All predictive models used the same 2048-bit Morgan fingerprint with radius 2 \citep{rogers2010extended}. This intentionally simple common representation limits architectural degrees of freedom and keeps the study focused on validation design.
-
-For classification, the models were logistic regression (LR), random forest (RF), and XGBoost (XGB). LR used $C=1$, the liblinear solver, balanced class weights, and 5,000 maximum iterations. RF used 500 trees, no imposed depth limit, minimum leaf size 1, and balanced-subsample class weighting. XGB used 500 trees, maximum depth 6, learning rate 0.05, row subsampling 0.8, column subsampling 0.8, the histogram tree method, and logistic loss. For each training partition, XGB used \texttt{scale\_pos\_weight}=$n_{\mathrm{negative}}/n_{\mathrm{positive}}$.
-
-For regression, ridge regression used $\alpha=1$ with the LSQR solver. RF used 500 trees with otherwise analogous tree settings, and XGB used the same boosting depth, learning rate, and sampling parameters with squared-error loss. Scikit-learn and XGBoost implementations were used \citep{pedregosa2011scikit,breiman2001random,chen2016xgboost}. LR and ridge were treated as deterministic under the fixed configuration. Stochastic RF and XGB models used an independent fixed model seed of 17 for all production partitions so that partition randomness was not coupled to model randomness.
-
-ROC--AUC was the primary classification metric; average precision, $F_1$, accuracy, balanced accuracy, and Brier score were retained as supporting metrics. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting metrics.
-
-\subsection{Partition diagnostics}
-
-For every partition, we recorded test size, train and test target means and standard deviations, target quantiles, the absolute target-mean gap in Eq.~\ref{eq:target-gap}, the two-sample Kolmogorov--Smirnov statistic, and the Wasserstein distance. Test-set scaffold composition was summarized by the number of scaffolds, largest-scaffold fraction, top-five scaffold fraction, Herfindahl--Hirschman index (HHI), effective scaffold number $1/\mathrm{HHI}$, Gini coefficient, and acyclic fraction. Chemical proximity was evaluated from Morgan-fingerprint Tanimoto similarity as a separate diagnostic dimension. These quantities characterize the validation problem and are not folded into the target-balancing objective.
-
-\subsection{Primary partition-level inference}
-
-The primary comparison contains $6\times3=18$ dataset--model cells. For classification, the paired performance effect for partition seed $s$ was
+For classification, the paired primary effect for partition seed $s$ was
 \begin{equation}
- \Delta_s^{\mathrm{class}}=\mathrm{AUC}_{s,\mathrm{bal}}-\mathrm{AUC}_{s,\mathrm{size}}.
+ \Delta_s^{\mathrm{class}}=\mathrm{AUC}_{s,\mathrm{bal}}-\mathrm{AUC}_{s,\mathrm{size}},
  \label{eq:class-effect}
 \end{equation}
-For regression, where lower RMSE is better, the sign was defined consistently as
+and for regression
 \begin{equation}
  \Delta_s^{\mathrm{reg}}=\mathrm{RMSE}_{s,\mathrm{size}}-\mathrm{RMSE}_{s,\mathrm{bal}}.
  \label{eq:reg-effect}
 \end{equation}
-Thus, positive $\Delta$ always favors target balancing. The statistical unit was the unique paired partition, not a model seed. Each cell contained 20 paired partitions. We report mean and median effects, standard deviations, a 10,000-replicate paired bootstrap 95\% interval for the mean, and a two-sided Wilcoxon signed-rank test. Holm correction was applied jointly across the 18 primary cells. A cell was labelled target-balanced better only when the Holm-adjusted $P<0.05$ and the bootstrap interval lay entirely above zero; the analogous rule below zero defined target-balanced worse. All other cells were labelled inconclusive.
+Positive $\Delta$ therefore favors target-mean-aware selection for both task types. The statistical unit was the unique paired partition ($n=20$ per dataset--model cell), not a model seed. Each of the 18 primary cells received a 10,000-replicate paired bootstrap interval for the mean and a two-sided Wilcoxon signed-rank test; Holm correction was applied jointly across all 18 cells. A cell was labelled target-balanced better only when the Holm-adjusted $P<0.05$ and the bootstrap interval lay wholly above zero; the analogous rule below zero defined target-balanced worse. All other cells were labelled inconclusive.
 
-\subsection{Acyclic scaffold-semantics sensitivity}
+\subsection{Collateral partition diagnostics and mean-only regression control}
 
-ESOL and FreeSolv were rerun using the singleton treatment of acyclic molecules. The same 20 partition seeds and paired selection logic were used, with the pre-frozen 5,000-candidate budget. LR/ridge, RF, and XGB model definitions were unchanged. This sensitivity tests whether the main regression contrast depends on the structural semantics assigned to an empty Bemis--Murcko framework. Because it is a protocol sensitivity rather than a second primary family, its bootstrap intervals and Wilcoxon statistics are reported descriptively and are interpreted by comparison with the primary single-group effects.
+For every size-matched and target-mean-balanced partition we recorded train/test target means, standard deviations, quantiles, two-sample Kolmogorov--Smirnov statistics, Wasserstein distances, test-set scaffold counts, largest- and top-five-scaffold fractions, scaffold HHI, effective scaffold number, Gini concentration, and acyclic fraction. These quantities were not included in the selection objective and are used to show which benchmark properties changed as consequences of target-aware partition selection.
 
-\subsection{Dominant-fragment representation sensitivity}
+Regression received an additional mechanistic control. For each paired partition, a mean-only predictor assigned every test molecule the training-set target mean. Its error obeys the identity
+\begin{equation}
+ \mathrm{MSE}_{\mathrm{mean\text{-}only}}=\mathrm{Var}(y_{\mathrm{test}})+(\bar y_{\mathrm{test}}-\bar y_{\mathrm{train}})^2,
+ \label{eq:mean-only-decomp}
+\end{equation}
+which makes explicit the direct coupling between the target-mean selection criterion and RMSE difficulty. Mean-only paired RMSE effects were summarized with the same 10,000-replicate bootstrap procedure, descriptively rather than as an additional primary multiplicity family.
 
-A post hoc structural audit found disconnected multi-component records in BBBP, ClinTox, and HIV but none in BACE, ESOL, or FreeSolv. We therefore performed one pre-specified representation sensitivity on the affected classification datasets. Each source-faithful canonical molecule was decomposed into disconnected RDKit fragments. Fragments were ranked deterministically by heavy-atom count, then carbon-atom count, then canonical isomeric SMILES; the top-ranked component was termed the \emph{dominant fragment}. This term is operational and does not assert that the selected component is the chemically correct parent for salts, mixtures, co-crystals, or metal complexes.
+\subsection{Predeclared sensitivity analyses}
 
-After mapping, dominant-fragment identities with consistent labels were collapsed to one record, whereas identities associated with both binary labels were excluded in full. Splits were regenerated from scratch using the single-group acyclic convention, the same 20 partition seeds, and 300 candidates per seed. Only the exact-size size-matched and target-balanced protocols were fitted with LR, RF, and XGB. The nine affected dataset--model cells formed a separate sensitivity family with 10,000 paired bootstrap replicates, Wilcoxon signed-rank tests, and Holm correction across those nine cells. No alternative salt-removal, charge-normalization, or fragment-selection policy was chosen after observing these model outcomes.
+For the acyclic-scaffold sensitivity, ESOL and FreeSolv were rerun under singleton acyclic identities using the same 20 partition seeds, exact-size paired logic, models, and frozen 5,000-candidate cap. These results are interpreted as protocol sensitivity and are not added to the 18-cell primary family.
+
+For the disconnected-component sensitivity, BBBP, ClinTox, and HIV were deterministically mapped to the fragment ranked first by heavy-atom count, then carbon count, then canonical isomeric SMILES. Consistent duplicate fragment identities were collapsed and conflicting-label fragment identities were excluded. Splits were regenerated from scratch using 20 partition seeds and the frozen 300-candidate classification budget. The nine affected dataset--model cells formed a separate sensitivity family with paired bootstrap intervals, Wilcoxon tests, and Holm correction across those nine cells only.
+
+Finally, stochastic-model sensitivity was predeclared for RF and XGB on partition seeds 42, 123, 2024, 2026, and 3407. Model seeds 29 and 43 were added to production seed 17 for the size-matched and target-mean-balanced protocols. These repeated fits quantify model stochasticity but never increase the partition-level inferential sample size.
