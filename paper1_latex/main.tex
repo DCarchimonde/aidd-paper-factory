@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage[margin=3cm]{geometry}
+\usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{array}
@@ -16,25 +16,22 @@
 
 \doublespacing
 \graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
+\newcommand{\runningtitle}{Chemometric Audit of Molecular Benchmark Construction}
 
-% Compact display-math spacing: equations should follow the preceding sentence
-% without a visually empty line while remaining readable in double-spaced copy.
 \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}
 \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}
 \setlength{\abovedisplayshortskip}{4pt plus 2pt minus 1pt}
 \setlength{\belowdisplayshortskip}{4pt plus 2pt minus 1pt}
-
-% Journal-style caption and float spacing.
 \captionsetup{font=small,labelfont=bf,labelsep=period,skip=6pt}
-\setlength{\textfloatsep}{12pt plus 3pt minus 3pt}
-\setlength{\floatsep}{10pt plus 2pt minus 2pt}
-\setlength{\intextsep}{10pt plus 2pt minus 2pt}
-\renewcommand{\topfraction}{0.90}
-\renewcommand{\bottomfraction}{0.80}
-\renewcommand{\textfraction}{0.08}
-\renewcommand{\floatpagefraction}{0.82}
+\setlength{\textfloatsep}{11pt plus 3pt minus 3pt}
+\setlength{\floatsep}{9pt plus 2pt minus 2pt}
+\setlength{\intextsep}{9pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.05}
+\renewcommand{\floatpagefraction}{0.78}
 
-\title{Dissecting Molecular Benchmark Construction: A Paired Chemometric Audit of Target Balance, Scaffold Semantics, and Molecular Representation}
+\title{Dissecting Molecular Benchmark Construction: A Paired Chemometric Audit of Target-Mean Balance, Scaffold Semantics, and Molecular Representation}
 \author{
 \begin{minipage}{0.94\textwidth}
 \centering
@@ -51,10 +48,8 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 
 \input{sections/abstract_chemometrics}
 \input{sections/introduction_chemometrics}
-\input{sections/related_work_chemometrics}
 \input{sections/methods_chemometrics}
 \input{sections/results_chemometrics}
-\input{sections/additional_visual_results_v3}
 \input{sections/discussion_chemometrics}
 \input{statements}
 
