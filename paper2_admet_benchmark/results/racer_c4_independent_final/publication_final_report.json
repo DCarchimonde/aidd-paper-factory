@@ -1,0 +1,24 @@
+{
+  "algorithm": "RACER-C4/TAME",
+  "arbitrary_shift_coverage_guarantee_claim_authorized": false,
+  "development_gate_passed": true,
+  "final_label_sha256": "293438f8407c996a0212bedce86d7b9a278f5548df7e7b45ade2126c6dd2770d",
+  "final_labels_opened_after_promotion": true,
+  "macro_csy_noninferiority_margin": -0.05,
+  "predictions_sealed_before_final_labels": true,
+  "primary_cell_count": 30,
+  "primary_inference": {
+    "bootstrap_repetitions": 2000,
+    "bootstrap_seed": 44021,
+    "estimand": "endpoint_seed_equal_mean_minimum_class_coverage_delta",
+    "estimate": 0.01364872799931726,
+    "percentile_95_interval": [
+      0.005826860594101873,
+      0.020050872223821615
+    ]
+  },
+  "primary_mean_macro_csy_delta": -0.016066860641328725,
+  "result_interpretation": "coverage_gain_with_efficiency_noninferiority",
+  "scientific_superiority_claim_authorized": false,
+  "status": "complete_independent_final_epa_evaluation"
+}
