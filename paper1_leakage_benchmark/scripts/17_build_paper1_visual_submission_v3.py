@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPT_DIR = ROOT / "paper1_leakage_benchmark" / "scripts"
 FINAL_RUNNER = SCRIPT_DIR / "22_build_paper1_q1_final_v3.py"
 Q1_SCRIPTS = [
-    SCRIPT_DIR / "20_build_q1_scientific_controls_v3.py",
+    SCRIPT_DIR / "20a_build_q1_scientific_controls_safe_v3.py",
     SCRIPT_DIR / "20b_build_q1_tex_tables_v3.py",
     SCRIPT_DIR / "20c_write_q1_result_text_v3.py",
     SCRIPT_DIR / "20d_capture_raw_source_provenance_v3.py",
