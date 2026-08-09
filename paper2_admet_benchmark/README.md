@@ -130,6 +130,14 @@ Windows one-command reproduction after `git pull`:
 powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c4\run_racer_c4_overnight.ps1
 ```
 
+This is a from-source RACER-C4 reproduction, so it intentionally rebuilds the
+Tox21 10K training inputs before running the new C4 development gate and sealed
+EPA evaluation. It does not rerun, replace, or modify the completed RACER-C v1
+or seed-99 evidence. Before cleaning, the wrapper verifies the frozen RDKit
+runtime (`2026.03.4`). If the selected conda environment has another RDKit
+patch release, the wrapper installs only the exact `rdkit==2026.3.4` binary
+wheel with dependency changes disabled and then verifies the runtime again.
+
 The sealed independent EPA run is complete. On the six-endpoint primary panel,
 minimum class coverage improved by 1.3649 percentage points (frozen hierarchical
 bootstrap 95% interval: +0.5827 to +1.9696 points) while mean MacroCSY changed

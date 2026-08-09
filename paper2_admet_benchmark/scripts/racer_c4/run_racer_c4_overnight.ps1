@@ -4,7 +4,8 @@ param(
     [ValidateSet("primary", "all")]
     [string]$Scope = "all",
     [ValidateRange(1, 3)]
-    [int]$MaximumPasses = 2
+    [int]$MaximumPasses = 2,
+    [switch]$SkipEnvironmentRepair
 )
 
 $ErrorActionPreference = "Stop"
@@ -16,6 +17,8 @@ Set-Location $RepoRoot
 $LogDir = Join-Path $RepoRoot "paper2_admet_benchmark\results\logs"
 $OutputDir = Join-Path $RepoRoot ".local\racer_c4_results"
 $FinalReport = Join-Path $OutputDir "final_report.json"
+$RequiredRdkitRuntime = "2026.03.4"
+$RequiredRdkitDistribution = "2026.3.4"
 New-Item -ItemType Directory -Force $LogDir | Out-Null
 $LogPath = Join-Path $LogDir (
     "racer_c4_overnight_{0}.log" -f (Get-Date -Format "yyyyMMdd_HHmmss")
@@ -23,6 +26,42 @@ $LogPath = Join-Path $LogDir (
 
 if (-not (Get-Command conda -ErrorAction SilentlyContinue)) {
     throw "Conda is not available in this PowerShell session."
+}
+
+function Get-RdkitRuntimeVersion {
+    $ProbeOutput = @(
+        & conda run -n $CondaEnv python -c `
+            "from rdkit import rdBase; print(rdBase.rdkitVersion)" 2>&1
+    )
+    if ($LASTEXITCODE -ne 0) {
+        return ""
+    }
+    $Versions = @(
+        $ProbeOutput |
+            ForEach-Object { "$_".Trim() } |
+            Where-Object { $_ -match '^\d{4}\.\d{2}\.\d+$' }
+    )
+    if ($Versions.Count -eq 0) {
+        return ""
+    }
+    return [string]$Versions[-1]
+}
+
+function Install-LockedRdkit {
+    Write-Host (
+        "Installing the locked RDKit $RequiredRdkitDistribution wheel " +
+        "without changing its dependencies..."
+    ) -ForegroundColor Yellow
+    & conda run --no-capture-output -n $CondaEnv python -m pip install `
+        --disable-pip-version-check `
+        --no-cache-dir `
+        --no-deps `
+        "--only-binary=:all:" `
+        --upgrade `
+        "rdkit==$RequiredRdkitDistribution"
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to install locked RDKit $RequiredRdkitDistribution in $CondaEnv."
+    }
 }
 
 $TrackedChanges = @(git status --porcelain --untracked-files=no)
@@ -61,6 +100,36 @@ try {
     Write-Host "Conda environment: $CondaEnv"
     Write-Host "Endpoint scope: $Scope"
     Write-Host "Log: $LogPath"
+
+    Write-Host "`n==> Locked RDKit environment preflight" -ForegroundColor Cyan
+    $RdkitBefore = Get-RdkitRuntimeVersion
+    if ($RdkitBefore -ne $RequiredRdkitRuntime) {
+        $Observed = if ([string]::IsNullOrWhiteSpace($RdkitBefore)) {
+            "unavailable"
+        }
+        else {
+            $RdkitBefore
+        }
+        if ($SkipEnvironmentRepair) {
+            throw (
+                "RACER-C4 requires RDKit $RequiredRdkitRuntime, observed $Observed. " +
+                "Rerun without -SkipEnvironmentRepair to install only the locked " +
+                "RDKit wheel."
+            )
+        }
+        Write-Host (
+            "RDKit mismatch: required=$RequiredRdkitRuntime observed=$Observed."
+        ) -ForegroundColor Yellow
+        Install-LockedRdkit
+    }
+    $RdkitAfter = Get-RdkitRuntimeVersion
+    if ($RdkitAfter -ne $RequiredRdkitRuntime) {
+        throw (
+            "Locked RDKit verification failed: required=$RequiredRdkitRuntime " +
+            "observed=$RdkitAfter."
+        )
+    }
+    Write-Host "RDKit runtime verified: $RdkitAfter" -ForegroundColor Green
 
     Write-Host "`n==> Contract and numerical tests" -ForegroundColor Cyan
     conda run --no-capture-output -n $CondaEnv python -m unittest discover `

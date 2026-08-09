@@ -103,3 +103,10 @@ process-scoped keep-awake behavior:
 ```powershell
 powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c4\run_racer_c4_overnight.ps1
 ```
+
+The entrypoint first requires the frozen RDKit runtime `2026.03.4`. A different
+or missing RDKit build is repaired with the exact `rdkit==2026.3.4` binary wheel
+using `--no-deps`, followed by a fresh runtime-version check before any cleaning
+or model execution. This preprocessing is part of the RACER-C4 from-source
+reproduction and does not rerun or overwrite the historical RACER-C v1 or
+seed-99 experiments.

@@ -93,6 +93,23 @@ class RacerC4ContractTests(unittest.TestCase):
         self.assertIn("SetThreadExecutionState", wrapper)
         self.assertIn("--mode full --scope $Scope", wrapper)
 
+    def test_one_click_wrapper_repairs_and_rechecks_locked_rdkit(self) -> None:
+        wrapper = (
+            P2 / "scripts" / "racer_c4" / "run_racer_c4_overnight.ps1"
+        ).read_text(encoding="utf-8")
+        self.assertIn('$RequiredRdkitRuntime = "2026.03.4"', wrapper)
+        self.assertIn('$RequiredRdkitDistribution = "2026.3.4"', wrapper)
+        self.assertIn('"rdkit==$RequiredRdkitDistribution"', wrapper)
+        self.assertIn("--no-deps", wrapper)
+        self.assertIn('"--only-binary=:all:"', wrapper)
+        preflight = wrapper.index("$RdkitBefore = Get-RdkitRuntimeVersion")
+        repair = wrapper.index("Install-LockedRdkit", preflight)
+        recheck = wrapper.index("$RdkitAfter = Get-RdkitRuntimeVersion", repair)
+        tests = wrapper.index('Write-Host "`n==> Contract and numerical tests"')
+        self.assertLess(preflight, repair)
+        self.assertLess(repair, recheck)
+        self.assertLess(recheck, tests)
+
     def test_committed_final_report_matches_sealed_integrity_record(self) -> None:
         result = P2 / "results" / "racer_c4_independent_final"
         report_path = result / "final_report.json"
