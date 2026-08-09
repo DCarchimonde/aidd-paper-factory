@@ -92,6 +92,12 @@ order of the endpoint draw. The affected artifact is only the percentile
 interval; sealed predictions, labels, point estimate, MacroCSY estimate, and
 the predeclared interpretation remain unchanged.
 
+The hash-verified inference-only recomputation completed on 2026-08-10. The
+publication-facing deterministic 95% interval is
+`[0.005826860594101873, 0.020050872223821615]`. The original sealed report is
+retained unchanged, while `publication_final_report.json` and the associated
+repair/promotion records carry the corrected interval.
+
 Secondary descriptive estimands are MacroCSY delta, class-specific coverage,
 wrong-singleton exposure, ambiguity, and empty-set rate. The hierarchy is
 primary first, then descriptive secondary results; no multiplicity-adjusted
