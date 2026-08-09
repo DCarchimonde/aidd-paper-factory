@@ -41,6 +41,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "12_analyze_partition_effects_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20_build_q1_scientific_controls_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "20d_capture_raw_source_provenance_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20c_write_q1_result_text_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "21_build_manuscript_assets_v3_round3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
@@ -122,7 +123,8 @@ def package_submission() -> None:
         "primary_inference_summary_v3.csv", "supporting_metric_effects_v3.csv",
         "acyclic_singleton_sensitivity_v3.csv", "q1_mean_only_regression_summary_v3.csv",
         "q1_collateral_diagnostics_summary_v3.csv", "q1_model_seed_summary_v3.csv",
-        "q1_cleaning_accounting_v3.csv", "q1_environment_versions_v3.txt",
+        "q1_cleaning_accounting_v3.csv", "q1_raw_source_provenance_v3.csv",
+        "q1_environment_versions_v3.txt",
     ]
     outtables = BUNDLE / "tables"
     outtables.mkdir(exist_ok=True)
