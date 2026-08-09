@@ -42,6 +42,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "20_build_q1_scientific_controls_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "21_build_manuscript_assets_v3_round3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
 
 
 def compile_latex() -> None:
@@ -82,7 +83,7 @@ def audit_latex_logs() -> dict:
             lower = line.lower()
             if "overfull \\hbox" in lower:
                 report["overfull_hbox_lines"].append(f"{name}: {line}")
-            if "undefined references" in lower or "reference" in lower and "undefined" in lower:
+            if "undefined references" in lower or ("reference" in lower and "undefined" in lower):
                 report["undefined_reference_lines"].append(f"{name}: {line}")
             if "citation" in lower and "undefined" in lower:
                 report["undefined_citation_lines"].append(f"{name}: {line}")
