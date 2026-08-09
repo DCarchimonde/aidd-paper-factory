@@ -1,0 +1,27 @@
+{
+  "canonical_lf_publication_final_report_sha256": "43e45fb5378a5c90c88be287472c969add2324652e15da7356e005bc23275851",
+  "canonical_lf_windows_repair_record_sha256": "e667db19a3513eed4c56ae687f668e27ce31778f3639916005ba0db0fe27cd42",
+  "corrected_percentile_95_interval": [
+    0.005826860594101873,
+    0.020050872223821615
+  ],
+  "integration_parent_git_head": "64453883bb0685f13327614f47772c332999e04c",
+  "labels_or_predictions_changed": false,
+  "model_refit_performed": false,
+  "original_sealed_final_report_preserved": true,
+  "original_sealed_integrity_manifest_preserved": true,
+  "original_sealed_percentile_95_interval": [
+    0.005827082926476428,
+    0.01969592254085895
+  ],
+  "point_estimate_changed": false,
+  "prediction_regeneration_performed": false,
+  "publication_facing_report": "publication_final_report.json",
+  "repair_execution_git_head": "64453883bb0685f13327614f47772c332999e04c",
+  "repair_implementation_git_head": "693c505fb55d287514530f2f6e92a50b96c8fa6a",
+  "reproduction_prediction_git_head": "5272d14136e1a10c41c56d76e04805854b63f50e",
+  "reproduction_scientific_artifact_hashes_match_sealed_manifest": true,
+  "source_record_uses_windows_worktree_byte_hashes": true,
+  "status": "complete_deterministic_inference_repair_promoted_for_publication",
+  "windows_repair_record": "deterministic_inference_repair_windows_20260810.json"
+}
