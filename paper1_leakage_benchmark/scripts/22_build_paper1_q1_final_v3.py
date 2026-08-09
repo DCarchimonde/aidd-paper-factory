@@ -39,7 +39,7 @@ def run_model_seed_sensitivity() -> None:
 
 def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "12_analyze_partition_effects_v3.py")], cwd=ROOT)
-    run([sys.executable, str(SCRIPTS / "20_build_q1_scientific_controls_v3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "20a_build_q1_scientific_controls_safe_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20d_capture_raw_source_provenance_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20c_write_q1_result_text_v3.py")], cwd=ROOT)
