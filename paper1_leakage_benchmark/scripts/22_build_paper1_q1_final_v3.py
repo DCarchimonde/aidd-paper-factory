@@ -43,6 +43,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "21_build_manuscript_assets_v3_round3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "24_q1_submission_gate_v3.py")], cwd=ROOT)
 
 
 def compile_latex() -> None:
@@ -143,7 +144,7 @@ def package_submission() -> None:
     (BUNDLE / "BUILD_MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     if audit["undefined_reference_lines"] or audit["undefined_citation_lines"]:
-        print("\nWARNING: LaTeX undefined-reference/citation messages remain. Inspect BUILD_MANIFEST.json.")
+        raise AssertionError("Undefined LaTeX references/citations remain; inspect BUILD_MANIFEST.json")
     if audit["overfull_hbox_lines"]:
         print(f"\nNOTICE: {len(audit['overfull_hbox_lines'])} overfull-hbox log lines were detected; inspect if visually material.")
 
@@ -155,6 +156,7 @@ def main() -> None:
     run_model_seed_sensitivity()
     scientific_pipeline()
     compile_latex()
+    run([sys.executable, str(SCRIPTS / "24_q1_submission_gate_v3.py"), "--post-build"], cwd=ROOT)
     package_submission()
     print("\n" + "=" * 78)
     print("PAPER 1 Q1 FINAL BUILD: PASS")
