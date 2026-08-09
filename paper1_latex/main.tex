@@ -6,6 +6,7 @@
 \usepackage{multirow}
 \usepackage{caption}
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{microtype}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -15,6 +16,23 @@
 
 \doublespacing
 \graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
+
+% Compact display-math spacing: equations should follow the preceding sentence
+% without a visually empty line while remaining readable in double-spaced copy.
+\setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}
+\setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}
+\setlength{\abovedisplayshortskip}{4pt plus 2pt minus 1pt}
+\setlength{\belowdisplayshortskip}{4pt plus 2pt minus 1pt}
+
+% Journal-style caption and float spacing.
+\captionsetup{font=small,labelfont=bf,labelsep=period,skip=6pt}
+\setlength{\textfloatsep}{12pt plus 3pt minus 3pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{0.90}
+\renewcommand{\bottomfraction}{0.80}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.82}
 
 \title{Dissecting Molecular Benchmark Construction: A Paired Chemometric Audit of Target Balance, Scaffold Semantics, and Molecular Representation}
 \author{
@@ -30,9 +48,6 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 
 \begin{document}
 \maketitle
-\begin{center}
-\small\textbf{Short title:} Chemometric Audit of Molecular Benchmark Construction
-\end{center}
 
 \input{sections/abstract_chemometrics}
 \input{sections/introduction_chemometrics}
