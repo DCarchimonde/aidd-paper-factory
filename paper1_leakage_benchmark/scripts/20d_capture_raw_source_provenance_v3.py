@@ -44,11 +44,19 @@ def main() -> None:
     frame = pd.DataFrame(rows)
     out = TABLES / "q1_raw_source_provenance_v3.csv"
     frame.to_csv(out, index=False)
+
     text = (
-        "Raw-source provenance was re-audited during the final build. For all six datasets, the exact download URL used by the dataset registry, local raw-file path, byte size, and SHA-256 digest are recorded in the machine-readable file "
-        "\\texttt{q1\\_raw\\_source\\_provenance\\_v3.csv}. The raw inputs themselves are not silently replaced during the final manuscript build."
+        "Raw-source provenance was re-audited during the final build. For all six datasets, the exact registry download URL, local raw-file path, byte size, and SHA-256 digest are recorded in the machine-readable file "
+        "\\texttt{q1\\_raw\\_source\\_provenance\\_v3.csv}."
     )
     (GEN / "q1_raw_provenance_text_v3.tex").write_text(text + "\n", encoding="utf-8")
+
+    cleaning_tex = GEN / "q1_cleaning_accounting_table_v3.tex"
+    if not cleaning_tex.exists():
+        raise FileNotFoundError("Run 20b_build_q1_tex_tables_v3.py before raw provenance capture")
+    existing = cleaning_tex.read_text(encoding="utf-8").rstrip()
+    cleaning_tex.write_text(existing + "\n\n\\par\\noindent " + text + "\n", encoding="utf-8")
+
     print(frame[["dataset", "raw_bytes", "raw_sha256"]].to_string(index=False))
     print("RAW SOURCE PROVENANCE CAPTURE: PASS")
 
