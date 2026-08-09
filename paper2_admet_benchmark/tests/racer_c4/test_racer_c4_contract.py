@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -99,9 +100,26 @@ class RacerC4ContractTests(unittest.TestCase):
         manifest = json.loads(
             (result / "integrity_manifest.json").read_text(encoding="utf-8")
         )
-        digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
-        self.assertEqual(digest(report_path), manifest["final_report_sha256"])
-        self.assertEqual(digest(promotion_path), manifest["promotion_record_sha256"])
+        # A Windows checkout may materialize text blobs with CRLF. The sealed
+        # integrity record binds the exact bytes committed to Git, not the
+        # platform-specific working-tree representation.
+        def committed_digest(path: Path) -> str:
+            repository_path = path.relative_to(ROOT).as_posix()
+            committed_bytes = subprocess.run(
+                ["git", "cat-file", "blob", f"HEAD:{repository_path}"],
+                cwd=ROOT,
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ).stdout
+            return hashlib.sha256(committed_bytes).hexdigest()
+
+        self.assertEqual(
+            committed_digest(report_path), manifest["final_report_sha256"]
+        )
+        self.assertEqual(
+            committed_digest(promotion_path), manifest["promotion_record_sha256"]
+        )
         report = json.loads(report_path.read_text(encoding="utf-8"))
         promotion = json.loads(promotion_path.read_text(encoding="utf-8"))
         self.assertTrue(report["predictions_sealed_before_final_labels"])
