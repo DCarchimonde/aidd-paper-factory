@@ -623,7 +623,11 @@ def hierarchical_bootstrap_primary(
     for repetition in range(int(repetitions)):
         sampled_endpoints = rng.choice(primary_endpoints, size=len(primary_endpoints), replace=True).tolist()
         indices = {}
-        for endpoint in set(sampled_endpoints):
+        # Preserve the bootstrap draw's first-occurrence order while avoiding
+        # duplicate within-endpoint resamples.  A set is not valid here:
+        # PYTHONHASHSEED can change its traversal order and therefore assign
+        # different portions of the fixed RNG stream to different endpoints.
+        for endpoint in dict.fromkeys(sampled_endpoints):
             target = table[(endpoint, int(seeds[0]), METHOD_BASELINE)][0]
             # Preserve each endpoint's class counts so a rare-class bootstrap
             # draw cannot silently turn the class-balanced estimand marginal.
