@@ -33,11 +33,11 @@ Candidate-budget auditing showed that search effort was itself part of benchmark
 
 \subsection{Classification provided no corrected evidence of a target-mean-balanced advantage}
 
-Across BACE, BBBP, ClinTox, and HIV, none of the 12 classification dataset--model cells met the pre-specified joint criterion for a target-balanced advantage after correction across the 18-cell primary family (Figure~\ref{fig:primary-effects}; complete values in Supporting Information Table~\ref{tab:si-primary-results}). Eleven of 12 mean AUC contrasts were negative, with HIV--RF the only positive mean contrast. Several unadjusted bootstrap intervals were displaced from zero, but the corrected decision rule remained inconclusive in every classification cell. The inference is therefore \emph{absence of corrected evidence for an advantage}, not evidence of equivalence.
+Across BACE, BBBP, ClinTox, and HIV, none of the 12 classification dataset--model cells met the pre-specified joint criterion for a target-balanced advantage after correction across the 18-cell primary family (Figure~\ref{fig:primary-effects}; complete values in Supporting Information Table S5). Eleven of 12 mean AUC contrasts were negative, with HIV--RF the only positive mean contrast. Several unadjusted bootstrap intervals were displaced from zero, but the corrected decision rule remained inconclusive in every classification cell. The inference is therefore \emph{absence of corrected evidence for an advantage}, not evidence of equivalence.
 
 \subsection{Primary regression effects were large but depended on scaffold semantics}
 
-All six ESOL and FreeSolv regression cells met the corrected target-balanced-better criterion under the primary convention that all acyclic molecules share the \texttt{\_\_ACYCLIC\_\_} identity (Figure~\ref{fig:primary-effects}). Mean RMSE reductions were 0.105--0.293 for ESOL and 0.798--1.149 for FreeSolv. Complete primary statistics are reported in Supporting Information Table~\ref{tab:si-primary-results}.
+All six ESOL and FreeSolv regression cells met the corrected target-balanced-better criterion under the primary convention that all acyclic molecules share the \texttt{\_\_ACYCLIC\_\_} identity (Figure~\ref{fig:primary-effects}). Mean RMSE reductions were 0.105--0.293 for ESOL and 0.798--1.149 for FreeSolv. Complete primary statistics are reported in Supporting Information Table S5.
 
 \begin{figure}[!p]
 \centering
@@ -46,7 +46,7 @@ All six ESOL and FreeSolv regression cells met the corrected target-balanced-bet
 \label{fig:primary-effects}
 \end{figure}
 
-Changing only the semantics assigned to an empty Bemis--Murcko framework strongly attenuated this regression pattern. Under singleton acyclic identities, ESOL effects decreased to 0.036--0.061 RMSE units, while all three FreeSolv point estimates reversed sign; all FreeSolv bootstrap intervals crossed zero (Figure~\ref{fig:acyclic-sensitivity}; Supporting Information Table~\ref{tab:si-acyclic}). The primary regression result is therefore conditional on the structural grouping semantics used to define scaffold novelty.
+Changing only the semantics assigned to an empty Bemis--Murcko framework strongly attenuated this regression pattern. Under singleton acyclic identities, ESOL effects decreased to 0.036--0.061 RMSE units, while all three FreeSolv point estimates reversed sign; all FreeSolv bootstrap intervals crossed zero (Figure~\ref{fig:acyclic-sensitivity}; Supporting Information Table S6). The primary regression result is therefore conditional on the structural grouping semantics used to define scaffold novelty.
 
 \begin{figure}[!p]
 \centering
@@ -63,9 +63,9 @@ This control does not invalidate the learned-model results. Instead, it changes 
 
 \subsection{Dominant-fragment representation changed point estimates but not corrected classification inference}
 
-The structural audit identified multi-component source-faithful records in 105 BBBP molecules, 14 ClinTox molecules, and 3,086 HIV molecules. Deterministic dominant-fragment selection changed Bemis--Murcko scaffold identity for 5, 1, and 235 records, respectively, and produced full-record versus fragment Morgan similarity below 0.90 for 18, 5, and 640 records. Fragment mapping also created conflicting-label identities, confirming that single-fragment selection is not a lossless formatting operation (Supporting Information Table~\ref{tab:si-fragment-audit}).
+The structural audit identified multi-component source-faithful records in 105 BBBP molecules, 14 ClinTox molecules, and 3,086 HIV molecules. Deterministic dominant-fragment selection changed Bemis--Murcko scaffold identity for 5, 1, and 235 records, respectively, and produced full-record versus fragment Morgan similarity below 0.90 for 18, 5, and 640 records. Fragment mapping also created conflicting-label identities, confirming that single-fragment selection is not a lossless formatting operation (Supporting Information Table S9).
 
-Across the nine affected dataset--model cells, all corrected dominant-fragment sensitivity inferences remained inconclusive, while seven of nine mean-effect directions reversed relative to the source-faithful primary representation (Figure~\ref{fig:fragment-sensitivity}; Supporting Information Table~\ref{tab:si-dominant}). Thus, inferential status was more stable than point-estimate direction.
+Across the nine affected dataset--model cells, all corrected dominant-fragment sensitivity inferences remained inconclusive, while seven of nine mean-effect directions reversed relative to the source-faithful primary representation (Figure~\ref{fig:fragment-sensitivity}; Supporting Information Table S10). Thus, inferential status was more stable than point-estimate direction.
 
 \begin{figure}[!p]
 \centering
@@ -91,7 +91,7 @@ The target-mean gap necessarily decreased by construction, but the selected mole
 
 \input{generated/q1_model_seed_results_v3}
 
-Figure~\ref{fig:si-model-seed} gives the complete model-seed sensitivity trajectories. Supporting classification and regression metrics are summarized separately in Figure~\ref{fig:si-supporting-metrics}. These analyses are robustness checks only; the primary inferential unit remains the unique partition pair.
+Supporting Information Figure S5 gives the complete model-seed sensitivity trajectories. Supporting classification metrics are summarized separately in Figure S4. These analyses are robustness checks only; the primary inferential unit remains the unique partition pair.
 
 \begin{figure}[!p]
 \centering
