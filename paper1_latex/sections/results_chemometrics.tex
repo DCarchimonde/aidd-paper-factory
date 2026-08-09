@@ -2,25 +2,7 @@
 
 \subsection{The paired design fixed test size and froze search effort before model outcomes}
 
-Every primary dataset produced 20 requested and 20 unique size-matched scaffold partitions and 20 requested and 20 unique target-mean-balanced counterparts. Within each partition seed, the paired protocols had exactly the same test-set cardinality (Table~\ref{tab:paired-size}); no duplicate partition hash entered the inferential sample as an independent replicate.
-
-\begin{table}[!htbp]
-\centering
-\caption{Integrity of the primary exact-size paired scaffold design. Each protocol contains 20 unique partition hashes.}
-\label{tab:paired-size}
-\begin{tabular}{lrrrr}
-\toprule
-Dataset & Clean $N$ & Size-matched $n_{\mathrm{test}}$ & Target-balanced $n_{\mathrm{test}}$ & Unique pairs \\
-\midrule
-BACE & 1513 & 303 & 303 & 20 \\
-BBBP & 1965 & 393 & 393 & 20 \\
-ClinTox & 1442 & 288 & 288 & 20 \\
-HIV & 41120 & 8224 & 8224 & 20 \\
-ESOL & 1117 & 223 & 223 & 20 \\
-FreeSolv & 642 & 128 & 128 & 20 \\
-\bottomrule
-\end{tabular}
-\end{table}
+Every primary dataset produced 20 requested and 20 unique size-matched scaffold partitions and 20 requested and 20 unique target-mean-balanced counterparts. Within each partition seed, the paired protocols had exactly the same test-set cardinality: 303 molecules for BACE, 393 for BBBP, 288 for ClinTox, 8,224 for HIV, 223 for ESOL, and 128 for FreeSolv. No duplicate partition hash entered the inferential sample as an independent replicate. Complete integrity counts are reported in Supporting Information Table S4 and visualized in Figure~\ref{fig:budget-audit}.
 
 Candidate-budget auditing showed that search effort was itself part of benchmark construction. Classification was frozen at 300 target-blind candidates. Under the primary single-group treatment of acyclic molecules, the mean selected target-mean gap for ESOL decreased from 0.0346 at 3,000 candidates to 0.00179 at 20,000, and FreeSolv decreased from 1.076 to 0.687 over the same range. Neither regression series met the pre-specified stopping criterion by the largest audited budget, so 20,000 was retained as a cap rather than interpreted as convergence. Figure~\ref{fig:audit-framework} summarizes the complete audit logic and Figure~\ref{fig:budget-audit} shows the frozen budget behavior.
 
@@ -91,7 +73,7 @@ The target-mean gap necessarily decreased by construction, but the selected mole
 
 \input{generated/q1_model_seed_results_v3}
 
-Supporting Information Figure S5 gives the complete model-seed sensitivity trajectories. Supporting classification metrics are summarized separately in Figure S4. These analyses are robustness checks only; the primary inferential unit remains the unique partition pair.
+Supporting Information Figure S5 gives the complete model-seed sensitivity trajectories. Supporting classification and regression metrics are summarized separately in Figure S4. These analyses are robustness checks only; the primary inferential unit remains the unique partition pair.
 
 \begin{figure}[!p]
 \centering
