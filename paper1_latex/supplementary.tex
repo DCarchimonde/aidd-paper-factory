@@ -5,12 +5,20 @@
 \usepackage{array}
 \usepackage{caption}
 \usepackage{float}
+\usepackage{placeins}
 \usepackage{microtype}
 \usepackage{setspace}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
 
 \doublespacing
 \graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
+\captionsetup{font=small,labelfont=bf,labelsep=period,skip=6pt}
+\setlength{\textfloatsep}{12pt plus 3pt minus 3pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\renewcommand{\topfraction}{0.90}
+\renewcommand{\bottomfraction}{0.80}
+\renewcommand{\textfraction}{0.08}
+\renewcommand{\floatpagefraction}{0.82}
 \renewcommand{\thesection}{S\arabic{section}}
 \renewcommand{\thefigure}{S\arabic{figure}}
 \renewcommand{\thetable}{S\arabic{table}}
