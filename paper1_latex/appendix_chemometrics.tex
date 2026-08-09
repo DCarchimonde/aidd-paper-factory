@@ -1,48 +1,24 @@
 \section{Audited Molecular-Data Construction}
 \label{sec:si-cleaning}
 
-The primary molecular universe was rebuilt before any v3 split search. Canonical molecular identity, duplicate handling, conflict exclusion, and row lineage were fixed by the audited cleaning policy. Table~\ref{tab:si-cleaning} summarizes the resulting data. Classification conflict groups were canonical molecular identities associated with both binary labels and were excluded in full. Regression duplicates were aggregated by arithmetic mean and retained with lineage information.
+Canonical molecular identity, duplicate handling, conflicting-label exclusion, and row lineage were fixed before split search. The closed accounting below distinguishes duplicate rows from conflicting-label exclusions so that the raw-to-clean transition is fully auditable.
 
-\begin{table}[H]
-\centering
-\caption{Audited raw-to-clean data construction.}
-\label{tab:si-cleaning}
-\begin{tabular}{llrrrr}
-\toprule
-Dataset & Task & Raw rows & Invalid/missing & Conflicting groups & Final rows \\
-\midrule
-BACE & Classification & 1513 & 0 & 0 & 1513 \\
-BBBP & Classification & 2050 & 11 & 10 & 1965 \\
-ClinTox & Classification & 1484 & 4 & 19 & 1442 \\
-HIV & Classification & 41127 & 7 & 0 & 41120 \\
-ESOL & Regression & 1128 & 0 & -- & 1117 \\
-FreeSolv & Regression & 642 & 0 & -- & 642 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{generated/q1_cleaning_accounting_table_v3}
 
-The SHA-256 digests of the final \texttt{clean\_v2} files were:
-\begin{itemize}
-\item BACE: \texttt{4f2595bfa9981d69eb79d11acc4f88a6d8e1d9940769c79eeb2a8d31b47cf7c2};
-\item BBBP: \texttt{ea65c8a7c23226b32a02d17c4518787f4eeac3ffd3ea4db8641c4d1157f84e09};
-\item ClinTox: \texttt{3f064b9e905af74a7354a8e7b0069953a1a5efed1c97df08cfafb04d32e6a64f};
-\item HIV: \texttt{2e2e6ffe01b8f95687bfe377c6c3577e8a06a12c3318c6b250afe10f6a809939};
-\item ESOL: \texttt{6a3c51838ec3f2777999acdc3f4f3d1e0872fa8a9fb45b7accb6e12f5efe31e8};
-\item FreeSolv: \texttt{8a7df402c12f21378b1165167aaa76ec05c40a03b57c43b3f3eac8673f80f95f}.
-\end{itemize}
+The SHA-256 digests of the final \texttt{clean\_v2} files were: BACE \texttt{4f2595bfa9981d69eb79d11acc4f88a6d8e1d9940769c79eeb2a8d31b47cf7c2}; BBBP \texttt{ea65c8a7c23226b32a02d17c4518787f4eeac3ffd3ea4db8641c4d1157f84e09}; ClinTox \texttt{3f064b9e905af74a7354a8e7b0069953a1a5efed1c97df08cfafb04d32e6a64f}; HIV \texttt{2e2e6ffe01b8f95687bfe377c6c3577e8a06a12c3318c6b250afe10f6a809939}; ESOL \texttt{6a3c51838ec3f2777999acdc3f4f3d1e0872fa8a9fb45b7accb6e12f5efe31e8}; and FreeSolv \texttt{8a7df402c12f21378b1165167aaa76ec05c40a03b57b43b3f3eac8673f80f95f}.
 
 \section{Candidate-Budget Audit}
 \label{sec:si-budget}
 
-The target-balanced partition is selected from a finite target-blind candidate pool, making candidate budget a benchmark-construction parameter. Classification was frozen at 300 candidates per partition seed. The regression single-group searches did not satisfy the pre-specified joint absolute-and-relative stability criterion by the largest audited budget and were capped at 20,000 candidates. The singleton acyclic sensitivity used the separately frozen 5,000-candidate budget.
+Classification was frozen at 300 candidates per partition seed. Primary single-group regression searches were capped at 20,000 candidates without a convergence claim. The singleton acyclic sensitivity used a separately frozen 5,000-candidate cap.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Extended single-group budget audit for the two regression datasets. Values are mean target-balanced absolute train--test target-mean gaps across the three audit seeds.}
+\caption{Single-group regression candidate-budget audit. Values are mean selected train--test target-mean gaps across the audit seeds.}
 \label{tab:si-budget-single}
 \begin{tabular}{lrrrr}
 \toprule
-Dataset & 3,000 candidates & 5,000 & 10,000 & 20,000 \\
+Dataset & 3,000 & 5,000 & 10,000 & 20,000 \\
 \midrule
 ESOL & 0.034622 & 0.018366 & 0.010563 & 0.001787 \\
 FreeSolv & 1.076491 & 1.044452 & 0.787491 & 0.686528 \\
@@ -50,9 +26,9 @@ FreeSolv & 1.076491 & 1.044452 & 0.787491 & 0.686528 \\
 \end{tabular}
 \end{table}
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Singleton acyclic budget audit. Temporary adjacent plateaus were not interpreted as convergence because larger budgets continued to improve the selected target gap.}
+\caption{Singleton acyclic candidate-budget audit. Temporary adjacent plateaus were not treated as convergence when larger budgets subsequently improved the objective.}
 \label{tab:si-budget-singleton}
 \begin{tabular}{lrrrrrr}
 \toprule
@@ -67,11 +43,11 @@ FreeSolv & 0.019467 & 0.006230 & 0.005645 & 0.005416 & 0.001609 & 0.000471 \\
 \section{Frozen Partition Integrity}
 \label{sec:si-partitions}
 
-The production manifest freeze passed before predictive fitting. Every main size-matched and target-balanced dataset contained 20 requested and 20 unique partition hashes. The paired scaffold protocols had identical test size within every seed (Table~\ref{tab:si-partition-integrity}). The deterministic legacy scaffold reference is not used as an inferential replicate.
+Every primary size-matched and target-mean-balanced dataset contained 20 requested and 20 unique partition hashes, and paired test size was identical within every partition seed.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Production partition integrity for the primary scaffold contrast.}
+\caption{Production partition integrity for the primary paired scaffold contrast.}
 \label{tab:si-partition-integrity}
 \begin{tabular}{lrrrr}
 \toprule
@@ -87,14 +63,14 @@ FreeSolv & 20 & 20 & 128 & 128 \\
 \end{tabular}
 \end{table}
 
-The frozen production registry recorded the partition-registry SHA-256 as \texttt{d216233840549bee6daed153157c7ff6fc0c32d542b188de9aa15bdef916b14e} and the artifact-registry SHA-256 as \texttt{429146c74e1fd87cda078f9db3968bee1b328597c325be6672132977b4c47d37}. The freeze was created on branch \texttt{paper1-rebuild-v3} at commit \texttt{7d1b4aa15454c08d0764171c07e6aafd59b98227}.
+The frozen production registry recorded partition-registry SHA-256 \texttt{d216233840549bee6daed153157c7ff6fc0c32d542b188de9aa15bdef916b14e} and artifact-registry SHA-256 \texttt{429146c74e1fd87cda078f9db3968bee1b328597c325be6672132977b4c47d37}.
 
 \section{Complete Primary Partition-Level Inference}
 \label{sec:si-primary}
 
-Table~\ref{tab:si-primary-results} reports the complete 18-cell primary family. Classification effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$; regression effects are RMSE$_{\rm size}-$RMSE$_{\rm balanced}$, so positive values always favor target balancing. Each row is based on 20 unique paired partitions and 10,000 paired bootstrap replicates. Holm correction was applied across all 18 cells.
+Classification effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$; regression effects are RMSE$_{\rm size}-$RMSE$_{\rm balanced}$. Positive values therefore favor target-mean-aware selection. Holm correction was applied across all 18 primary cells.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Complete primary exact-size paired inference.}
 \label{tab:si-primary-results}
@@ -127,16 +103,12 @@ FreeSolv & XGB & RMSE & 3.518691 & 2.720284 & 0.798407 & [0.506442,1.087763] & 0
 }
 \end{table}
 
-The primary family therefore contained 12 inconclusive cells, six target-balanced-better cells, and no target-balanced-worse cell. All six supported cells were regression tasks under the primary single-group acyclic convention.
-
 \section{Acyclic-Scaffold Semantics Sensitivity}
 \label{sec:si-acyclic}
 
-Table~\ref{tab:si-acyclic} reports the singleton sensitivity. Positive effects favor target balancing. These Wilcoxon values are descriptive and were not added to the 18-cell primary multiplicity family.
-
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Regression sensitivity to singleton treatment of acyclic molecules.}
+\caption{Regression sensitivity to singleton treatment of acyclic molecules. Positive effects favor target-mean-aware selection; $P$ values are descriptive for this sensitivity and are not added to the primary multiplicity family.}
 \label{tab:si-acyclic}
 \begin{tabular}{llrrrrr}
 \toprule
@@ -152,15 +124,30 @@ FreeSolv & XGB & 2.258110 & 2.291647 & -0.033536 & [-0.344963,0.273297] & 0.8983
 \end{tabular}
 \end{table}
 
+\section{Mean-Only Regression Control}
+\label{sec:si-mean-only}
+
+The mean-only predictor uses no molecular features. Its MSE decomposition was verified numerically for every paired regression partition to machine precision.
+
+\input{generated/q1_mean_only_table_v3}
+
+\section{Collateral Partition Diagnostics}
+\label{sec:si-collateral}
+
+Only target-mean gap entered the target-aware selection objective. The remaining diagnostics below quantify collateral changes in the selected test population and are not treated as controlled covariates.
+
+\input{generated/q1_collateral_table_v3}
+
 \section{Disconnected-Component Structural Audit}
 \label{sec:si-fragment-audit}
 
-All clean-v2 SMILES parsed successfully in the post hoc RDKit audit. The warning that motivated this check was traced to valid disconnected representations containing isolated explicit hydrogen atoms rather than to parser failure. The broader audit nevertheless identified non-trivial multi-component representation sensitivity in BBBP, ClinTox, and HIV (Table~\ref{tab:si-fragment-audit}).
+All clean-v2 SMILES parsed successfully. The broader audit nevertheless identified non-trivial disconnected-component representation sensitivity in BBBP, ClinTox, and HIV.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Multi-component and deterministic dominant-fragment audit. Similarity is the Morgan Tanimoto coefficient between the source-faithful complete record and the selected dominant fragment.}
 \label{tab:si-fragment-audit}
+\scriptsize
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{lrrrrrrrr}
 \toprule
@@ -177,17 +164,14 @@ FreeSolv & 0 & 0 & 1.0000 & 0 & 0 & 0 & 0 & 0 \\
 }
 \end{table}
 
-The most frequent disconnected components included chloride, sodium-containing fragments, halide counterions, sulfate/sulfonate-related species, proton fragments, organic acids, and several larger molecular or metal-complex components. Because the ``largest fragment'' rule is not guaranteed to recover a chemically authoritative parent for all such records, the transformed representation was treated only as a sensitivity perturbation.
-
 \section{Dominant-Fragment Classification Sensitivity}
 \label{sec:si-dominant}
 
-The affected classification datasets were remapped to one deterministic dominant fragment. Consistent duplicate mappings were collapsed and conflicting-label fragment identities were excluded in full. The final transformed data were resplit from scratch with 20 partition seeds and a 300-candidate budget. All 360 planned model jobs completed. Table~\ref{tab:si-dominant} reports the separate nine-cell sensitivity family.
-
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
-\caption{Dominant-fragment representation sensitivity. Effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$. Holm correction was performed across these nine sensitivity cells only.}
+\caption{Dominant-fragment representation sensitivity. Effects are AUC$_{\rm balanced}-$AUC$_{\rm size}$; Holm correction was performed across these nine cells only.}
 \label{tab:si-dominant}
+\scriptsize
 \resizebox{\textwidth}{!}{%
 \begin{tabular}{llrrrrrl}
 \toprule
@@ -207,31 +191,21 @@ HIV & XGB & 0.782736 & 0.787282 & 0.004546 & [-0.010907,0.019498] & 1.0000 & Inc
 }
 \end{table}
 
-All nine inferential labels agreed with the source-faithful primary analysis, but the mean-effect sign agreed in only two of nine cells (ClinTox--LR and ClinTox--RF). Thus, seven of nine point-estimate directions reversed under the representation perturbation despite unchanged inferential conclusions.
+\section{Stochastic-Model Seed Sensitivity}
+\label{sec:si-model-seed}
 
-\section{Model and Computational Completeness}
+RF and XGB were additionally evaluated with model seeds 29 and 43 on the five predeclared partition seeds; production seed 17 is shown for comparison. These fits quantify stochastic-model sensitivity and do not increase inferential $n$.
+
+\input{generated/q1_model_seed_table_v3}
+
+\section{Model Completeness and Computational Environment}
 \label{sec:si-completeness}
 
-The frozen production suite contained 1,338 expected model jobs across the main classification analysis, main regression analysis, and acyclic singleton sensitivity. The completeness gate reported 1,338/1,338 current jobs, with no missing, stale, or invalid job. The dominant-fragment sensitivity added 360/360 completed jobs. Across both stages, 1,698 pre-specified model fits entered the audit outputs. Model seeds were separated from partition seeds; LR/ridge were deterministic under the fixed implementation, while production RF/XGB fits used model seed 17.
+The production suite contained 1,338/1,338 current main and acyclic-sensitivity jobs, and the dominant-fragment sensitivity added 360/360 completed jobs. The final Q1 build additionally verifies completion of the predeclared RF/XGB model-seed sensitivity before compiling the manuscript.
+
+\input{generated/q1_environment_table_v3}
 
 \section{Reproducibility and Artifact Map}
-\label{sec:si-reproducibility}
+\label{sec:si-repro}
 
-The Paper 1 v3 workflow is organized as an auditable sequence rather than a set of result-specific scripts. Key components are:
-\begin{itemize}
-\item \path{shared_utils/cleaning_policy_v2.py}: canonical molecular cleaning, duplicate decisions, and lineage;
-\item \path{shared_utils/scaffold_identity.py}: canonical scaffold identities, acyclic sentinel policy, split assertions, and partition hashing;
-\item \path{shared_utils/split_candidate_pool_v3.py}: fixed-budget target-blind candidate generation and exact-size paired selection;
-\item \path{paper1_leakage_benchmark/scripts/05_audit_candidate_pool_splits_v3.py}: split construction and candidate-pool diagnostics;
-\item \path{paper1_leakage_benchmark/scripts/06_audit_candidate_budget_v3.py}: candidate-budget audit;
-\item \path{paper1_leakage_benchmark/scripts/07_freeze_manifests_v3.py}: production-manifest and artifact freezing;
-\item \path{paper1_leakage_benchmark/scripts/09_run_models_v3.py}: manifest-driven predictive fitting;
-\item \path{paper1_leakage_benchmark/scripts/11_audit_model_completeness_v3.py}: production completeness gate;
-\item \path{paper1_leakage_benchmark/scripts/12_analyze_partition_effects_v3.py}: partition-level primary and acyclic-sensitivity inference;
-\item \path{paper1_leakage_benchmark/scripts/13_audit_rdkit_hydrogen_warnings_v3.py}: isolated-hydrogen audit;
-\item \path{paper1_leakage_benchmark/scripts/14_audit_multifragment_standardization_v3.py}: multi-component structural audit;
-\item \path{paper1_leakage_benchmark/scripts/15_run_parent_fragment_sensitivity_v3.py}: frozen dominant-fragment classification sensitivity pipeline;
-\item \path{paper1_leakage_benchmark/scripts/16_build_manuscript_assets_v3.py}: figures generated directly from authoritative v3 result tables.
-\end{itemize}
-
-The authoritative experimental protocols are recorded in \path{paper1_leakage_benchmark/REBUILD_PROTOCOL_V3.md}, \path{paper1_leakage_benchmark/MODEL_PROTOCOL_V3.md}, and the frozen dominant-fragment sensitivity protocol. Machine-readable manifests, registries, summary tables, and job metadata preserve the mapping from molecular records to every reported partition and fitted result.
+The authoritative workflow is organized as a pre-outcome audit sequence. Core components include \texttt{shared\_utils/cleaning\_policy\_v2.py} for molecular identity and lineage; \texttt{shared\_utils/scaffold\_identity.py} for scaffold semantics and partition hashing; \texttt{shared\_utils/split\_candidate\_pool\_v3.py} for target-blind candidate generation and exact-size pairing; scripts 05--12 for split auditing, freezing, model readiness, fitting, completeness, and partition-level inference; scripts 13--15 for disconnected-component sensitivity; script 20 for the Q1 scientific controls; and script 21 for publication-size figures. The frozen protocols are recorded in \texttt{REBUILD\_PROTOCOL\_V3.md}, \texttt{MODEL\_PROTOCOL\_V3.md}, and \texttt{PARENT\_FRAGMENT\_SENSITIVITY\_PROTOCOL\_V3.md}.
