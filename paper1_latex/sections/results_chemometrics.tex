@@ -56,6 +56,13 @@ Across the nine affected dataset--model cells, all corrected dominant-fragment s
 \label{fig:fragment-sensitivity}
 \end{figure}
 
+\begin{figure}[!p]
+\centering
+\includegraphics[width=\textwidth]{figure5_candidate_budget_audit_v3.pdf}
+\caption{Candidate-search budget and exact-size pairing. Regression target-mean mismatch continued to decrease through the frozen 20,000-candidate cap; the singleton sensitivity used a separately frozen search. Exact test-set cardinality is identical within every primary pair.}
+\label{fig:budget-audit}
+\end{figure}
+
 \subsection{Target-aware selection altered benchmark properties beyond the optimized target mean}
 
 \input{generated/q1_collateral_diagnostics_results_v3}
@@ -74,10 +81,3 @@ The target-mean gap necessarily decreased by construction, but the selected mole
 \input{generated/q1_model_seed_results_v3}
 
 Supporting Information Figure S5 gives the complete model-seed sensitivity trajectories. Supporting classification and regression metrics are summarized separately in Figure S4. These analyses are robustness checks only; the primary inferential unit remains the unique partition pair.
-
-\begin{figure}[!p]
-\centering
-\includegraphics[width=\textwidth]{figure5_candidate_budget_audit_v3.pdf}
-\caption{Candidate-search budget and exact-size pairing. Regression target-mean mismatch continued to decrease through the frozen 20,000-candidate cap; the singleton sensitivity used a separately frozen search. Exact test-set cardinality is identical within every primary pair.}
-\label{fig:budget-audit}
-\end{figure}
