@@ -22,3 +22,12 @@ standardized overlaps with the training cohort were also excluded as locked.
 The 39 MB row-level prediction file is intentionally not committed. Its SHA256
 is recorded in `promotion_record.json` and `integrity_manifest.json`; the
 one-command runner rebuilds it deterministically.
+
+Post-evaluation audit note (2026-08-10): the original bootstrap loop used an
+unordered Python set when assigning its fixed random stream to unique resampled
+endpoints. The interval above is therefore retained as the original sealed-run
+audit value, not the final publication-facing interval. Repair commit
+`693c505fb55d287514530f2f6e92a50b96c8fa6a` changes only that traversal order.
+The SHA-bound predictions, final labels, point estimate, MacroCSY estimate, and
+interpretation are unchanged; the corrected interval is promoted only after
+the inference-only repair record passes all hash checks.

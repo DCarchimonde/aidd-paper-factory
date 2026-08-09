@@ -138,6 +138,18 @@ runtime (`2026.03.4`). If the selected conda environment has another RDKit
 patch release, the wrapper installs only the exact `rdkit==2026.3.4` binary
 wheel with dependency changes disabled and then verifies the runtime again.
 
+If the sealed C4 run is already complete, the deterministic bootstrap repair
+uses the existing hash-bound predictions and does not retrain anything:
+
+```powershell
+conda run --no-capture-output -n aidd_paper python -u paper2_admet_benchmark\scripts\racer_c4\recompute_racer_c4_inference.py
+```
+
+The repair writes a separate verified package under
+`.local\racer_c4_deterministic_inference`. The original sealed interval below
+is retained as a pre-repair audit value until that deterministic package is
+promoted; the point estimate, MacroCSY result, and interpretation are unchanged.
+
 The sealed independent EPA run is complete. On the six-endpoint primary panel,
 minimum class coverage improved by 1.3649 percentage points (frozen hierarchical
 bootstrap 95% interval: +0.5827 to +1.9696 points) while mean MacroCSY changed

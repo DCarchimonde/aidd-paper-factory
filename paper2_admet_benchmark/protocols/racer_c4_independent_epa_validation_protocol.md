@@ -83,6 +83,15 @@ then resample labeled final compounds within each endpoint and true class
 (preserving endpoint class counts), retain all five prospective seeds, and run
 2,000 draws with seed 44021.
 
+A post-evaluation implementation audit found that the original code traversed
+the unique resampled endpoints through a Python `set`. That did not change the
+estimand or bootstrap hierarchy, but it assigned the fixed NumPy random stream
+to endpoints in a `PYTHONHASHSEED`-dependent order. Repair commit
+`693c505fb55d287514530f2f6e92a50b96c8fa6a` preserves the first-occurrence
+order of the endpoint draw. The affected artifact is only the percentile
+interval; sealed predictions, labels, point estimate, MacroCSY estimate, and
+the predeclared interpretation remain unchanged.
+
 Secondary descriptive estimands are MacroCSY delta, class-specific coverage,
 wrong-singleton exposure, ambiguity, and empty-set rate. The hierarchy is
 primary first, then descriptive secondary results; no multiplicity-adjusted
@@ -110,3 +119,14 @@ using `--no-deps`, followed by a fresh runtime-version check before any cleaning
 or model execution. This preprocessing is part of the RACER-C4 from-source
 reproduction and does not rerun or overwrite the historical RACER-C v1 or
 seed-99 experiments.
+
+For a completed sealed run, recompute only the repaired inference package with:
+
+```powershell
+conda run --no-capture-output -n aidd_paper python -u paper2_admet_benchmark\scripts\racer_c4\recompute_racer_c4_inference.py
+```
+
+This entrypoint verifies the frozen lock, promotion record, final-label hash,
+sealed-prediction hash, sample identities, and unchanged metric-table hashes.
+It performs no model fit or prediction regeneration, does not overwrite the
+original run, and writes to `.local\racer_c4_deterministic_inference`.
