@@ -4,7 +4,7 @@
 
 The rebuilt split protocol produced 20 requested and 20 unique size-matched scaffold partitions, and 20 requested and 20 unique target-balanced scaffold partitions, for every primary dataset. No duplicate partition hash was used as an independent statistical replicate. Within each partition seed, the paired scaffold protocols had exactly the same test-set size. The resulting paired test sizes were 303 for BACE, 393 for BBBP, 288 for ClinTox, 8,224 for HIV, 223 for ESOL, and 128 for FreeSolv (Table~\ref{tab:paired-size}). Thus, the primary performance contrast is not attributable to unequal test-set cardinality.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Integrity of the primary exact-size paired scaffold design. Each protocol contains 20 unique partition hashes.}
 \label{tab:paired-size}
@@ -24,12 +24,13 @@ FreeSolv & 642 & 128 & 128 & 20 \\
 
 Candidate-budget auditing showed why search effort had to be treated as part of the benchmark protocol. For the classification tasks, 300 target-blind candidates provided the frozen production budget. In contrast, under the primary single-group treatment of acyclic molecules, the mean target gap continued to improve for ESOL from 0.0346 at 3,000 candidates to 0.00179 at 20,000 candidates, and for FreeSolv from 1.076 at 3,000 candidates to 0.687 at 20,000 candidates. Neither regression series satisfied the pre-specified stability rule by the largest audited budget. The production budget was therefore capped rather than increased until an apparently desirable partition was obtained. Figure~\ref{fig:audit-framework} summarizes the resulting audit sequence.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.96\textwidth]{figure1_audit_framework_v3.pdf}
-\caption{Chemometric benchmark-audit framework. A source-faithful molecular universe is cleaned and assigned explicit scaffold semantics before target-blind candidate partitions are generated. The primary contrast is formed by an exact-size target-blind scaffold baseline and a target-balanced candidate selected from the same candidate pool. Candidate budgets and molecule-level manifests are frozen before model fitting. Protocol sensitivities then test whether the resulting claim survives alternative acyclic-scaffold and disconnected-component representations.}
+\includegraphics[width=0.99\textwidth]{figure1_audit_framework_v3.pdf}
+\caption{Chemometric benchmark-audit framework. The source-faithful molecular universe, exact-size paired perturbation, pre-outcome freezing, acyclic-scaffold semantics, disconnected-component representation, and claim-stability tests are shown as distinct parts of one measurement workflow. The primary contrast uses the same dataset, partition seed, target-blind candidate pool, scaffold rule, and test-set cardinality; target-distribution mismatch is the designed perturbation.}
 \label{fig:audit-framework}
 \end{figure}
+\FloatBarrier
 
 \subsection{Target balancing did not provide a reproducible classification advantage}
 
@@ -41,7 +42,7 @@ BACE showed the largest consistent negative point estimates: mean AUC effects we
 
 The regression tasks produced a different pattern. All six ESOL and FreeSolv dataset--model cells favored target balancing under the primary convention that all acyclic molecules share the \texttt{\_\_ACYCLIC\_\_} scaffold identity (Table~\ref{tab:primary-results}; Figure~\ref{fig:primary-effects}). For ESOL, the mean RMSE reductions were 0.293 for RF, 0.105 for ridge regression, and 0.227 for XGB, with Holm-adjusted $P$ values of 0.00235, 0.0475, and 0.00200. For FreeSolv, the corresponding reductions were substantially larger: 1.149 for RF, 1.000 for ridge regression, and 0.798 for XGB, all with Holm-adjusted $P<0.0014$.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Primary exact-size paired performance contrast. For classification, effect $=$ AUC$_{\mathrm{balanced}}-$AUC$_{\mathrm{size}}$; for regression, effect $=$ RMSE$_{\mathrm{size}}-$RMSE$_{\mathrm{balanced}}$. Positive effects therefore favor target balancing for both task types. Holm correction was applied across all 18 cells.}
 \label{tab:primary-results}
@@ -73,13 +74,15 @@ FreeSolv & XGB & RMSE & 3.5187 & 2.7203 & $0.7984$ ($0.506,1.088$) & 0.00131 & B
 \end{tabular}%
 }
 \end{table}
+\FloatBarrier
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.96\textwidth]{figure2_primary_effects_v3.pdf}
-\caption{Primary paired target-balance effects across 18 dataset--model cells. Points show mean paired effects over 20 unique partition pairs and horizontal bars show paired-bootstrap 95\% intervals. The effect sign is oriented so that positive values favor target balancing for both classification and regression. Corrected inference, rather than interval sign alone, follows the joint bootstrap-plus-Holm decision rule described in Methods.}
+\includegraphics[width=0.99\textwidth]{figure2_primary_effects_v3.pdf}
+\caption{Primary paired target-balance effects across 18 dataset--model cells. Points show mean paired effects over 20 unique partition pairs and horizontal bars show paired-bootstrap 95\% intervals. Positive effects favor target balancing for both task types. The classification panel emphasizes the absence of any corrected target-balanced advantage, whereas the regression panel shows the six supported effects under the primary single-group acyclic convention.}
 \label{fig:primary-effects}
 \end{figure}
+\FloatBarrier
 
 \subsection{The regression advantage depended strongly on acyclic-scaffold semantics}
 
@@ -87,7 +90,7 @@ The primary regression result did not survive unchanged when the structural mean
 
 This sensitivity is important because the predictive models, endpoint values, partition seeds, and paired selection logic were otherwise unchanged. The large primary regression gains are therefore not appropriately interpreted as a task-wide law that target balancing improves regression. They are conditional on the grouping semantics used to define structural novelty among acyclic molecules.
 
-\begin{table}[H]
+\begin{table}[!htbp]
 \centering
 \caption{Acyclic singleton scaffold sensitivity. Positive RMSE effects favor target balancing. Wilcoxon $P$ values are descriptive for this protocol sensitivity and are not added to the primary 18-cell family.}
 \label{tab:acyclic-sensitivity}
@@ -105,12 +108,13 @@ FreeSolv & XGB & 2.2581 & 2.2916 & $-0.0335$ ($-0.3450,0.2733$) & 0.8983 \\
 \end{tabular}
 \end{table}
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.96\textwidth]{figure3_acyclic_sensitivity_v3.pdf}
-\caption{Dependence of the regression effect on acyclic-scaffold semantics. The primary single-group convention places all acyclic molecules in one scaffold group; the sensitivity convention treats them as singleton groups. Effects are RMSE$_{\mathrm{size}}-$RMSE$_{\mathrm{balanced}}$, so positive values favor target balancing. The large primary gains are substantially attenuated under the singleton convention.}
+\includegraphics[width=0.99\textwidth]{figure3_acyclic_sensitivity_v3.pdf}
+\caption{Dependence of the regression effect on acyclic-scaffold semantics. Panel A isolates the semantic perturbation while holding endpoints, models, partition seeds, and exact-size pairing logic fixed. Panels B and C compare the primary single-group effects with the singleton sensitivity for ESOL and FreeSolv. The large primary gains attenuate strongly, and all three FreeSolv point estimates reverse sign.}
 \label{fig:acyclic-sensitivity}
 \end{figure}
+\FloatBarrier
 
 \subsection{Disconnected-component representation changed point estimates but not classification inference}
 
@@ -120,12 +124,13 @@ All 360 pre-specified dominant-fragment model jobs completed. Across the nine BB
 
 The appropriate robustness conclusion is therefore asymmetric: the \emph{absence of a statistically supported classification advantage} was stable to the dominant-fragment perturbation, whereas the direction and magnitude of the point estimates were not.
 
-\begin{figure}[H]
+\begin{figure}[p]
 \centering
-\includegraphics[width=0.96\textwidth]{figure4_dominant_fragment_sensitivity_v3.pdf}
-\caption{Source-faithful versus dominant-fragment classification effects for the nine affected dataset--model cells. Lines connect the mean paired effect obtained under the primary representation and the dominant-fragment sensitivity representation. Seven of nine mean-effect signs reverse, while all nine sensitivity inferences remain inconclusive.}
+\includegraphics[width=0.99\textwidth]{figure4_dominant_fragment_sensitivity_v3.pdf}
+\caption{Dominant-fragment representation sensitivity. Panels A--C summarize the representation perturbation and its structural consequences. Panel D connects source-faithful and dominant-fragment mean effects for the nine affected dataset--model cells. Seven of nine point-estimate signs reverse, whereas all nine corrected sensitivity inferences remain inconclusive.}
 \label{fig:fragment-sensitivity}
 \end{figure}
+\FloatBarrier
 
 \subsection{Benchmark claims were protocol-conditioned rather than model-intrinsic}
 
