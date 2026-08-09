@@ -2,7 +2,7 @@
 
 \subsection{Datasets and audited molecular identity}
 
-Six public molecular-property datasets distributed through the MoleculeNet/DeepChem ecosystem were analysed: BACE, BBBP, ClinTox, and HIV for binary classification, and ESOL and FreeSolv for regression \citep{wu2018moleculenet}. Source SMILES were parsed and canonicalized with RDKit \citep{rdkit}. Invalid structures and non-numeric targets were excluded with row-level lineage. Molecular identity was defined by canonical isomeric SMILES. Consistent classification duplicates were collapsed; canonical identities carrying conflicting binary labels were excluded in full. Regression duplicates were aggregated by arithmetic mean while retaining source counts, ranges, and lineage. No duplicate canonical identity remained in the clean datasets. The closed raw-to-clean accounting, including duplicate and conflict rows, is reported in Supporting Information Table~\ref{tab:si-cleaning-accounting}.
+Six public molecular-property datasets distributed through the MoleculeNet/DeepChem ecosystem were analysed: BACE, BBBP, ClinTox, and HIV for binary classification, and ESOL and FreeSolv for regression \citep{wu2018moleculenet}. Source SMILES were parsed and canonicalized with RDKit \citep{rdkit}. Invalid structures and non-numeric targets were excluded with row-level lineage. Molecular identity was defined by canonical isomeric SMILES. Consistent classification duplicates were collapsed; canonical identities carrying conflicting binary labels were excluded in full. Regression duplicates were aggregated by arithmetic mean while retaining source counts, ranges, and lineage. No duplicate canonical identity remained in the clean datasets. The closed raw-to-clean accounting, including duplicate and conflict rows, is reported in Supporting Information Table S1.
 
 \begin{table}[!htbp]
 \centering
@@ -63,7 +63,7 @@ Twenty partition seeds were fixed before model fitting: 42, 123, 2024, 2026, 340
 
 All models used the same radius-2, 2048-bit Morgan fingerprint \citep{rogers2010extended}. Classification models were logistic regression (LR), random forest (RF), and XGBoost (XGB); regression models were ridge regression, RF, and XGB. Hyperparameters were fixed before production fitting and are reported in the reproducibility protocol and Supporting Information. Scikit-learn and XGBoost implementations were used \citep{pedregosa2011scikit,breiman2001random,chen2016xgboost}. Stochastic RF/XGB production fits used model seed 17 throughout; LR/ridge were deterministic under the fixed configuration.
 
-ROC--AUC was the primary classification metric, with average precision, $F_1$, accuracy, balanced accuracy, and Brier score retained as supporting metrics. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting metrics. Supporting-metric effects are reported in Figure~\ref{fig:si-supporting-metrics} rather than promoted to additional primary hypothesis families.
+ROC--AUC was the primary classification metric, with average precision, $F_1$, accuracy, balanced accuracy, and Brier score retained as supporting metrics. RMSE was the primary regression metric, with MAE and $R^2$ retained as supporting metrics. Supporting-metric effects are reported in Supporting Information Figure S4 rather than promoted to additional primary hypothesis families.
 
 For classification, the paired primary effect for partition seed $s$ was
 \begin{equation}
