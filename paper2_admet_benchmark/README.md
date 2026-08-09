@@ -146,12 +146,15 @@ conda run --no-capture-output -n aidd_paper python -u paper2_admet_benchmark\scr
 ```
 
 The repair writes a separate verified package under
-`.local\racer_c4_deterministic_inference`. The original sealed interval below
-is retained as a pre-repair audit value until that deterministic package is
-promoted; the point estimate, MacroCSY result, and interpretation are unchanged.
+`.local\racer_c4_deterministic_inference`. The hash-verified repair completed
+on 2026-08-10 and was promoted as a separate publication-facing report. The
+original sealed report and integrity manifest remain unchanged as audit
+artifacts; no model, prediction, label, point estimate, MacroCSY result, or
+interpretation changed.
 
 The sealed independent EPA run is complete. On the six-endpoint primary panel,
-minimum class coverage improved by 1.3649 percentage points (frozen hierarchical
-bootstrap 95% interval: +0.5827 to +1.9696 points) while mean MacroCSY changed
-by -1.6067 points, inside the frozen -5-point non-inferiority margin. Aggregate
-results and integrity hashes are under `results/racer_c4_independent_final/`.
+minimum class coverage improved by 1.3649 percentage points (deterministic
+hierarchical-bootstrap 95% interval: +0.5827 to +2.0051 points) while mean
+MacroCSY changed by -1.6067 points, inside the frozen -5-point non-inferiority
+margin. Publication-facing results, the Windows repair record, and the preserved
+sealed audit artifacts are under `results/racer_c4_independent_final/`.
