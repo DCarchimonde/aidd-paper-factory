@@ -6,7 +6,7 @@ Every primary dataset produced 20 requested and 20 unique size-matched scaffold 
 
 Candidate-budget auditing showed that search effort was itself part of benchmark construction. Classification was frozen at 300 target-blind candidates. Under the primary single-group treatment of acyclic molecules, the mean selected target-mean gap for ESOL decreased from 0.0346 at 3,000 candidates to 0.00179 at 20,000, and FreeSolv decreased from 1.076 to 0.687 over the same range. Neither regression series met the pre-specified stopping criterion by the largest audited budget, so 20,000 was retained as a cap rather than interpreted as convergence. Figure~\ref{fig:audit-framework} summarizes the complete audit logic and Figure~\ref{fig:budget-audit} shows the frozen budget behavior.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure1_audit_framework_v3.pdf}
 \caption{Chemometric benchmark-audit framework. A target-blind scaffold candidate pool is used to construct an exact-size target-mean perturbation, with search budget and molecule-level partition manifests frozen before model fitting. Acyclic-scaffold semantics and disconnected-component representation are evaluated as separate predeclared sensitivities.}
@@ -21,7 +21,7 @@ Across BACE, BBBP, ClinTox, and HIV, none of the 12 classification dataset--mode
 
 All six ESOL and FreeSolv regression cells met the corrected target-balanced-better criterion under the primary convention that all acyclic molecules share the \texttt{\_\_ACYCLIC\_\_} identity (Figure~\ref{fig:primary-effects}). Mean RMSE reductions were 0.105--0.293 for ESOL and 0.798--1.149 for FreeSolv. Complete primary statistics are reported in Supporting Information Table S5.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure2_primary_effects_v3.pdf}
 \caption{Primary paired effects across 18 dataset--model cells. Points show mean effects over 20 unique partition pairs and horizontal bars show paired-bootstrap 95\% intervals. Positive values favor target-mean-aware selection. Corrected inference follows the joint bootstrap-plus-Holm decision rule.}
@@ -30,7 +30,7 @@ All six ESOL and FreeSolv regression cells met the corrected target-balanced-bet
 
 Changing only the semantics assigned to an empty Bemis--Murcko framework strongly attenuated this regression pattern. Under singleton acyclic identities, ESOL effects decreased to 0.036--0.061 RMSE units, while all three FreeSolv point estimates reversed sign; all FreeSolv bootstrap intervals crossed zero (Figure~\ref{fig:acyclic-sensitivity}; Supporting Information Table S6). The primary regression result is therefore conditional on the structural grouping semantics used to define scaffold novelty.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure3_acyclic_sensitivity_v3.pdf}
 \caption{Dependence of regression effects on acyclic-scaffold semantics. The sensitivity changes only the structural meaning assigned to acyclic molecules while keeping endpoints, models, partition seeds, and exact-size paired selection logic fixed.}
@@ -49,14 +49,14 @@ The structural audit identified multi-component source-faithful records in 105 B
 
 Across the nine affected dataset--model cells, all corrected dominant-fragment sensitivity inferences remained inconclusive, while seven of nine mean-effect directions reversed relative to the source-faithful primary representation (Figure~\ref{fig:fragment-sensitivity}; Supporting Information Table S10). Thus, inferential status was more stable than point-estimate direction.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure4_dominant_fragment_sensitivity_v3.pdf}
 \caption{Dominant-fragment representation sensitivity. The upper panels summarize structural consequences of the deterministic representation perturbation; the lower panel connects source-faithful and dominant-fragment mean AUC effects for the nine affected dataset--model cells.}
 \label{fig:fragment-sensitivity}
 \end{figure}
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure5_candidate_budget_audit_v3.pdf}
 \caption{Candidate-search budget and exact-size pairing. Regression target-mean mismatch continued to decrease through the frozen 20,000-candidate cap; the singleton sensitivity used a separately frozen search. Exact test-set cardinality is identical within every primary pair.}
@@ -69,7 +69,7 @@ Across the nine affected dataset--model cells, all corrected dominant-fragment s
 
 The target-mean gap necessarily decreased by construction, but the selected molecular subset could also change scaffold concentration and the number or fraction of structural groups represented in the test set. These quantities are consequences of the partition-selection rule rather than nuisance variables that were held fixed. Figure~\ref{fig:collateral-diagnostics} visualizes this distinction and places the mean-only RMSE control beside the structural diagnostics.
 
-\begin{figure}[!p]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure6_collateral_diagnostics_v3.pdf}
 \caption{Mechanistic and collateral diagnostics for target-mean-aware partition selection. Panel A compares the mean-only regression control with the learned-model effects. Panel B shows the reduction in target-mean mismatch. Panels C and D show paired changes in test-set scaffold concentration and effective scaffold number, neither of which entered the target-balancing objective.}
