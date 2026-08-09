@@ -41,6 +41,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "12_analyze_partition_effects_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20_build_q1_scientific_controls_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "20c_write_q1_result_text_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "21_build_manuscript_assets_v3_round3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "24_q1_submission_gate_v3.py")], cwd=ROOT)
