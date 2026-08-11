@@ -1,25 +1,33 @@
 Dear Professor Federico Marini,
 
-We are pleased to submit the manuscript entitled “Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift” for consideration as an Original Research Article in *Chemometrics and Intelligent Laboratory Systems*.
+We are pleased to submit the manuscript entitled "Beyond Aggregate Reliability in ADMET Prediction: Auditing Chemical Shift and Protecting Weakest-Class Coverage with RACER-C4/TAME" for consideration as an Original Research Article in *Chemometrics and Intelligent Laboratory Systems*.
 
-The manuscript presents a frozen, representation-controlled chemometric audit of molecular-property reliability. Rather than proposing another predictive architecture or reporting a routine model leaderboard, we evaluate whether commonly used reliability diagnostics provide mutually consistent conclusions under repeated random, label-blind scaffold, and similarity-cluster splits. The protocol integrates point performance, probability calibration, continuous and threshold-sensitive applicability-domain analysis, marginal and class-conditional conformal prediction, prediction-set efficiency, and retention-aware selective prediction within paired endpoint–split–model–seed comparisons.
+The manuscript presents a two-stage chemometric study of molecular-prediction reliability. First, a frozen, representation-controlled audit evaluates point performance, probability calibration, applicability-domain behavior, marginal and class-conditional conformal validity, prediction-set informativeness, and retained-class composition under repeated random, label-blind scaffold, and similarity-cluster splits. The audit shows why no one aggregate reliability quantity is sufficient. At nominal 90% coverage, for example, ClinTox marginal and shift-weighted conformal procedures achieved overall coverage near target while positive-class coverage was only 0.068-0.158. Mondrian calibration restored positive coverage to approximately 0.93-0.94, but returned ambiguous two-label sets for about 71% of compounds.
 
-The study reveals several practically important conflicts that are not visible from aggregate accuracy alone. At nominal 90% coverage, marginal and shift-weighted conformal prediction achieved overall ClinTox coverage near target while positive-class coverage remained only 0.068–0.158. Mondrian calibration increased positive-class coverage to approximately 0.93–0.94, but produced ambiguous two-label sets for about 71% of samples. Chemical similarity ranked risk reliably for some endpoints but was weak or directionally reversed for others, and confidence-based selective prediction could reduce ordinary error partly by preferentially removing minority-class examples.
+Second, the observed failures are translated into explicit design constraints for TAME, a transport-audited multi-view conformal envelope. TAME permits two label-free transport views to affect the ordinary Mondrian baseline only after prespecified effective-sample-size, clipping, domain-discrimination, and balance checks. Its construction always contains the baseline set, emits no empty set, cannot create a new confident singleton, and returns an exact ordinary fallback when a transport audit fails.
 
-We believe the manuscript fits the journal because it is a non-routine application of chemometric validation, supervised modelling, robust comparison, applicability-domain analysis, and uncertainty calibration to a chemically structured decision problem. Its contribution is an auditable evaluation protocol and empirical demonstration that predictive accuracy, marginal validity, class-conditional validity, informativeness, chemical domain, and retained-class composition must be interpreted jointly. A recent broad foundation-model ADMET benchmark is explicitly discussed and distinguished: that work maps architecture performance under real-world challenges, whereas our controlled study isolates post-prediction reliability conflicts.
+Architecture development was restricted to the public Tox21 leaderboard cohort. The method, primary endpoints, fresh seeds, promotion gate, five-percentage-point Macro correct-singleton yield non-inferiority bound, and negative-result policy were frozen before independent labels were opened. Final EPA predictions and transport audits were written and hashed before the locked label file was acquired and parsed. Across six primary endpoints and five fresh seeds, TAME improved the endpoint-seed-equal mean minimum-class coverage by 1.3649 percentage points; the deterministic hierarchical-bootstrap 95% interval was +0.5827 to +2.0051 points. Macro correct-singleton yield changed by -1.6067 points, inside the frozen non-inferiority bound. Both approved transport views passed in all 60 final endpoint-seed cells, whereas the diagnostic ECFP view failed in all 60.
 
-All confirmatory design choices, splits, model families, diagnostic definitions, and stopping rules were frozen before confirmatory outputs were inspected. Development seed 99 was excluded from scientific conclusions, adverse and null findings were retained, and model families were not treated as independent inferential replicates. The public repository provides source code, frozen manuscript-ready result tables, an integrity manifest, figures, LaTeX sources, and complete rebuilding instructions.
+We believe the manuscript fits the journal because its contribution is a non-routine combination of chemometric validation, applicability-domain analysis, calibrated predictive sets, explicit transport diagnostics, paired repeated-split inference, and prospective evidence control. It complements architecture-centered ADMET benchmarks by isolating post-prediction reliability conflicts and by testing a fixed intervention under a prediction-to-label firewall.
+
+The manuscript does not claim exact coverage under arbitrary chemical shift, conditional coverage, clinical safety, or universal algorithmic superiority. Null and adverse findings were retained, including one primary endpoint with zero minimum-class-coverage change and every negative endpoint-level efficiency change. The public reproducibility repository contains the executable lock, code, tests, cryptographic manifests, frozen summaries, vector figures, LaTeX sources, and rebuilding instructions.
 
 This manuscript is original, has not been published previously, and is not under consideration elsewhere. Both authors have approved the submitted version and declare no competing interests. The use of generative AI and AI-assisted technologies during manuscript preparation is disclosed in the manuscript in accordance with Elsevier policy.
 
-Thank you for considering our work. We believe it will be of interest to readers concerned with chemometric model validation, predictive uncertainty, applicability domains, and trustworthy machine learning in chemical and toxicological applications.
+Thank you for considering our work. We believe it will be of interest to readers concerned with chemometric model validation, trustworthy molecular prediction, conformal inference, and applicability domains under structured distribution shift.
 
 Sincerely,
 
 S. Tong
+
 Corresponding author
+
 Department of Artificial Intelligence
+
 Faculty of Computer Science and Information Technology
+
 University of Malaya
+
 50603 Kuala Lumpur, Malaysia
+
 Email: 25064241@siswa.um.edu.my

@@ -1,5 +1,5 @@
-• Repeated chemical splits exposed endpoint-specific reliability failures.
-• ClinTox marginal coverage masked severe positive-class undercoverage.
-• Mondrian calibration restored coverage but yielded 71% ambiguous sets.
-• Chemical similarity ranked risk inconsistently across ADMET endpoints.
-• Selective rejection could reduce error by removing minority examples.
+- Aggregate conformal coverage concealed severe ClinTox class undercoverage.
+- A two-view audit rejected unstable ECFP transport weighting.
+- TAME preserved baseline labels and created no new confident singleton.
+- Sealed EPA validation improved minimum-class coverage by 1.36 points.
+- MacroCSY fell 1.61 points, within the frozen 5-point efficiency bound.

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-"""Entry point for the final Paper 2 publication figure package."""
+"""Entry point for the integrated Paper 2/RACER-C4 publication figures."""
 
-from figure36_safe_layout_refresh import main
+from figure38_tame_manuscript import main
 
 
 if __name__ == "__main__":
