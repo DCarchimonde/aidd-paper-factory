@@ -20,6 +20,11 @@ def fmt(x: object, n: int = 4) -> str:
     return f"{float(x):.{n}f}"
 
 
+def fmt_p(x: object) -> str:
+    value = float(x)
+    return "$<0.0001$" if value < 1e-4 else f"{value:.4f}"
+
+
 def write(name: str, lines: list[str]) -> None:
     (GEN / name).write_text("\n".join(lines) + "\n", encoding="utf-8")
 
@@ -61,7 +66,7 @@ def mean_only_table() -> None:
         label = "Primary" if r.freeze_label == "main_regression" else "Singleton"
         lines.append(
             f"{label} & {r.dataset} & {fmt(r.mean_size_intercept_rmse)} & {fmt(r.mean_balanced_intercept_rmse)} & "
-            f"{fmt(r.mean_effect_size_minus_balanced_rmse)} & [{fmt(r.bootstrap_ci_low)}, {fmt(r.bootstrap_ci_high)}] & {fmt(r.wilcoxon_p_descriptive)} \\\\"
+            f"{fmt(r.mean_effect_size_minus_balanced_rmse)} & [{fmt(r.bootstrap_ci_low)}, {fmt(r.bootstrap_ci_high)}] & {fmt_p(r.wilcoxon_p_descriptive)} \\\\"
         )
     lines += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
     write("q1_mean_only_table_v3.tex", lines)
@@ -69,7 +74,10 @@ def mean_only_table() -> None:
 
 def collateral_table() -> None:
     df = pd.read_csv(TABLES / "q1_collateral_diagnostics_summary_v3.csv", keep_default_na=False)
-    keep = ["abs_target_mean_gap", "target_ks_statistic", "target_wasserstein", "largest_test_scaffold_fraction", "effective_test_scaffolds", "acyclic_test_fraction"]
+    keep = [
+        "abs_target_mean_gap", "target_ks_statistic", "target_wasserstein",
+        "largest_test_scaffold_fraction", "effective_test_scaffolds", "acyclic_test_fraction",
+    ]
     labels = {
         "abs_target_mean_gap": "Target-mean gap", "target_ks_statistic": "KS statistic",
         "target_wasserstein": "Wasserstein", "largest_test_scaffold_fraction": "Largest-scaffold fraction",
@@ -77,16 +85,23 @@ def collateral_table() -> None:
     }
     lines = [
         "\\begin{table}[!htbp]", "\\centering",
-        "\\caption{Collateral partition diagnostics. Values are means across 20 paired partitions; $\\Delta$ is target-mean-balanced minus size-matched. Only target-mean gap entered the selection objective.}",
+        "\\caption{Collateral partition diagnostics. Size and balanced columns are marginal means across 20 partitions; $\\Delta$ is the mean paired target-mean-balanced minus size-matched change. The final column is the mean of partition-wise ratios $b_s/s_s$ and therefore need not equal the ratio of the two displayed marginal means. Only target-mean gap entered the selection objective.}",
         "\\label{tab:si-collateral}", "\\scriptsize", "\\resizebox{\\textwidth}{!}{%", "\\begin{tabular}{llrrrr}", "\\toprule",
-        "Dataset & Diagnostic & Size mean & Balanced mean & Mean $\\Delta$ & Balanced/size ratio \\\\", "\\midrule",
+        "Dataset & Diagnostic & Size mean & Balanced mean & Mean $\\Delta$ & Mean paired ratio $b_s/s_s$ \\\\", "\\midrule",
     ]
     for ds in ["BACE", "BBBP", "ClinTox", "HIV", "ESOL", "FreeSolv"]:
         for metric in keep:
             r = df[(df.dataset == ds) & (df.metric == metric)].iloc[0]
             ratio = r.mean_ratio_balanced_over_size
-            ratio_text = "--" if str(ratio) == "" or pd.isna(ratio) else fmt(ratio, 3)
-            lines.append(f"{ds} & {labels[metric]} & {fmt(r.mean_size,3)} & {fmt(r.mean_balanced,3)} & {fmt(r.mean_delta_balanced_minus_size,3)} & {ratio_text} \\\\")
+            # Ratios of fractions with structural zeros are unstable and not scientifically useful.
+            if metric == "acyclic_test_fraction" or str(ratio) == "" or pd.isna(ratio):
+                ratio_text = "--"
+            else:
+                ratio_text = fmt(ratio, 3)
+            lines.append(
+                f"{ds} & {labels[metric]} & {fmt(r.mean_size,3)} & {fmt(r.mean_balanced,3)} & "
+                f"{fmt(r.mean_delta_balanced_minus_size,3)} & {ratio_text} \\\\"
+            )
         lines.append("\\addlinespace")
     lines += ["\\bottomrule", "\\end{tabular}%", "}", "\\end{table}"]
     write("q1_collateral_table_v3.tex", lines)
