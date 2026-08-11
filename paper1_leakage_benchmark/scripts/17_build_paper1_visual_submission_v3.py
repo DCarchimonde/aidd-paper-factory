@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import py_compile
 import subprocess
 import sys
@@ -21,13 +22,43 @@ Q1_SCRIPTS = [
 ]
 
 
+def matplotlib_api_gate(script: Path) -> None:
+    """Reject direct wspace/hspace kwargs to plt.subplots before long-running jobs start."""
+    tree = ast.parse(script.read_text(encoding="utf-8"), filename=str(script))
+    bad: list[str] = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        is_subplots = (
+            isinstance(func, ast.Attribute)
+            and func.attr == "subplots"
+            and isinstance(func.value, ast.Name)
+            and func.value.id == "plt"
+        )
+        if not is_subplots:
+            continue
+        direct = sorted(
+            kw.arg for kw in node.keywords
+            if kw.arg in {"wspace", "hspace"}
+        )
+        if direct:
+            bad.append(f"line {getattr(node, 'lineno', '?')}: {', '.join(direct)}")
+    if bad:
+        raise AssertionError(
+            f"Matplotlib compatibility gate failed for {script.name}: direct spacing kwargs to plt.subplots are unsupported in the target environment; use gridspec_kw. "
+            + "; ".join(bad)
+        )
+
+
 def main() -> None:
     print("PAPER 1 BUILD ENTRYPOINT -> Q1 FINAL PIPELINE")
-    print("Running Python syntax gate before any model jobs...")
+    print("Running Python syntax + Matplotlib API compatibility gates before any model jobs...")
     for script in Q1_SCRIPTS:
         py_compile.compile(str(script), doraise=True)
+        matplotlib_api_gate(script)
         print("  OK", script.name)
-    print("Q1 PYTHON SYNTAX GATE: PASS")
+    print("Q1 PYTHON + MATPLOTLIB API GATES: PASS")
 
     completed = subprocess.run([sys.executable, str(FINAL_RUNNER)], cwd=str(ROOT))
     if completed.returncode != 0:
