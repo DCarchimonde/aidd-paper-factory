@@ -43,7 +43,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "20b_build_q1_tex_tables_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20d_capture_raw_source_provenance_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "20c_write_q1_result_text_v3.py")], cwd=ROOT)
-    run([sys.executable, str(SCRIPTS / "21_build_manuscript_assets_v3_round3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "21a_build_manuscript_assets_v3_round3_compat.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "24_q1_submission_gate_v3.py")], cwd=ROOT)
 
