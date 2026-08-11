@@ -31,7 +31,7 @@ Publishing route: Subscription (no publication fee charged to authors)
 - Upload editable `.tex` sources as well as the review PDF
 - Upload highlights as a separate editable file
 - Upload Supporting Information as a separate file
-- Enter the public GitHub repository and RACER-C4/TAME branch in the data/code availability field
+- Enter the public GitHub repository and `paper2-racer-c4-development-2026` branch in the data/code availability field
 - Do not claim a Zenodo DOI or archival identifier unless one is later created
 
 ## Final local build

@@ -28,7 +28,7 @@ The main figure path is:
 
 ## Optional: rebuild the six figures
 
-The reporting script reads only frozen Stage I tables and frozen RACER-C4/TAME summaries. It does not fit a model, regenerate a prediction, open a sealed label, or change an inferential quantity.
+The reporting script reads only frozen Stage I tables and frozen TAME-under-RACER-C4 summaries. It does not fit a model, regenerate a prediction, open a sealed label, or change an inferential quantity.
 
 ~~~powershell
 cd E:\AIDD_Paper_Factory

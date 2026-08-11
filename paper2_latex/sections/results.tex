@@ -3,7 +3,7 @@
 
 Unless stated otherwise, Stage~I values are descriptive means across frozen model or model--regime combinations; model families were not treated as independent inferential replicates. Audit contrasts were paired on the same endpoint, split, seed, model, and regime, and seed~99 was excluded from scientific conclusions. Stage~II development and final results are reported separately so that architecture-selection evidence is not confused with independent validation.
 
-\subsection{Chemical shift changed point performance and calibration}
+\subsection{Molecular distribution shift changed point performance and calibration}
 \label{sec:results_performance}
 
 Random splitting generally produced the strongest point performance, but the size and form of degradation depended on the endpoint (Figure~\ref{fig:shift_performance}). BBBP mean ROC--AUC declined from 0.886 under random splitting to 0.851 under scaffold and 0.864 under similarity-cluster splitting. Balanced accuracy decreased from 0.789 to 0.736 and 0.748, respectively. ClinTox was more difficult: ROC--AUC ranged from 0.675 to 0.703 and balanced accuracy from 0.537 to 0.575, with the random split again strongest.
@@ -15,9 +15,10 @@ Positive-probability calibration also favored random splitting within endpoint. 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure_2_shift_performance.pdf}
-\caption{\textbf{Point prediction and calibration under chemical distribution shift.} Descriptive means across frozen model or model--regime combinations are shown for random, label-blind scaffold, and label-blind similarity-cluster splits. (A) ROC--AUC for BBBP and ClinTox. (B) Balanced accuracy. (C) $R^2$ for ESOL and Lipophilicity. (D) Positive-probability expected calibration error. Dashed lines denote chance discrimination or zero explained variance where applicable. Model-specific cross-seed uncertainty is reported in the Supporting Information.}
+\caption{\textbf{Point prediction and calibration under molecular distribution shift.} Descriptive means across frozen model or model--regime combinations are shown for random, label-blind scaffold, and label-blind similarity-cluster splits. (A) ROC--AUC for BBBP and ClinTox. (B) Balanced accuracy. (C) $R^2$ for ESOL and Lipophilicity. (D) Positive-probability expected calibration error. Dashed lines denote chance discrimination or zero explained variance where applicable. Model-specific cross-seed uncertainty is reported in the Supporting Information.}
 \label{fig:shift_performance}
 \end{figure}
+\FloatBarrier
 
 \subsection{Aggregate conformal coverage concealed class failure and low information}
 \label{sec:results_coverage}
@@ -36,6 +37,7 @@ The same distinction reappeared during public Tox21 development (Figure~\ref{fig
 \caption{\textbf{Aggregate validity can hide either class failure or uninformative prediction sets.} (A) ClinTox overall, positive-class, and negative-class coverage for marginal, ECFP shift-weighted, and Mondrian conformal prediction, averaged across the frozen audit designs. (B) Minimum class coverage versus ambiguous two-label rate across BBBP and ClinTox split designs; marker shape identifies the conformal method and color identifies the endpoint. The arrow indicates the direction of jointly greater coverage and lower ambiguity. (C) Public Tox21 development summaries across six primary endpoints and five seeds. Bubble area is proportional to ambiguity; the ECFP-weighted comparator attained complete coverage by returning two labels for every compound.}
 \label{fig:reliability_illusion}
 \end{figure}
+\FloatBarrier
 
 \subsection{Regression conformal variants did not show a universal advantage}
 \label{sec:results_regression}
@@ -59,6 +61,7 @@ Similarity-based regression rejection was likewise not transferable as a univers
 \caption{\textbf{Chemical-domain and selective-retention diagnostics are endpoint dependent.} (A) Mean Spearman association between maximum training-set similarity and predictive risk. (B) Association between similarity and marginal conformal miscoverage. Negative values indicate increasing risk or miscoverage as similarity decreases. (C) ClinTox positive-class retention when 50\% of all samples remain after confidence- or similarity-based rejection; the dashed line is composition-neutral 50\% retention. (D) Improvement in regression risk at 50\% retention for similarity rejection relative to matched random rejection. Threshold and rejection analyses are sensitivity diagnostics, not universal chemical-domain rules.}
 \label{fig:domain_retention}
 \end{figure}
+\FloatBarrier
 
 \subsection{Audit failures became frozen TAME constraints}
 \label{sec:results_development}
@@ -69,27 +72,29 @@ Development results were retained as design evidence only. Across 30 public prim
 
 \begin{figure}[!htbp]
 \centering
-\includegraphics[width=\textwidth]{figure_5_tame_mechanism.pdf}
+\includegraphics[width=\textwidth,height=0.78\textheight,keepaspectratio]{figure_5_tame_mechanism.pdf}
 \caption{\textbf{Mechanism and invariants of the transport-audited multi-view envelope.} (A) Four frozen ECFP classifiers feed a logit router and ordinary class-conditional Mondrian baseline. (B) Physicochemical and score views estimate separate label-free source-to-target weights. (C) Each view must pass the complete frozen transport certificate; the envelope requires an all-view quorum. (D) If both views pass, label~0 is added only by consensus while every baseline label is preserved. If either view fails, TAME returns the repaired ordinary baseline. The construction emits no empty set and cannot create a new confident singleton.}
 \label{fig:tame_mechanism}
 \end{figure}
+\FloatBarrier
 
-\subsection{Sealed EPA validation improved minimum-class coverage within the efficiency bound}
+\subsection{Sealed EPA validation improved minimum-class coverage within the efficiency guardrail}
 \label{sec:results_final}
 
 The independent run completed all 12 official endpoints across five fresh seeds (60/60 endpoint--seed cells); the primary analysis comprised the prespecified six endpoints and 30 cells. Two of 647 external structures failed the frozen standardizer and were retained as explicit full-set exclusions. Endpoint-specific standardized overlaps with the Tox21 training cohort were removed according to the lock. Predictions, the label-blind transport audit, and their hashes were written before the final label file was opened.
 
 TAME increased the endpoint--seed-equal mean minimum-class coverage by 1.3649 percentage points relative to ordinary routed Mondrian prediction (Figure~\ref{fig:epa_validation}A,B). The deterministic 2000-draw hierarchical-bootstrap 95\% interval was $+0.5827$ to $+2.0051$ points. Five of six endpoint means were positive: NR-AhR $+2.1644$, NR-ER $+1.2362$, SR-ARE $+2.1461$, SR-MMP $+1.1489$, and SR-p53 $+1.4936$ points. SR-ATAD5 had zero minimum-class-coverage change even though its class-0 coverage increased by 1.4363 points; the unchanged class remained the minimum.
 
-The primary mean MacroCSY change was $-1.6067$ percentage points, inside the frozen $-5$-point non-inferiority bound (Figure~\ref{fig:epa_validation}C). Because the envelope only adds a label, this efficiency cost is the expected counterpart of converting some singleton predictions into explicit deferrals. Structural checks confirmed the predeclared invariants: every TAME set contained its ordinary baseline set, no TAME set was empty, and no new singleton was created. Accordingly, wrong-singleton exposure did not increase on the same rows.
+The primary mean MacroCSY change was $-1.6067$ percentage points, inside the frozen $-5$-point efficiency guardrail (Figure~\ref{fig:epa_validation}C). Because the envelope only adds a label, this efficiency cost is the expected counterpart of converting some singleton predictions into explicit deferrals. Structural checks confirmed the predeclared invariants: every TAME set contained its ordinary baseline set, no TAME set was empty, and no new singleton was created. Accordingly, wrong-singleton exposure did not increase on the same rows.
 
 Both approved transport views passed in 60/60 final endpoint--seed cells, whereas the high-dimensional ECFP diagnostic failed in 60/60 because its frozen effective-sample-size, clipping, and balance certificate was not satisfied (Figure~\ref{fig:epa_validation}D). The diagnostic comparator nevertheless attained mean minimum-class coverage of 0.998 across all 12 endpoints while its mean ambiguity was 0.997 and MacroCSY only 0.002. This independent secondary result reproduced the central audit lesson: a coverage number can be nearly perfect because the output is nearly always uninformative.
 
-The predeclared interpretation was therefore a coverage gain with efficiency non-inferiority in the locked Tox21 evaluation. It was not an automatic declaration of scientific superiority. The result does not establish conditional coverage, exact validity for estimated density ratios, transfer to arbitrary chemical shifts, or a general rule that label~0 should be protected in other assay families.
+The machine-readable predeclared result code was \nolinkurl{coverage_gain_with_efficiency_noninferiority}. In publication-facing statistical language, the result is a coverage gain with the MacroCSY point estimate inside the prespecified efficiency guardrail, not formal evidence of non-inferiority and not an automatic declaration of scientific superiority. The result does not establish conditional coverage, exact validity for estimated density ratios, transfer to arbitrary molecular distribution shifts, or a general rule that label~0 should be protected in other assay families.
 
 \begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figure_6_epa_validation.pdf}
-\caption{\textbf{Independent EPA validation under the prediction-to-label firewall.} (A) Mean TAME-minus-ordinary change in minimum-class coverage for each of the six prespecified primary endpoints across five fresh seeds. (B) Primary endpoint--seed-equal estimate and deterministic hierarchical-bootstrap 95\% interval (2000 draws; seed~44021). (C) Endpoint-level MacroCSY changes and their aggregate; the dashed line is the frozen $-5$-percentage-point non-inferiority bound. (D) Final activity of the two approved label-free transport views and the ECFP diagnostic across all 12 endpoints and five seeds. Predictions and transport audits were hashed before labels were opened.}
+\caption{\textbf{Independent EPA validation under the prediction-to-label firewall.} (A) Mean TAME-minus-ordinary change in minimum-class coverage for each of the six prespecified primary endpoints across five fresh seeds. (B) Primary endpoint--seed-equal estimate and deterministic hierarchical-bootstrap 95\% interval (2000 draws; seed~44021). (C) Endpoint-level MacroCSY changes and their aggregate; the dashed line is the frozen $-5$-percentage-point point-estimate efficiency guardrail. (D) Final activity of the two approved label-free transport views and the ECFP diagnostic across all 12 endpoints and five seeds. Predictions and transport audits were hashed before labels were opened.}
 \label{fig:epa_validation}
 \end{figure}
+\FloatBarrier

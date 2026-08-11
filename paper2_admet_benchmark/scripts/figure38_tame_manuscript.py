@@ -3,7 +3,8 @@ from __future__ import annotations
 """Build the publication figures for the integrated Paper 2/TAME manuscript.
 
 The script is deliberately reporting-only.  It reads versioned, frozen summary
-tables from the reliability audit and the sealed RACER-C4/TAME evaluation.  It
+tables from the reliability audit and the sealed TAME evaluation conducted
+under the RACER-C4 protocol.  It
 does not fit a model, regenerate a prediction, inspect an unsealed label, choose
 an endpoint, or change any inferential quantity.
 """
@@ -74,17 +75,23 @@ FIGURE_STEMS = [
     "figure_6_epa_validation",
 ]
 
+# Elsevier's general artwork guidance recommends approximately 7 pt lettering
+# at final printed size.  The figures are authored near a 190 mm two-column
+# width with no text below 9 pt, so lettering remains about 7 pt even when the
+# review manuscript scales the art to its narrower text block.
+ARTWORK_WIDTH = 7.4
+
 
 def configure_style() -> None:
     plt.rcParams.update(
         {
             "font.family": "DejaVu Sans",
-            "font.size": 9.5,
-            "axes.titlesize": 11,
-            "axes.labelsize": 10,
-            "xtick.labelsize": 9,
-            "ytick.labelsize": 9,
-            "legend.fontsize": 8.8,
+            "font.size": 9.6,
+            "axes.titlesize": 10.2,
+            "axes.labelsize": 9.4,
+            "xtick.labelsize": 9.0,
+            "ytick.labelsize": 9.0,
+            "legend.fontsize": 9.0,
             "axes.spines.top": False,
             "axes.spines.right": False,
             "axes.edgecolor": COLORS["outline"],
@@ -147,9 +154,18 @@ def save_figure(fig: plt.Figure, stem: str) -> list[Path]:
     FIGURE_DIR.mkdir(parents=True, exist_ok=True)
     pdf = FIGURE_DIR / f"{stem}.pdf"
     png = FIGURE_DIR / f"{stem}.png"
-    fig.savefig(pdf, bbox_inches="tight", pad_inches=0.04)
-    fig.savefig(png, bbox_inches="tight", pad_inches=0.04)
+    # Write beside the destination and replace atomically only after each
+    # encoder has closed the complete file.  This prevents a synchronizing
+    # workspace or an interrupted renderer from exposing a partial PNG/PDF.
+    pdf_tmp = FIGURE_DIR / f".{stem}.tmp.pdf"
+    png_tmp = FIGURE_DIR / f".{stem}.tmp.png"
+    fig.savefig(pdf_tmp, bbox_inches="tight", pad_inches=0.06)
+    fig.savefig(png_tmp, bbox_inches="tight", pad_inches=0.06)
     plt.close(fig)
+    pdf_tmp.replace(pdf)
+    png_tmp.replace(png)
+    pdf_tmp.unlink(missing_ok=True)
+    png_tmp.unlink(missing_ok=True)
     print("wrote", pdf)
     print("wrote", png)
     return [pdf, png]
@@ -192,13 +208,13 @@ def stage_header(
     title: str,
     color: str,
 ) -> None:
-    ax.text(x, y, label, transform=ax.transAxes, fontsize=14, fontweight="bold", va="top")
+    ax.text(x, y, label, transform=ax.transAxes, fontsize=13, fontweight="bold", va="top")
     ax.text(
         x + 0.032,
         y,
         title,
         transform=ax.transAxes,
-        fontsize=10.5,
+        fontsize=9.6,
         fontweight="bold",
         va="top",
         color=color,
@@ -214,106 +230,68 @@ def stage_header(
 
 
 def figure1_evidence_chain() -> list[Path]:
-    fig, ax = plt.subplots(figsize=(15.0, 6.4))
+    fig, ax = plt.subplots(figsize=(ARTWORK_WIDTH, 8.2))
     ax.set_axis_off()
-
-    xs = [0.018, 0.266, 0.514, 0.762]
-    card_w = 0.218
-    card_y = 0.16
-    card_h = 0.73
-    header_y = 0.84
-
-    for x in xs:
-        rounded_card(
-            ax,
-            x,
-            card_y,
-            card_w,
-            card_h,
-            facecolor="#FAFCFC",
-            edgecolor=COLORS["grid"],
-            linewidth=1.0,
-            radius=0.016,
-        )
-
-    stage_header(ax, xs[0] + 0.012, header_y, card_w - 0.024, "A", "CONFIRMATORY AUDIT", COLORS["teal_dark"])
-    stage_header(ax, xs[1] + 0.012, header_y, card_w - 0.024, "B", "FAILURE SIGNALS", COLORS["coral"])
-    stage_header(ax, xs[2] + 0.012, header_y, card_w - 0.024, "C", "TAME DESIGN", COLORS["teal"])
-    stage_header(ax, xs[3] + 0.012, header_y, card_w - 0.024, "D", "SEALED EPA TEST", COLORS["teal_dark"])
-
-    # Stage A: audit ingredients.
-    x = xs[0]
-    for yy, title, subtitle, fill in [
-        (0.675, "4 public endpoints", "BBBP | ClinTox | ESOL | Lipophilicity", COLORS["mint_light"]),
-        (0.545, "3 label-blind split designs", "Random | scaffold | similarity cluster", COLORS["gray_light"]),
-        (0.365, "5 reliability lenses", "Performance | calibration | domain\nconformal sets | selective retention", "#E8F2F3"),
-    ]:
-        rounded_card(ax, x + 0.022, yy, card_w - 0.044, 0.10 if yy != 0.365 else 0.145, facecolor=fill, edgecolor=fill)
-        ax.text(x + card_w / 2, yy + (0.067 if yy != 0.365 else 0.100), title, transform=ax.transAxes, ha="center", va="center", fontsize=9.4, fontweight="bold")
-        ax.text(x + card_w / 2, yy + (0.035 if yy != 0.365 else 0.052), subtitle, transform=ax.transAxes, ha="center", va="center", fontsize=7.8, color=COLORS["muted"], linespacing=1.2)
-    ax.text(x + card_w / 2, 0.245, "Paired, frozen, repeated-seed evidence", transform=ax.transAxes, ha="center", fontsize=8.5, color=COLORS["teal_dark"], fontweight="bold")
-
-    # Stage B: the three empirical contradictions that motivate the method.
-    x = xs[1]
-    signal_specs = [
-        (0.635, "0.90 overall", "0.07-0.10 positive\nClinTox marginal coverage"),
-        (0.455, "~71% ambiguous", "Mondrian repairs coverage\nby returning {0,1}"),
-        (0.275, "27-31% retained", "ClinTox positives when\n50% of samples remain"),
+    band_x, band_w, band_h = 0.035, 0.93, 0.190
+    content_x = [0.055, 0.3575, 0.660]
+    content_w = 0.285
+    stages = [
+        (0.760, "A", "CONFIRMATORY AUDIT", COLORS["teal_dark"]),
+        (0.535, "B", "FAILURE SIGNALS", COLORS["coral"]),
+        (0.310, "C", "TAME DESIGN", COLORS["teal"]),
+        (0.085, "D", "SEALED EPA EVALUATION", COLORS["teal_dark"]),
     ]
-    for yy, headline, subtitle in signal_specs:
-        rounded_card(ax, x + 0.026, yy, card_w - 0.052, 0.135, facecolor=COLORS["coral_light"], edgecolor="#E9B8AC", linewidth=0.9)
-        ax.text(x + card_w / 2, yy + 0.088, headline, transform=ax.transAxes, ha="center", va="center", fontsize=12.5, fontweight="bold", color=COLORS["coral"])
-        ax.text(x + card_w / 2, yy + 0.040, subtitle, transform=ax.transAxes, ha="center", va="center", fontsize=7.9, color=COLORS["ink"], linespacing=1.15)
+    for y, label, title, accent in stages:
+        rounded_card(ax, band_x, y, band_w, band_h, facecolor="#FAFCFC", edgecolor=COLORS["grid"], radius=0.012)
+        ax.text(0.060, y + 0.158, label, transform=ax.transAxes, fontsize=14, fontweight="bold", va="center")
+        ax.text(0.097, y + 0.158, title, transform=ax.transAxes, fontsize=10.1, fontweight="bold", va="center", color=accent)
+        ax.plot([0.055, 0.945], [y + 0.137, y + 0.137], transform=ax.transAxes, color=accent, linewidth=1.6)
 
-    # Stage C: method components.
-    x = xs[2]
-    rounded_card(ax, x + 0.024, 0.664, card_w - 0.048, 0.105, facecolor=COLORS["mint_light"], edgecolor=COLORS["mint"])
-    ax.text(x + card_w / 2, 0.731, "Two label-free transport views", transform=ax.transAxes, ha="center", fontsize=9.3, fontweight="bold")
-    ax.text(x + card_w / 2, 0.692, "Physicochemical descriptors  +  model scores", transform=ax.transAxes, ha="center", fontsize=7.7, color=COLORS["muted"])
-    rounded_card(ax, x + 0.050, 0.515, card_w - 0.100, 0.090, facecolor="#E8F2F3", edgecolor=COLORS["teal"])
-    ax.text(x + card_w / 2, 0.560, "Transport audit", transform=ax.transAxes, ha="center", va="center", fontsize=9.5, fontweight="bold", color=COLORS["teal_dark"])
-    ax.annotate("", xy=(x + card_w / 2, 0.615), xytext=(x + card_w / 2, 0.655), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.1))
-    rounded_card(ax, x + 0.024, 0.350, card_w - 0.048, 0.105, facecolor="#E5F0F2", edgecolor=COLORS["teal"])
-    ax.text(x + card_w / 2, 0.416, "Baseline-containing consensus", transform=ax.transAxes, ha="center", fontsize=9.2, fontweight="bold")
-    ax.text(x + card_w / 2, 0.378, "Expand uncertainty; never invent confidence", transform=ax.transAxes, ha="center", fontsize=7.7, color=COLORS["muted"])
-    ax.annotate("", xy=(x + card_w / 2, 0.465), xytext=(x + card_w / 2, 0.505), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.1))
-    ax.text(x + card_w / 2, 0.255, "Audit failure: ordinary baseline fallback", transform=ax.transAxes, ha="center", fontsize=8.2, color=COLORS["coral"], fontweight="bold")
+    stage_content = [
+        (
+            0.760,
+            [
+                ("4 public endpoints", "BBBP | ClinTox\nESOL | Lipophilicity", COLORS["mint_light"], COLORS["mint"]),
+                ("3 split designs", "Random | scaffold\nsimilarity cluster", COLORS["gray_light"], COLORS["gray"]),
+                ("5 reliability lenses", "Performance | calibration\ndomain | sets | retention", "#E8F2F3", COLORS["teal_light"]),
+            ],
+        ),
+        (
+            0.535,
+            [
+                ("0.90 overall", "0.07-0.10 positive\nClinTox marginal coverage", COLORS["coral_light"], "#E9B8AC"),
+                ("~71% ambiguous", "Mondrian repairs coverage\nby returning {0,1}", COLORS["coral_light"], "#E9B8AC"),
+                ("27-31% retained", "ClinTox positives at\n50% overall retention", COLORS["coral_light"], "#E9B8AC"),
+            ],
+        ),
+        (
+            0.310,
+            [
+                ("Two label-free views", "Physicochemical\ndescriptors + scores", COLORS["mint_light"], COLORS["mint"]),
+                ("Transport certificate", "Support | ESS | clipping\nAUC | weighted balance", "#E8F2F3", COLORS["teal"]),
+                ("Protected envelope", "Consensus expansion\nexact fallback on failure", "#E5F0F2", COLORS["teal"]),
+            ],
+        ),
+        (
+            0.085,
+            [
+                ("Prediction firewall", "HASH + SEAL\nthen open labels", COLORS["gray_light"], COLORS["blue_gray"]),
+                ("+1.36 pp", "Minimum-class coverage\n95% interval:\n+0.58 to +2.01 pp", COLORS["mint_light"], COLORS["mint"]),
+                ("MacroCSY -1.61 pp", "Inside frozen -5 pp\nefficiency guardrail", "#E8F2F3", COLORS["teal_light"]),
+            ],
+        ),
+    ]
+    for y, cards in stage_content:
+        for x, (title, subtitle, fill, edge) in zip(content_x, cards):
+            rounded_card(ax, x, y + 0.018, content_w, 0.108, facecolor=fill, edgecolor=edge, radius=0.010)
+            headline_size = 13.0 if title == "+1.36 pp" else 9.8
+            headline_color = COLORS["teal_dark"] if title == "+1.36 pp" else (COLORS["coral"] if y == 0.535 else COLORS["ink"])
+            ax.text(x + content_w / 2, y + 0.091, title, transform=ax.transAxes, ha="center", va="center", fontsize=headline_size, fontweight="bold", color=headline_color)
+            ax.text(x + content_w / 2, y + 0.048, subtitle, transform=ax.transAxes, ha="center", va="center", fontsize=9.0, color=COLORS["muted"], linespacing=1.16)
 
-    # Stage D: firewall and final result.
-    x = xs[3]
-    ax.text(x + card_w / 2, 0.725, "predictions", transform=ax.transAxes, ha="center", fontsize=8.0, color=COLORS["muted"])
-    ax.text(x + card_w / 2, 0.674, "HASH + SEAL", transform=ax.transAxes, ha="center", fontsize=11.0, fontweight="bold", color=COLORS["teal_dark"])
-    ax.text(x + card_w / 2, 0.623, "then open labels", transform=ax.transAxes, ha="center", fontsize=8.0, color=COLORS["muted"])
-    ax.annotate("", xy=(x + card_w / 2, 0.635), xytext=(x + card_w / 2, 0.655), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.0))
-    rounded_card(ax, x + 0.026, 0.405, card_w - 0.052, 0.155, facecolor=COLORS["mint_light"], edgecolor=COLORS["mint"])
-    ax.text(x + card_w / 2, 0.505, "+1.36 pp", transform=ax.transAxes, ha="center", fontsize=18, fontweight="bold", color=COLORS["teal_dark"])
-    ax.text(x + card_w / 2, 0.455, "minimum-class coverage", transform=ax.transAxes, ha="center", fontsize=8.8, fontweight="bold")
-    ax.text(x + card_w / 2, 0.425, "95% CI +0.58 to +2.01 pp", transform=ax.transAxes, ha="center", fontsize=7.8, color=COLORS["muted"])
-    ax.text(x + card_w / 2, 0.332, "MacroCSY  -1.61 pp", transform=ax.transAxes, ha="center", fontsize=9.2, fontweight="bold")
-    ax.text(x + card_w / 2, 0.292, "within the frozen -5 pp non-inferiority bound", transform=ax.transAxes, ha="center", fontsize=7.6, color=COLORS["muted"])
-    ax.text(x + card_w / 2, 0.225, "60/60 endpoint-seed cells complete", transform=ax.transAxes, ha="center", fontsize=8.3, color=COLORS["teal_dark"], fontweight="bold")
-
-    # Arrows between the four stages.
-    for left_x, right_x in zip(xs[:-1], xs[1:]):
-        ax.annotate(
-            "",
-            xy=(right_x - 0.007, 0.52),
-            xytext=(left_x + card_w + 0.007, 0.52),
-            xycoords=ax.transAxes,
-            arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.5, mutation_scale=12),
-        )
-
-    ax.text(
-        0.5,
-        0.065,
-        "DIAGNOSIS   >   DESIGN CONSTRAINTS   >   AUDITABLE METHOD   >   INDEPENDENT EVIDENCE",
-        transform=ax.transAxes,
-        ha="center",
-        va="center",
-        fontsize=9.5,
-        fontweight="bold",
-        color=COLORS["teal_dark"],
-    )
+    for upper_y, lower_y in [(0.760, 0.535), (0.535, 0.310), (0.310, 0.085)]:
+        ax.annotate("", xy=(0.50, lower_y + band_h + 0.005), xytext=(0.50, upper_y - 0.005), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.5, mutation_scale=12))
+    ax.text(0.50, 0.025, "60/60 final endpoint-seed cells completed under the prediction-to-label firewall", transform=ax.transAxes, ha="center", fontsize=9.2, fontweight="bold", color=COLORS["teal_dark"])
     return save_figure(fig, "figure_1_evidence_chain")
 
 
@@ -341,7 +319,7 @@ def line_panel(
         }[endpoint]
         ax.plot(x, values, marker="o", linewidth=2.0, markersize=6.5, color=color, label=label)
         for xx, value in zip(x, values):
-            ax.text(xx, value, f" {value:.2f}", fontsize=7.4, color=color, va="bottom")
+            ax.text(xx, value, f" {value:.2f}", fontsize=9.0, color=color, va="bottom")
     if baseline is not None:
         ax.axhline(baseline, color=COLORS["muted"], linestyle="--", linewidth=0.9)
     ax.set_xticks(x, [SPLIT_SHORT[split] for split in SPLITS])
@@ -358,14 +336,14 @@ def figure2_shift_performance() -> list[Path]:
     reg_perf = table("table_rq1_regression_performance.csv")
     class_cal = table("table_rq1_classification_calibration.csv")
 
-    fig, axes = plt.subplots(2, 2, figsize=(12.4, 7.4))
+    fig, axes = plt.subplots(2, 2, figsize=(ARTWORK_WIDTH, 7.8))
     line_panel(
         axes[0, 0],
         class_perf,
         "roc_auc",
         ["bbbp", "clintox"],
         [COLORS["teal_dark"], COLORS["coral"]],
-        "Discrimination under chemical shift",
+        "ROC-AUC under molecular shift",
         "ROC-AUC",
         baseline=0.5,
         ylim=(0.48, 0.93),
@@ -388,7 +366,7 @@ def figure2_shift_performance() -> list[Path]:
         ["esol", "lipophilicity"],
         [COLORS["mint"], COLORS["blue_gray"]],
         "Explained variance",
-        r"$R^2$",
+        "R²",
         baseline=0.0,
         ylim=(-0.70, 0.56),
     )
@@ -409,12 +387,14 @@ def figure2_shift_performance() -> list[Path]:
     fig.text(
         0.5,
         0.012,
-        "Points are descriptive means across frozen model/regime combinations; model-specific cross-seed uncertainty is reported in the Supporting Information.",
+        "Points are descriptive means across frozen model/regime combinations;\n"
+        "model-specific cross-seed uncertainty is reported in the Supporting Information.",
         ha="center",
-        fontsize=8.2,
+        va="bottom",
+        fontsize=9.0,
         color=COLORS["muted"],
     )
-    fig.tight_layout(rect=(0.02, 0.04, 1, 1), h_pad=2.2, w_pad=2.0)
+    fig.tight_layout(rect=(0.02, 0.065, 1, 1), h_pad=2.2, w_pad=2.0)
     return save_figure(fig, "figure_2_shift_performance")
 
 
@@ -428,8 +408,8 @@ def figure3_reliability_illusion() -> list[Path]:
     conformal["method_label"] = conformal["method"].map(method_labels)
     development_summary = read_csv(C4_DEV_DIR / "development_summary.csv")
 
-    fig = plt.figure(figsize=(14.4, 5.9))
-    grid = fig.add_gridspec(1, 3, width_ratios=[1.08, 1.05, 1.22], wspace=0.30)
+    fig = plt.figure(figsize=(ARTWORK_WIDTH, 8.0))
+    grid = fig.add_gridspec(2, 2, height_ratios=[1.0, 1.05], hspace=0.42, wspace=0.34)
 
     # A: the marginal-coverage illusion in ClinTox.
     ax = fig.add_subplot(grid[0, 0])
@@ -450,7 +430,7 @@ def figure3_reliability_illusion() -> list[Path]:
         values = clintox[column].to_numpy()
         ax.bar(x + offset, values, width=width, color=color, edgecolor=COLORS["white"], linewidth=0.8, label=label)
         for xx, value in zip(x + offset, values):
-            ax.text(xx, value + 0.018, f"{value:.2f}", ha="center", fontsize=7.2, rotation=90)
+            ax.text(xx, value + 0.018, f"{value:.2f}", ha="center", fontsize=9.0, rotation=90)
     ax.axhline(0.90, color=COLORS["muted"], linestyle="--", linewidth=1.0)
     ax.set_xticks(x, ["Marginal", "Shift-\nweighted", "Mondrian"])
     ax.set_ylim(0, 1.08)
@@ -485,7 +465,7 @@ def figure3_reliability_illusion() -> list[Path]:
         xy=(0.03, 0.99),
         xytext=(0.28, 0.76),
         arrowprops=dict(arrowstyle="->", color=COLORS["teal_dark"], lw=1.1),
-        fontsize=8.2,
+        fontsize=9.0,
         color=COLORS["teal_dark"],
     )
     ax.set_xlabel("Ambiguous two-label rate")
@@ -502,11 +482,11 @@ def figure3_reliability_illusion() -> list[Path]:
         plt.Line2D([0], [0], marker="o", color="none", markerfacecolor=endpoint_colors[e], markeredgecolor=endpoint_colors[e], markersize=6, label=("BBBP" if e == "bbbp" else "ClinTox"))
         for e in ["bbbp", "clintox"]
     ]
-    ax.legend(handles=method_handles + endpoint_handles, frameon=False, loc="lower right", ncol=1)
+    ax.legend(handles=method_handles + endpoint_handles, frameon=False, loc="lower right", ncol=2, columnspacing=0.9, handletextpad=0.4)
     panel_label(ax, "B")
 
     # C: a public-development counterexample; near-perfect coverage can be useless.
-    ax = fig.add_subplot(grid[0, 2])
+    ax = fig.add_subplot(grid[1, :])
     display = {
         "RACER-C4_TAME": "TAME",
         "ordinary_mondrian_global_stack": "Ordinary Mondrian",
@@ -538,21 +518,29 @@ def figure3_reliability_illusion() -> list[Path]:
         )
         if label in {"TAME", "Ordinary Mondrian", "ECFP-weighted"}:
             offsets = {
-                "TAME": (0.010, 0.003),
+                "TAME": (-0.012, 0.014),
                 "Ordinary Mondrian": (-0.155, -0.015),
                 "ECFP-weighted": (0.014, -0.008),
             }[label]
-            ax.text(float(row["mean_macro_csy"]) + offsets[0], float(row["mean_minimum_class_coverage"]) + offsets[1], label, fontsize=8.0, color=plot_colors[label], fontweight="bold")
+            ax.text(
+                float(row["mean_macro_csy"]) + offsets[0],
+                float(row["mean_minimum_class_coverage"]) + offsets[1],
+                label,
+                fontsize=9.0,
+                color=plot_colors[label],
+                fontweight="bold",
+                ha="right" if label == "TAME" else "left",
+            )
     ax.set_xlabel("Macro correct-singleton yield")
     ax.set_ylabel("Minimum class coverage")
     ax.set_xlim(-0.02, 0.48)
     ax.set_ylim(0.76, 1.015)
     ax.set_title("Public Tox21 development: high coverage can be uninformative", loc="left", pad=9, fontweight="bold")
     clean_axis(ax)
-    ax.text(0.02, 0.772, "Bubble area scales with ambiguity", fontsize=8.0, color=COLORS["muted"])
+    ax.text(0.02, 0.772, "Bubble area scales with ambiguity", fontsize=9.0, color=COLORS["muted"])
     panel_label(ax, "C")
 
-    fig.subplots_adjust(left=0.055, right=0.985, bottom=0.14, top=0.90, wspace=0.30)
+    fig.subplots_adjust(left=0.090, right=0.975, bottom=0.080, top=0.955, hspace=0.42, wspace=0.34)
     return save_figure(fig, "figure_3_reliability_illusion")
 
 
@@ -572,17 +560,17 @@ def heatmap_panel(
     ax.set_yticks(np.arange(len(rows)), rows)
     for i in range(matrix.shape[0]):
         for j in range(matrix.shape[1]):
-            ax.text(j, i, f"{matrix[i, j]:.2f}", ha="center", va="center", fontsize=8.3)
+            ax.text(j, i, f"{matrix[i, j]:.2f}", ha="center", va="center", fontsize=9.0)
     ax.set_title(title, loc="left", pad=9, fontweight="bold")
     cbar = plt.colorbar(image, ax=ax, fraction=0.047, pad=0.03)
-    cbar.ax.tick_params(labelsize=7.5)
+    cbar.ax.tick_params(labelsize=9.0)
 
 
 def figure4_domain_retention() -> list[Path]:
     continuous = table("table_rq2_ad_continuous.csv")
     selective = table("table_rq2_rq3_selective_prediction.csv")
 
-    fig, axes = plt.subplots(2, 2, figsize=(12.6, 7.6))
+    fig, axes = plt.subplots(2, 2, figsize=(ARTWORK_WIDTH, 8.0))
     endpoint_order = ["bbbp", "clintox", "esol", "lipophilicity"]
     row_labels = ["BBBP", "ClinTox", "ESOL", "Lipophilicity"]
     columns = ["Random", "Scaffold", "Cluster"]
@@ -612,12 +600,12 @@ def figure4_domain_retention() -> list[Path]:
         values = np.asarray([float(part.loc[split, "positive_retention_at_05"]) for split in SPLITS])
         ax.bar(x + offset, values, width=width, color=color, edgecolor=COLORS["white"], label=label)
         for xx, value in zip(x + offset, values):
-            ax.text(xx, value + 0.012, f"{100*value:.0f}%", ha="center", fontsize=7.7)
+            ax.text(xx, value + 0.012, f"{100*value:.0f}%", ha="center", fontsize=9.0)
     ax.axhline(0.50, color=COLORS["muted"], linestyle="--", linewidth=0.9)
     ax.set_xticks(x, columns)
     ax.set_ylim(0, 0.57)
     ax.set_ylabel("Positive-class retention")
-    ax.set_title("ClinTox: who remains after 50% rejection?", loc="left", pad=9, fontweight="bold")
+    ax.set_title("ClinTox positive retention\nat 50% coverage", loc="left", pad=9, fontweight="bold")
     clean_axis(ax)
     ax.legend(frameon=False, loc="upper right", ncol=2, columnspacing=1.2, handletextpad=0.5)
     panel_label(ax, "C", x=-0.16)
@@ -637,7 +625,7 @@ def figure4_domain_retention() -> list[Path]:
     ax.axhline(0, color=COLORS["muted"], linewidth=0.9)
     ax.set_xticks(endpoint_x, ["ESOL", "Lipophilicity"])
     ax.set_ylabel("Risk improvement vs random rejection")
-    ax.set_title("Similarity rejection is endpoint dependent", loc="left", pad=9, fontweight="bold")
+    ax.set_title("Regression risk after\nsimilarity rejection", loc="left", pad=9, fontweight="bold")
     clean_axis(ax)
     ax.legend(frameon=False, loc="upper left", ncol=3)
     panel_label(ax, "D", x=-0.16)
@@ -645,105 +633,109 @@ def figure4_domain_retention() -> list[Path]:
     fig.text(
         0.5,
         0.012,
-        "Negative heat-map values indicate increasing risk or miscoverage as similarity decreases. Threshold partitions are sensitivity analyses, not universal chemical-domain rules.",
+        "Negative heat-map values indicate increasing risk or miscoverage as similarity decreases.\n"
+        "Threshold partitions are sensitivity analyses, not universal chemical-domain rules.",
         ha="center",
-        fontsize=8.1,
+        va="bottom",
+        fontsize=9.0,
         color=COLORS["muted"],
     )
-    fig.tight_layout(rect=(0.02, 0.04, 1, 1), h_pad=2.1, w_pad=1.7)
+    fig.tight_layout(rect=(0.02, 0.065, 1, 1), h_pad=2.4, w_pad=2.8)
     return save_figure(fig, "figure_4_domain_retention")
 
 
 def figure5_tame_mechanism() -> list[Path]:
-    fig, ax = plt.subplots(figsize=(15.0, 7.2))
+    fig, ax = plt.subplots(figsize=(ARTWORK_WIDTH, 8.2))
     ax.set_axis_off()
-
-    # A: ordinary baseline.
-    stage_header(ax, 0.025, 0.91, 0.205, "A", "ORDINARY MONDRIAN", COLORS["blue_gray"])
-    rounded_card(ax, 0.035, 0.705, 0.185, 0.125, facecolor=COLORS["gray_light"], edgecolor=COLORS["gray"])
-    ax.text(0.1275, 0.778, "Four ECFP classifiers", transform=ax.transAxes, ha="center", fontsize=9.3, fontweight="bold")
-    ax.text(0.1275, 0.735, "logistic | RF | extra trees | NB", transform=ax.transAxes, ha="center", fontsize=7.7, color=COLORS["muted"])
-    rounded_card(ax, 0.060, 0.535, 0.135, 0.095, facecolor="#E6EFF2", edgecolor=COLORS["blue_gray"])
-    ax.text(0.1275, 0.582, "Logit router", transform=ax.transAxes, ha="center", va="center", fontsize=9.4, fontweight="bold")
-    rounded_card(ax, 0.035, 0.350, 0.185, 0.115, facecolor=COLORS["white"], edgecolor=COLORS["blue_gray"])
-    ax.text(0.1275, 0.420, r"$s_0=p,\quad s_1=1-p$", transform=ax.transAxes, ha="center", fontsize=11.0)
-    ax.text(0.1275, 0.379, "class-specific 90% thresholds", transform=ax.transAxes, ha="center", fontsize=7.9, color=COLORS["muted"])
-    rounded_card(ax, 0.060, 0.185, 0.135, 0.090, facecolor=COLORS["mint_light"], edgecolor=COLORS["mint"])
-    ax.text(0.1275, 0.230, r"baseline set $S_M(x)$", transform=ax.transAxes, ha="center", va="center", fontsize=9.6, fontweight="bold")
-    for y1, y2 in [(0.695, 0.640), (0.525, 0.475), (0.340, 0.285)]:
-        ax.annotate("", xy=(0.1275, y2), xytext=(0.1275, y1), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.1))
-
-    # B: two approved transport views.
-    stage_header(ax, 0.275, 0.91, 0.205, "B", "LABEL-FREE VIEWS", COLORS["teal"])
-    view_specs = [
-        (0.285, 0.640, "Physicochemical view", "MW | logP | TPSA | counts", COLORS["mint_light"], COLORS["mint"]),
-        (0.285, 0.470, "Score view", "four component logits + router", "#E3F0F2", COLORS["teal"]),
+    band_x, band_w, band_h = 0.035, 0.93, 0.190
+    stage_specs = [
+        (0.760, "A", "ORDINARY MONDRIAN BASELINE", COLORS["blue_gray"]),
+        (0.535, "B", "TWO LABEL-FREE TRANSPORT VIEWS", COLORS["teal"]),
+        (0.310, "C", "COMPLETE TRANSPORT CERTIFICATE", COLORS["coral"]),
+        (0.085, "D", "ENVELOPE AND EXACT FALLBACK", COLORS["teal_dark"]),
     ]
-    for x, y, title, subtitle, fill, edge in view_specs:
-        rounded_card(ax, x, y, 0.185, 0.125, facecolor=fill, edgecolor=edge)
-        ax.text(x + 0.0925, y + 0.078, title, transform=ax.transAxes, ha="center", fontsize=9.4, fontweight="bold")
-        ax.text(x + 0.0925, y + 0.040, subtitle, transform=ax.transAxes, ha="center", fontsize=7.7, color=COLORS["muted"])
-    rounded_card(ax, 0.310, 0.265, 0.135, 0.115, facecolor=COLORS["white"], edgecolor=COLORS["teal"])
-    ax.text(0.3775, 0.340, "Weighted Mondrian", transform=ax.transAxes, ha="center", fontsize=9.0, fontweight="bold")
-    ax.text(0.3775, 0.300, r"$S_{phys}(x)$   $S_{score}(x)$", transform=ax.transAxes, ha="center", fontsize=8.5)
-    for x0 in [0.330, 0.425]:
-        ax.annotate("", xy=(0.3775, 0.390), xytext=(x0, 0.460), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.0))
+    for y, label, title, accent in stage_specs:
+        rounded_card(ax, band_x, y, band_w, band_h, facecolor="#FAFCFC", edgecolor=COLORS["grid"], radius=0.012)
+        ax.text(0.060, y + 0.158, label, transform=ax.transAxes, fontsize=14, fontweight="bold", va="center")
+        ax.text(0.097, y + 0.158, title, transform=ax.transAxes, fontsize=10.0, fontweight="bold", va="center", color=accent)
+        ax.plot([0.055, 0.945], [y + 0.137, y + 0.137], transform=ax.transAxes, color=accent, linewidth=1.6)
 
-    # C: certificate before activation.
-    stage_header(ax, 0.525, 0.91, 0.205, "C", "TRANSPORT CERTIFICATE", COLORS["coral"])
-    rounded_card(ax, 0.535, 0.525, 0.185, 0.285, facecolor="#FAFCFC", edgecolor=COLORS["coral"])
+    # A: frozen ordinary baseline.
+    a_y = 0.778
+    a_cards = [
+        (0.055, 0.260, "ECFP classifiers", "logistic | RF\nextra trees | NB", COLORS["gray_light"], COLORS["gray"]),
+        (0.370, 0.260, "Logit router", "four component logits", "#E6EFF2", COLORS["blue_gray"]),
+        (0.685, 0.260, "Ordinary set", r"$s_0=p,\ s_1=1-p$" + "\n" + r"$S_M(x)$ at 90%", COLORS["mint_light"], COLORS["mint"]),
+    ]
+    for x, w, title, subtitle, fill, edge in a_cards:
+        rounded_card(ax, x, a_y, w, 0.108, facecolor=fill, edgecolor=edge)
+        ax.text(x + w / 2, a_y + 0.073, title, transform=ax.transAxes, ha="center", fontsize=9.8, fontweight="bold")
+        ax.text(x + w / 2, a_y + 0.032, subtitle, transform=ax.transAxes, ha="center", va="center", fontsize=9.0, color=COLORS["muted"])
+    for start, end in [((0.320, 0.832), (0.360, 0.832)), ((0.635, 0.832), (0.675, 0.832))]:
+        ax.annotate("", xy=end, xytext=start, xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.3))
+
+    # B: two independently weighted views.
+    b_y = 0.553
+    view_cards = [
+        (0.055, "Physicochemical\nview", "MW | logP\nTPSA | counts", COLORS["mint_light"], COLORS["mint"]),
+        (0.360, "Score view", "component\nlogits + router", "#E3F0F2", COLORS["teal"]),
+    ]
+    for x, title, subtitle, fill, edge in view_cards:
+        rounded_card(ax, x, b_y, 0.275, 0.108, facecolor=fill, edgecolor=edge)
+        ax.text(x + 0.1375, b_y + 0.078, title, transform=ax.transAxes, ha="center", va="center", fontsize=9.8, fontweight="bold", linespacing=1.0)
+        ax.text(x + 0.1375, b_y + 0.027, subtitle, transform=ax.transAxes, ha="center", va="center", fontsize=9.0, color=COLORS["muted"], linespacing=1.0)
+    rounded_card(ax, 0.665, b_y, 0.280, 0.108, facecolor=COLORS["white"], edgecolor=COLORS["teal"])
+    ax.text(0.805, b_y + 0.073, "Weighted sets", transform=ax.transAxes, ha="center", fontsize=9.8, fontweight="bold")
+    ax.text(0.805, b_y + 0.032, r"$S_{phys}(x)$ and $S_{score}(x)$", transform=ax.transAxes, ha="center", fontsize=9.0)
+
+    # C: every check must pass for both approved views.
+    c_y = 0.328
+    rounded_card(ax, 0.055, c_y, 0.650, 0.108, facecolor=COLORS["white"], edgecolor=COLORS["coral"])
     checks = [
-        "source and target n >= 100",
-        "per-class conformal n >= 20",
-        "total and class ESS >= 25%",
-        "clipping at each bound <= 30%",
-        "domain AUC <= 0.99",
-        "weighted balance not worse",
+        "source/target ≥ 100",
+        "class support ≥ 20",
+        "ESS ≥ 25%",
+        "clip ≤ 30%/bound",
+        "domain AUC ≤ .99",
+        "balance not worse",
     ]
     for i, check in enumerate(checks):
-        yy = 0.765 - i * 0.039
-        ax.text(0.555, yy, "OK", transform=ax.transAxes, color=COLORS["teal_dark"], fontsize=7.0, fontweight="bold", va="center")
-        ax.text(0.574, yy, check, transform=ax.transAxes, fontsize=7.8, va="center")
-    rounded_card(ax, 0.555, 0.320, 0.145, 0.100, facecolor=COLORS["coral_light"], edgecolor="#E9B8AC")
-    ax.text(0.6275, 0.373, "Both views pass?", transform=ax.transAxes, ha="center", va="center", fontsize=9.4, fontweight="bold")
-    ax.text(0.6275, 0.340, "all-view quorum", transform=ax.transAxes, ha="center", fontsize=7.6, color=COLORS["muted"])
-    ax.annotate("", xy=(0.6275, 0.430), xytext=(0.6275, 0.515), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.1))
+        col = i // 3
+        row = i % 3
+        xx = 0.075 + col * 0.330
+        yy = c_y + 0.080 - row * 0.031
+        ax.text(xx, yy, "PASS", transform=ax.transAxes, color=COLORS["teal_dark"], fontsize=9.0, fontweight="bold", va="center")
+        ax.text(xx + 0.066, yy, check, transform=ax.transAxes, fontsize=9.0, va="center")
+    rounded_card(ax, 0.745, c_y, 0.200, 0.108, facecolor=COLORS["coral_light"], edgecolor="#E9B8AC")
+    ax.text(0.845, c_y + 0.072, "Both views\npass?", transform=ax.transAxes, ha="center", fontsize=9.5, fontweight="bold", linespacing=1.0)
+    ax.text(0.845, c_y + 0.032, "all-view quorum", transform=ax.transAxes, ha="center", fontsize=9.0, color=COLORS["muted"])
+    ax.annotate("", xy=(0.735, c_y + 0.054), xytext=(0.715, c_y + 0.054), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.2))
 
-    # D: envelope and exact fallback.
-    stage_header(ax, 0.775, 0.91, 0.205, "D", "ENVELOPE + FALLBACK", COLORS["teal_dark"])
-    rounded_card(ax, 0.785, 0.620, 0.185, 0.160, facecolor=COLORS["mint_light"], edgecolor=COLORS["teal_dark"], linewidth=1.2)
-    ax.text(0.8775, 0.726, "Protected-label consensus", transform=ax.transAxes, ha="center", fontsize=9.6, fontweight="bold")
-    ax.text(0.8775, 0.675, r"$S_{TAME}=S_M\cup\{0:\,0\in S_{phys}\cap S_{score}\}$", transform=ax.transAxes, ha="center", fontsize=9.0)
-    ax.text(0.8775, 0.640, "baseline labels are never removed", transform=ax.transAxes, ha="center", fontsize=7.6, color=COLORS["muted"])
-    rounded_card(ax, 0.785, 0.435, 0.185, 0.105, facecolor=COLORS["coral_light"], edgecolor=COLORS["coral"])
-    ax.text(0.8775, 0.493, "Audit fails: ordinary fallback", transform=ax.transAxes, ha="center", fontsize=9.0, fontweight="bold", color=COLORS["coral"])
-    ax.text(0.8775, 0.458, "baseline empty set becomes {0,1}", transform=ax.transAxes, ha="center", fontsize=7.6)
-    rounded_card(ax, 0.785, 0.195, 0.185, 0.165, facecolor="#F7FAFA", edgecolor=COLORS["grid"])
-    invariants = [
-        r"$S_{TAME}\supseteq S_M$",
-        "no empty prediction sets",
-        "no newly created singletons",
-    ]
-    for i, item in enumerate(invariants):
-        yy = 0.315 - i * 0.045
-        ax.text(0.808, yy, "OK", transform=ax.transAxes, color=COLORS["teal_dark"], fontweight="bold", fontsize=7.0, va="center")
-        ax.text(0.831, yy, item, transform=ax.transAxes, fontsize=8.4, va="center")
+    # D: pass expands by consensus; failure returns the ordinary baseline.
+    d_y = 0.103
+    rounded_card(ax, 0.055, d_y, 0.575, 0.108, facecolor=COLORS["mint_light"], edgecolor=COLORS["teal_dark"], linewidth=1.2)
+    ax.text(0.3425, d_y + 0.078, "PASS: protected-label consensus", transform=ax.transAxes, ha="center", fontsize=9.8, fontweight="bold", color=COLORS["teal_dark"])
+    ax.text(0.3425, d_y + 0.045, r"$S_{TAME}=\bar S_M\cup\{0:\,0\in S_{phys}\cap S_{score}\}$", transform=ax.transAxes, ha="center", fontsize=10.2)
+    ax.text(0.3425, d_y + 0.016, "Baseline labels are never removed", transform=ax.transAxes, ha="center", fontsize=9.0, color=COLORS["muted"])
+    rounded_card(ax, 0.660, d_y, 0.285, 0.108, facecolor=COLORS["coral_light"], edgecolor=COLORS["coral"])
+    ax.text(0.8025, d_y + 0.072, "FAIL: exact fallback", transform=ax.transAxes, ha="center", fontsize=9.8, fontweight="bold", color=COLORS["coral"])
+    ax.text(0.8025, d_y + 0.039, r"$S_{TAME}=\bar S_M$", transform=ax.transAxes, ha="center", fontsize=10.2)
+    ax.text(0.8025, d_y + 0.014, "empty baseline -> {0,1}", transform=ax.transAxes, ha="center", fontsize=9.0, color=COLORS["muted"])
 
-    # Main horizontal flow and failure branch.
-    for start, end in [((0.225, 0.50), (0.273, 0.50)), ((0.475, 0.50), (0.523, 0.50)), ((0.725, 0.50), (0.773, 0.50))]:
-        ax.annotate("", xy=end, xytext=start, xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.5, mutation_scale=12))
-    ax.annotate("PASS", xy=(0.785, 0.695), xytext=(0.655, 0.300), xycoords=ax.transAxes, fontsize=7.5, color=COLORS["teal_dark"], fontweight="bold", arrowprops=dict(arrowstyle="-|>", color=COLORS["teal_dark"], lw=1.1, connectionstyle="arc3,rad=-0.20"))
-    ax.annotate("FAIL", xy=(0.785, 0.490), xytext=(0.646, 0.275), xycoords=ax.transAxes, fontsize=7.5, color=COLORS["coral"], fontweight="bold", arrowprops=dict(arrowstyle="-|>", color=COLORS["coral"], lw=1.1, connectionstyle="arc3,rad=0.12"))
-
+    for upper_y, lower_y in [(0.760, 0.535), (0.535, 0.310), (0.310, 0.085)]:
+        ax.annotate("", xy=(0.50, lower_y + band_h + 0.005), xytext=(0.50, upper_y - 0.005), xycoords=ax.transAxes, arrowprops=dict(arrowstyle="-|>", color=COLORS["outline"], lw=1.5, mutation_scale=12))
     ax.text(
-        0.5,
-        0.075,
-        "TAME can turn a baseline singleton into an explicit defer, but it cannot create a new confident singleton.",
+        0.50,
+        0.030,
+        r"$S_{TAME}\supseteq S_M$  |  no empty sets  |  no newly created singletons" "\n"
+        "Only singleton-to-defer transitions are permitted",
         transform=ax.transAxes,
         ha="center",
+        va="center",
         fontsize=9.2,
         fontweight="bold",
         color=COLORS["teal_dark"],
+        linespacing=1.15,
     )
     return save_figure(fig, "figure_5_tame_mechanism")
 
@@ -753,7 +745,7 @@ def figure6_epa_validation() -> list[Path]:
     report = read_json(C4_FINAL_DIR / "publication_final_report.json")
     audit = read_json(C4_FINAL_DIR / "transport_audit_summary.json")
 
-    fig, axes = plt.subplots(2, 2, figsize=(12.7, 7.9))
+    fig, axes = plt.subplots(2, 2, figsize=(ARTWORK_WIDTH, 8.2))
     endpoint_labels = {
         "Tox21_NR_AhR": "NR-AhR",
         "Tox21_NR_ER": "NR-ER",
@@ -773,11 +765,11 @@ def figure6_epa_validation() -> list[Path]:
     ax.hlines(y, 0, values, color=COLORS["teal_light"], linewidth=3.0)
     ax.scatter(values, y, color=COLORS["teal_dark"], s=50, zorder=3)
     for value, yy in zip(values, y):
-        ax.text(value + 0.10, yy, f"{value:+.2f}", va="center", fontsize=8.0, color=COLORS["teal_dark"])
+        ax.text(value + 0.10, yy, f"{value:+.2f}", va="center", fontsize=9.0, color=COLORS["teal_dark"])
     ax.axvline(0, color=COLORS["muted"], linewidth=0.9)
     ax.set_yticks(y, order)
-    ax.set_xlabel("Minimum-class coverage difference (percentage points)")
-    ax.set_title("Six prespecified primary endpoints", loc="left", pad=9, fontweight="bold")
+    ax.set_xlabel("Minimum-class coverage delta (pp)")
+    ax.set_title("Primary endpoint effects", loc="left", pad=9, fontweight="bold")
     ax.set_xlim(-0.2, 2.8)
     clean_axis(ax, grid="x")
     panel_label(ax, "A", x=-0.18)
@@ -792,11 +784,11 @@ def figure6_epa_validation() -> list[Path]:
     ax.set_ylim(-0.8, 0.8)
     ax.set_yticks([])
     ax.set_xlim(-0.25, 2.30)
-    ax.set_xlabel("Endpoint-seed-equal mean difference (percentage points)")
-    ax.set_title("Primary hierarchical-bootstrap inference", loc="left", pad=9, fontweight="bold")
+    ax.set_xlabel("Endpoint-seed-equal mean delta (pp)")
+    ax.set_title("Hierarchical-bootstrap inference", loc="left", pad=9, fontweight="bold")
     ax.text(estimate, 0.24, f"{estimate:+.2f} pp", ha="center", fontsize=12.5, fontweight="bold", color=COLORS["teal_dark"])
-    ax.text((lower + upper) / 2, -0.28, f"95% CI  {lower:+.2f} to {upper:+.2f} pp", ha="center", fontsize=8.8)
-    ax.text((lower + upper) / 2, -0.48, "2,000 draws | seed 44021", ha="center", fontsize=7.7, color=COLORS["muted"])
+    ax.text((lower + upper) / 2, -0.28, f"95% interval  {lower:+.2f} to {upper:+.2f} pp", ha="center", fontsize=9.0)
+    ax.text((lower + upper) / 2, -0.48, "2,000 draws | seed 44021", ha="center", fontsize=9.0, color=COLORS["muted"])
     clean_axis(ax, grid="x")
     panel_label(ax, "B", x=-0.12)
 
@@ -807,15 +799,15 @@ def figure6_epa_validation() -> list[Path]:
     ax.barh(y, macro_by_endpoint, color=colors, edgecolor=COLORS["white"], height=0.62)
     aggregate = 100 * float(report["primary_mean_macro_csy_delta"])
     ax.scatter([aggregate], [-0.75], marker="D", s=58, color=COLORS["teal_dark"], zorder=4)
-    ax.text(aggregate + 0.12, -0.75, f"aggregate {aggregate:+.2f}", va="center", fontsize=8.0, fontweight="bold", color=COLORS["teal_dark"])
+    ax.text(aggregate + 0.12, -0.75, f"aggregate {aggregate:+.2f}", va="center", fontsize=9.0, fontweight="bold", color=COLORS["teal_dark"])
     ax.axvline(-5.0, color=COLORS["coral"], linestyle="--", linewidth=1.2)
     ax.axvline(0.0, color=COLORS["muted"], linewidth=0.9)
-    ax.text(-4.92, len(order) - 0.15, "frozen non-inferiority bound", rotation=90, va="top", fontsize=7.5, color=COLORS["coral"])
+    ax.text(-4.92, len(order) - 0.15, "frozen efficiency guardrail", rotation=90, va="top", fontsize=9.0, color=COLORS["coral"])
     ax.set_yticks(y, order)
     ax.set_ylim(-1.35, len(order) - 0.35)
     ax.set_xlim(-5.5, 0.6)
-    ax.set_xlabel("MacroCSY difference (percentage points)")
-    ax.set_title("Efficiency cost remains inside the -5 pp bound", loc="left", pad=9, fontweight="bold")
+    ax.set_xlabel("MacroCSY delta (pp)")
+    ax.set_title("MacroCSY versus -5 pp guardrail", loc="left", pad=9, fontweight="bold")
     clean_axis(ax, grid="x")
     panel_label(ax, "C", x=-0.18)
 
@@ -831,27 +823,26 @@ def figure6_epa_validation() -> list[Path]:
     ax.set_yticks(np.arange(3), views)
     ax.invert_yaxis()
     ax.set_xlim(0, 66)
-    ax.set_xlabel("Active endpoint-seed cells (of 60)")
-    ax.set_title("Label-blind transport audit and firewall", loc="left", pad=9, fontweight="bold")
+    ax.set_xlabel("Active cells (of 60)")
+    ax.set_title("Transport audit and firewall", loc="left", pad=9, fontweight="bold")
     for bar, value in zip(bars, counts):
-        ax.text(value + 1.2, bar.get_y() + bar.get_height() / 2, f"{value}/60", va="center", fontsize=8.3, fontweight="bold")
+        ax.text(value + 1.2, bar.get_y() + bar.get_height() / 2, f"{value}/60", va="center", fontsize=9.0, fontweight="bold")
     clean_axis(ax, grid="x")
-    ax.text(
-        0.03,
-        -0.30,
-        "PASS  predictions and transport audit hashed before labels\n"
-        "PASS  60/60 endpoint-seed cells completed\n"
-        "PASS  82/82 tests after deterministic interval repair",
-        transform=ax.transAxes,
-        fontsize=8.1,
-        linespacing=1.45,
-        va="top",
+    fig.text(
+        0.50,
+        0.025,
+        "Firewall PASS: predictions and transport audit hashed before labels | 60/60 cells completed\n"
+        "Integrity PASS: deterministic interval repair | 82/82 tests passed",
+        ha="center",
+        fontsize=9.0,
+        linespacing=1.25,
+        va="bottom",
         color=COLORS["teal_dark"],
         fontweight="bold",
     )
     panel_label(ax, "D", x=-0.18)
 
-    fig.tight_layout(rect=(0.02, 0.08, 1, 1), h_pad=2.5, w_pad=2.0)
+    fig.tight_layout(rect=(0.03, 0.12, 0.99, 0.99), h_pad=3.2, w_pad=3.0)
     return save_figure(fig, "figure_6_epa_validation")
 
 

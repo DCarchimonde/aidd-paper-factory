@@ -2,11 +2,11 @@
 
 ## Title
 
-**Beyond Aggregate Reliability in ADMET Prediction: Auditing Chemical Shift and Protecting Weakest-Class Coverage with RACER-C4/TAME**
+**Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope**
 
 ## Purpose
 
-This development release integrates the frozen four-endpoint reliability audit with the frozen RACER-C4/TAME development and independent EPA result. It contains the manuscript source, Supporting Information source, vector figures, reporting-only figure builder, executable lock, cryptographic audit records, frozen summaries, and build instructions.
+This development release integrates the frozen four-endpoint reliability audit with development and independent EPA evaluation of TAME under the frozen RACER-C4 protocol. It contains the manuscript source, Supporting Information source, vector figures, reporting-only figure builder, executable lock, cryptographic audit records, frozen summaries, and build instructions.
 
 ## Evidence stages
 
@@ -19,7 +19,7 @@ This development release integrates the frozen four-endpoint reliability audit w
 - Development seed 99 excluded from scientific conclusions.
 - Paired comparisons within endpoint, split, seed, model, and regime.
 
-### Stage II: RACER-C4/TAME
+### Stage II: TAME under the RACER-C4 protocol
 
 - Public Tox21 leaderboard batch: architecture development only, seeds 101--105.
 - Final EPA batch: one label-firewalled evaluation, fresh seeds 211--215.
@@ -51,7 +51,7 @@ python paper2_admet_benchmark/scripts/34_build_main_figures.py
 
 ## Claim boundary
 
-This package does not authorize claims of exact coverage under arbitrary shift, conditional coverage, clinical safety, or universal superiority. The final result is a coverage gain with efficiency non-inferiority in the locked Tox21 evaluation. Null and adverse endpoint results remain included.
+This package does not authorize claims of exact coverage under arbitrary shift, conditional coverage, clinical safety, formal efficiency non-inferiority, or universal superiority. The final result is a coverage gain with the MacroCSY point estimate inside the prespecified efficiency guardrail in the locked Tox21 evaluation. Null and adverse endpoint results remain included.
 
 ## Archival status
 

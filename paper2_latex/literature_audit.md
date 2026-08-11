@@ -49,6 +49,10 @@ The table below records the intended evidentiary role of every citation. A refer
 | `martins2012bbbp` | 2012 | Dataset | Original BBBP modeling dataset context | ACS publisher page; DOI 10.1021/ci300124c |
 | `tibshirani2019covariate` | 2019 | Weighted conformal | Foundational weighted conformal method under covariate shift | Official NeurIPS proceedings |
 | `guo2017calibration` | 2017 | Calibration | Foundational modern probability-calibration reference | Official ICML proceedings |
+| `laghuvarapu2026kmmcp` | 2026 | Shift-aware conformal preprint | Distinguish TAME's audited logistic transport views from kernel mean matching and selective support overlap | arXiv record 2603.26415 |
+| `yang2026multidistribution` | 2026 | Robust conformal preprint | Distinguish one-source/unlabeled-target TAME from multi-source uniform-validity assumptions | arXiv record 2601.02998 |
+| `wang2025socop` | 2025 | Efficiency-focused conformal preprint | Contrast singleton optimization with TAME's structurally one-sided set expansion | arXiv record 2509.24095, revised 2026 |
+| `gazin2025batch` | 2025 | Batch conformal | Distinguish per-compound TAME sets from joint batch label-vector inference | Official PMLR/AISTATS record |
 
 ## Citation-placement safeguards
 
@@ -58,3 +62,4 @@ The table below records the intended evidentiary role of every citation. A refer
 4. Class-conditional and multivalid references motivate subgroup evaluation, but empirical ClinTox conclusions come only from the frozen outputs of this study.
 5. Recent ADMET platforms establish the practical modeling ecosystem; they do not validate the present benchmark numerically.
 6. Older references are not counted toward the requested recent-literature minimum.
+7. The three 2025--2026 arXiv entries are identified as preprints; they are used for positioning, not as reproduced experimental comparators.
