@@ -17,15 +17,34 @@ def write(name: str, text: str) -> None:
 
 def mean_only_text() -> None:
     df = pd.read_csv(TABLES / "q1_mean_only_regression_summary_v3.csv", keep_default_na=False)
+    primary_effects = pd.read_csv(TABLES / "primary_inference_summary_v3.csv", keep_default_na=False)
     primary = df.loc[df["freeze_label"].eq("main_regression")].set_index("dataset")
     es = primary.loc["ESOL"]
     fs = primary.loc["FreeSolv"]
     same_direction = float(es.mean_effect_size_minus_balanced_rmse) > 0 and float(fs.mean_effect_size_minus_balanced_rmse) > 0
-    interpretation = (
-        "Both effects favored the target-mean-balanced partition, showing that part of the primary regression contrast is already present for a predictor that uses no molecular features. This is the expected mechanical contribution of target-mean alignment to RMSE difficulty."
-        if same_direction else
-        "The two datasets did not show a common directional mean-only effect, so the learned-model contrast cannot be reduced to a universal mean-alignment mechanism."
-    )
+
+    learned = primary_effects.loc[primary_effects["task_type"].eq("regression")].copy()
+    exceed_all = True
+    for dataset, control_row in [("ESOL", es), ("FreeSolv", fs)]:
+        learned_ds = learned.loc[learned["dataset"].eq(dataset), "mean_effect"].astype(float)
+        if len(learned_ds) != 3 or float(control_row.mean_effect_size_minus_balanced_rmse) <= float(learned_ds.max()):
+            exceed_all = False
+            break
+
+    if same_direction:
+        interpretation = (
+            "Both effects favored the target-mean-balanced partition, showing that part of the primary regression contrast is already present for a predictor that uses no molecular features. "
+            "This is the expected mechanical contribution of target-mean alignment to RMSE difficulty."
+        )
+    else:
+        interpretation = (
+            "The two datasets did not show a common directional mean-only effect, so the learned-model contrast cannot be reduced to a universal mean-alignment mechanism."
+        )
+    if exceed_all:
+        interpretation += (
+            " The mean-only effect exceeded the corresponding learned-model mean effect in all six primary regression dataset--model cells; this comparison is descriptive and does not imply an additive decomposition of learned-model RMSE."
+        )
+
     text = (
         "As a mechanistic control, every test molecule was assigned the training-set target mean. For this predictor, test MSE satisfies "
         "$\\mathrm{MSE}=\\mathrm{Var}(y_{\\mathrm{test}})+(\\bar y_{\\mathrm{test}}-\\bar y_{\\mathrm{train}})^2$ exactly. "
@@ -38,9 +57,11 @@ def mean_only_text() -> None:
 
 def collateral_text() -> None:
     df = pd.read_csv(TABLES / "q1_collateral_diagnostics_summary_v3.csv", keep_default_na=False)
+
     def rng(metric: str) -> tuple[float, float]:
         x = df.loc[df["metric"].eq(metric), "mean_delta_balanced_minus_size"].to_numpy(float)
         return float(np.nanmin(x)), float(np.nanmax(x))
+
     largest = rng("largest_test_scaffold_fraction")
     effective = rng("effective_test_scaffolds")
     ks = rng("target_ks_statistic")
