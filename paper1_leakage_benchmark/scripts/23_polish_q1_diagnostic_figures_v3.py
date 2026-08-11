@@ -97,7 +97,6 @@ def figure6() -> None:
         b = g["balanced_abs_target_mean_gap"].to_numpy(float)
         ratio = np.divide(b, s, out=np.full_like(b, np.nan), where=s > 0)
         finite = ratio[np.isfinite(ratio)]
-        # A selected gap can be exactly zero; place it at a plotting floor and retain the exact value in CSV/SI.
         positive_values.extend(finite[finite > 0].tolist())
         floor = max(np.min(finite[finite > 0]) * 0.35, 1e-6) if np.any(finite > 0) else 1e-6
         plotted = np.where(finite > 0, finite, floor)
@@ -194,7 +193,8 @@ def figure_s5() -> None:
         ("main_regression", "B  Primary regression"),
         ("acyclic_singleton_sensitivity", "C  Singleton regression"),
     ]
-    fig, axs = plt.subplots(1, 3, figsize=(7.15, 3.65), wspace=0.38)
+    # Matplotlib compatibility: spacing belongs in GridSpec, not Figure kwargs.
+    fig, axs = plt.subplots(1, 3, figsize=(7.15, 3.65), gridspec_kw={"wspace": 0.38})
     for ax, (label, title) in zip(axs, panels):
         sub = seed.loc[seed["freeze_label"].eq(label)].copy()
         sub["do"] = sub["dataset"].map(DATASET_ORDER); sub["mo"] = sub["model"].map(MODEL_ORDER)
