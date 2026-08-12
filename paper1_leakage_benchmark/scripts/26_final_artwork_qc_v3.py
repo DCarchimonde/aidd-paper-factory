@@ -87,15 +87,23 @@ def panel(ax: plt.Axes, letter: str, title: str, *, letter_x: float = -0.15, tit
             fontweight="bold", ha="left", va="bottom", clip_on=False)
 
 
-def box(ax: plt.Axes, xy, w, h, text, fc, ec, fs=7.0, bold=False) -> None:
+def box(ax: plt.Axes, xy, w, h, text, fc, ec, fs=7.0, bold=False):
     patch = FancyBboxPatch(
         xy, w, h, boxstyle="round,pad=0.010,rounding_size=0.018",
         transform=ax.transAxes, facecolor=fc, edgecolor=ec, linewidth=0.9,
     )
     ax.add_patch(patch)
-    ax.text(xy[0] + w / 2, xy[1] + h / 2, text, transform=ax.transAxes,
-            ha="center", va="center", fontsize=fs,
-            fontweight="bold" if bold else "normal", linespacing=1.06)
+    return ax.text(xy[0] + w / 2, xy[1] + h / 2, text, transform=ax.transAxes,
+                   ha="center", va="center", fontsize=fs,
+                   fontweight="bold" if bold else "normal", linespacing=1.06)
+
+
+def assert_no_text_overlap(fig: plt.Figure, left, right, label: str) -> None:
+    """Fail the build if paired card labels overlap at final publication size."""
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    if left.get_window_extent(renderer=renderer).overlaps(right.get_window_extent(renderer=renderer)):
+        raise AssertionError(f"Artwork text collision detected: {label}")
 
 
 def arrow(ax: plt.Axes, start, end, color=None) -> None:
@@ -138,8 +146,9 @@ def figure1() -> None:
     box(ax, (0.20, 0.51), 0.60, 0.13, "Same realized test size", C["white"], C["mid"], 7.0, True)
     arrow(ax, (0.50, 0.50), (0.25, 0.38), C["gray"])
     arrow(ax, (0.50, 0.50), (0.75, 0.38), C["teal2"])
-    box(ax, (0.02, 0.19), 0.40, 0.17, "Size-matched\ntarget-blind baseline", C["pale_gray"], C["mid"], 6.9, True)
-    box(ax, (0.58, 0.19), 0.40, 0.17, "Target-mean-aware\nsame $n_{test}$", C["pale_teal"], C["teal"], 6.9, True)
+    b_left = box(ax, (0.02, 0.19), 0.40, 0.17, "Size-matched\ntarget-blind baseline", C["pale_gray"], C["mid"], 6.9, True)
+    b_right = box(ax, (0.58, 0.19), 0.40, 0.17, "Target-mean-aware\nsame $n_{test}$", C["pale_teal"], C["teal"], 6.9, True)
+    assert_no_text_overlap(fig, b_left, b_right, "Figure 1B paired selection cards")
     ax.text(0.50, 0.06, "Fixed before outcomes: seed · scaffold rule · candidate budget",
             transform=ax.transAxes, ha="center", fontsize=6.25, color=C["gray"])
 
@@ -162,10 +171,11 @@ def figure1() -> None:
             transform=ax.transAxes, ha="center", fontsize=6.45, color=C["gray"])
 
     ax = fig.add_subplot(gs[1, 1]); ax.set_axis_off(); panel(ax, "D", "Predeclared protocol sensitivities", letter_x=-0.08)
-    box(ax, (0.02, 0.56), 0.40, 0.21, "Acyclic semantics\nsingle-group ↔ singleton", C["pale_blue"], C["navy"], 6.9, True)
-    box(ax, (0.58, 0.56), 0.40, 0.21, "Molecular representation\nsource-faithful ↔ fragment", C["pale_orange"], C["orange"], 6.8, True)
-    arrow(ax, (0.22, 0.54), (0.40, 0.36), C["navy"])
-    arrow(ax, (0.78, 0.54), (0.60, 0.36), C["orange"])
+    d_left = box(ax, (0.01, 0.55), 0.36, 0.23, "Acyclic semantics\nsingle-group ↔\nsingleton", C["pale_blue"], C["navy"], 6.6, True)
+    d_right = box(ax, (0.63, 0.55), 0.36, 0.23, "Record representation\nfull record ↔\nfragment", C["pale_orange"], C["orange"], 6.6, True)
+    assert_no_text_overlap(fig, d_left, d_right, "Figure 1D sensitivity cards")
+    arrow(ax, (0.19, 0.54), (0.40, 0.36), C["navy"])
+    arrow(ax, (0.81, 0.54), (0.60, 0.36), C["orange"])
     box(ax, (0.25, 0.19), 0.50, 0.16, "Does the scientific claim survive?", C["pale_teal"], C["teal"], 7.0, True)
     ax.text(0.50, 0.07, "Disagreements are reported, not resolved post hoc.",
             transform=ax.transAxes, ha="center", fontsize=6.3, color=C["gray"])
