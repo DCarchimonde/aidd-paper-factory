@@ -91,6 +91,40 @@ def supplementary_language_gate() -> list[str]:
     return [phrase for phrase in banned if phrase in combined]
 
 
+def journal_format_gate() -> None:
+    main = (LATEX / "main.tex").read_text(encoding="utf-8")
+    results = (LATEX / "sections" / "results_chemometrics.tex").read_text(encoding="utf-8")
+    refs = (LATEX / "references_joc.tex").read_text(encoding="utf-8")
+
+    required_main = [
+        "\\usepackage[margin=3cm]{geometry}",
+        "\\doublespacing",
+        "\\renewcommand{\\thetable}{\\Roman{table}}",
+        "\\input{references_joc}",
+    ]
+    missing = [token for token in required_main if token not in main]
+    if missing:
+        raise AssertionError("Journal of Chemometrics manuscript formatting missing: " + "; ".join(missing))
+    if "\\bibliography{" in main:
+        raise AssertionError("Legacy BibTeX reference output remains in submission main.tex")
+    if results.count("width=0.895\\textwidth") != 6:
+        raise AssertionError("All six main figures must be placed at the journal reproduction width")
+
+    bibitems = refs.count("\\bibitem{")
+    if bibitems != 24:
+        raise AssertionError(f"Expected 24 audited references, found {bibitems}")
+    reference_checks = [
+        "Landrum GA, Beckers M, Lanini J, Schneider N, Stiefl N, Riniker S.",
+        "Netzeva TI, Worth A, Aldenberg T, et al.",
+        "doi:10.5281/zenodo.21291217",
+        "\\textit{J. Chemom.}",
+        "\\textit{J. Chem. Inf. Model.}",
+    ]
+    missing_refs = [token for token in reference_checks if token not in refs]
+    if missing_refs:
+        raise AssertionError("Audited reference metadata/style missing: " + "; ".join(missing_refs))
+
+
 def pdf_pages(path: Path) -> int | None:
     pdfinfo = shutil.which("pdfinfo")
     if pdfinfo:
@@ -138,13 +172,15 @@ def source_gate() -> None:
     if si_banned:
         raise AssertionError("Outdated/ambiguous Supporting Information wording remains: " + "; ".join(si_banned))
 
-    figure_names = [
-        "figure1_audit_framework_v3.pdf", "figure2_primary_effects_v3.pdf",
-        "figure3_acyclic_sensitivity_v3.pdf", "figure4_dominant_fragment_sensitivity_v3.pdf",
-        "figure5_candidate_budget_audit_v3.pdf", "figure6_collateral_diagnostics_v3.pdf",
-        "figureS1_dataset_construction_v3.pdf", "figureS2_budget_semantics_v3.pdf",
-        "figureS3_multicomponent_audit_v3.pdf", "figureS4_supporting_metrics_v3.pdf",
-        "figureS5_model_seed_sensitivity_v3.pdf",
+    journal_format_gate()
+
+    figure_stems = [
+        "figure1_audit_framework_v3", "figure2_primary_effects_v3",
+        "figure3_acyclic_sensitivity_v3", "figure4_dominant_fragment_sensitivity_v3",
+        "figure5_candidate_budget_audit_v3", "figure6_collateral_diagnostics_v3",
+        "figureS1_dataset_construction_v3", "figureS2_budget_semantics_v3",
+        "figureS3_multicomponent_audit_v3", "figureS4_supporting_metrics_v3",
+        "figureS5_model_seed_sensitivity_v3",
     ]
     required = [
         PAPER / "results" / "tables" / "q1_mean_only_regression_summary_v3.csv",
@@ -154,7 +190,14 @@ def source_gate() -> None:
         PAPER / "results" / "tables" / "q1_raw_source_provenance_v3.csv",
         PAPER / "scripts" / "25_finalize_submission_figures_v3.py",
         PAPER / "scripts" / "26_final_artwork_qc_v3.py",
-    ] + [PAPER / "results" / "figures" / name for name in figure_names]
+        PAPER / "scripts" / "27_joc_submission_artwork_v3.py",
+        LATEX / "references_joc.tex",
+    ]
+    for stem in figure_stems:
+        required.extend([
+            PAPER / "results" / "figures" / f"{stem}.pdf",
+            PAPER / "results" / "figures" / f"{stem}.tiff",
+        ])
     missing = [str(p.relative_to(ROOT)) for p in required if not p.exists()]
     if missing:
         raise FileNotFoundError("Q1 final artifacts missing: " + ", ".join(missing))
@@ -169,13 +212,12 @@ def post_build_gate() -> None:
             raise FileNotFoundError(p)
     pages = pdf_pages(main)
     if pages is None:
-        print("Main-manuscript page count: unavailable automatically; visual audit required.")
-    else:
-        print(f"Main-manuscript pages: {pages}")
-        if pages > 25:
-            print(
-                f"PAGE-COUNT REVIEW: main manuscript is {pages} pages. Keep the compiled artifacts, but reduce the journal submission copy if the target journal counts embedded figures/tables toward its 25-page guidance."
-            )
+        raise AssertionError("Main-manuscript page count could not be verified automatically")
+    print(f"Main-manuscript pages: {pages}")
+    if pages > 25:
+        raise AssertionError(
+            f"Journal of Chemometrics Original Research limit exceeded: {pages} > 25 double-spaced pages"
+        )
 
     for log_name in ["main.log", "supplementary.log"]:
         log = build / log_name
@@ -195,7 +237,7 @@ def main() -> None:
     source_gate()
     if args.post_build:
         post_build_gate()
-    print("Q1 SUBMISSION GATE: PASS")
+    print("Q1 + JOURNAL OF CHEMOMETRICS SUBMISSION GATE: PASS")
 
 
 if __name__ == "__main__":
