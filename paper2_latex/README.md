@@ -70,3 +70,18 @@ The builder writes `paper2_latex/generated_supplementary_tables.tex`. This gener
 - `sections/`: abstract, introduction, methods, results, and discussion
 - `references.bib` and `references_2026.bib`: bibliography
 - `submission_cils/`: cover letter, highlights, and checklist for *Chemometrics and Intelligent Laboratory Systems*
+
+## Build the submission-ready LaTeX archive
+
+The packaging script creates one self-contained archive containing the main
+manuscript, Supporting Information, bibliography, generated SI tables, and the
+six vector figures. It excludes auxiliary build files and row-level data.
+
+~~~powershell
+cd E:\AIDD_Paper_Factory
+python paper2_latex\submission_cils\build_cils_latex_package.py
+~~~
+
+Upload the generated
+`paper2_latex/submission_cils/CILS_Paper2_TAME_LaTeX_Source.zip` using the
+Editorial Manager item type **LaTeX source files**.

@@ -21,7 +21,9 @@
 
 \doublespacing
 \raggedbottom
-\graphicspath{{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
+% The first path makes the submission ZIP self-contained; the second keeps the
+% repository build connected to the frozen publication assets.
+\graphicspath{{figures/}{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
 
 % Permit figures to share pages with neighboring text while keeping each float
 % inside the paragraph boundary at which it is introduced.  A local
@@ -41,7 +43,7 @@
 \author{
 \begin{minipage}{0.94\textwidth}
 \centering
-S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
+Siyuan Tong$^{1,*}$ and Yuechen Wang$^{2}$\\[0.45em]
 \small $^{1}$Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia\\
 \small $^{2}$Faculty of Data Science, City University of Macau, Macau SAR, China\\[0.30em]
 \small $^{*}$Corresponding author: \texttt{25064241@siswa.um.edu.my}

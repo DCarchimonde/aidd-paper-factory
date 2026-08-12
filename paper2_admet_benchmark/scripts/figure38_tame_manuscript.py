@@ -832,7 +832,7 @@ def figure6_epa_validation() -> list[Path]:
         0.50,
         0.025,
         "Firewall PASS: predictions and transport audit hashed before labels | 60/60 cells completed\n"
-        "Integrity PASS: deterministic interval repair | 82/82 tests passed",
+        "Integrity PASS: deterministic interval repair | 96/96 tests passed",
         ha="center",
         fontsize=9.0,
         linespacing=1.25,

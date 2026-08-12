@@ -18,7 +18,7 @@ Thank you for considering our work. We believe it will be of interest to readers
 
 Sincerely,
 
-S. Tong
+Siyuan Tong
 
 Corresponding author
 
