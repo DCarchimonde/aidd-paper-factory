@@ -9,6 +9,7 @@ each final figure is rendered once in the authoritative order below.
 """
 
 import importlib.util
+import textwrap
 from pathlib import Path
 
 from PIL import Image
@@ -97,8 +98,24 @@ def configure_module(module) -> None:
             kwargs["figsize"] = scale_figsize(kwargs["figsize"])
         return original_subplots(*args, **kwargs)
 
+    def final_save(fig, stem: str) -> None:
+        # Long development-stage suptitles are wrapped at the intended journal width
+        # instead of enlarging the tight bounding box beyond the artwork envelope.
+        title = getattr(fig, "_suptitle", None)
+        if title is not None:
+            raw = title.get_text().replace("\n", " ")
+            if len(raw) > 58:
+                title.set_text(textwrap.fill(raw, width=58, break_long_words=False))
+                title.set_fontsize(min(float(title.get_fontsize()), 8.7))
+                title.set_linespacing(1.05)
+        fig.savefig(FIG / f"{stem}.pdf", bbox_inches="tight", pad_inches=0.035)
+        fig.savefig(FIG / f"{stem}.png", dpi=600, bbox_inches="tight", pad_inches=0.035)
+        module.plt.close(fig)
+        print(FIG / f"{stem}.pdf")
+
     module.plt.figure = final_figure
     module.plt.subplots = final_subplots
+    module.save = final_save
 
 
 def draw_card(module, ax, xy, w, h, lines, fc, ec, fs=6.3, bold=True):
