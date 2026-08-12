@@ -1,5 +1,5 @@
 \documentclass[11pt]{article}
-\usepackage[margin=1in]{geometry}
+\usepackage[margin=3cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
 \usepackage{array}
@@ -17,6 +17,10 @@
 \doublespacing
 \graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
 \newcommand{\runningtitle}{Chemometric Audit of Molecular Benchmark Construction}
+
+% Journal of Chemometrics: tables use Roman numerals; citations are superior numbers.
+\renewcommand{\thetable}{\Roman{table}}
+\renewcommand{\bibnumfmt}[1]{#1.}
 
 \setlength{\abovedisplayskip}{6pt plus 2pt minus 2pt}
 \setlength{\belowdisplayskip}{6pt plus 2pt minus 2pt}
@@ -53,6 +57,7 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 \input{sections/discussion_chemometrics}
 \input{statements}
 
-\bibliographystyle{unsrtnat}
-\bibliography{references,references_extra,references_recent,references_v3}
+% Submission-formatted references: appearance order, superior in-text numbering,
+% ACS/CASSI-style abbreviated journal titles, and et al. after six authors.
+\input{references_joc}
 \end{document}
