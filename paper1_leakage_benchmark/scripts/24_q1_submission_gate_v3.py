@@ -62,6 +62,7 @@ def manuscript_language_gate() -> list[str]:
         LATEX / "sections" / "methods_chemometrics.tex",
         LATEX / "sections" / "results_chemometrics.tex",
         LATEX / "sections" / "discussion_chemometrics.tex",
+        LATEX / "statements.tex",
     ]
     combined = "\n".join(p.read_text(encoding="utf-8") for p in paths).lower()
     banned = [
@@ -70,6 +71,7 @@ def manuscript_language_gate() -> list[str]:
         "no reproducible classification gain",
         "proves equivalence",
         "numerical convergence was achieved",
+        "intended to be preserved as an immutable tagged release",
     ]
     return [phrase for phrase in banned if phrase in combined]
 
@@ -151,6 +153,7 @@ def source_gate() -> None:
         PAPER / "results" / "tables" / "q1_cleaning_accounting_v3.csv",
         PAPER / "results" / "tables" / "q1_raw_source_provenance_v3.csv",
         PAPER / "scripts" / "25_finalize_submission_figures_v3.py",
+        PAPER / "scripts" / "26_final_artwork_qc_v3.py",
     ] + [PAPER / "results" / "figures" / name for name in figure_names]
     missing = [str(p.relative_to(ROOT)) for p in required if not p.exists()]
     if missing:
