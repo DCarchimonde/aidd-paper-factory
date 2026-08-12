@@ -47,6 +47,7 @@ def scientific_pipeline() -> None:
     run([sys.executable, str(SCRIPTS / "23_polish_q1_diagnostic_figures_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "25_finalize_submission_figures_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "26_final_artwork_qc_v3.py")], cwd=ROOT)
+    run([sys.executable, str(SCRIPTS / "27_joc_submission_artwork_v3.py")], cwd=ROOT)
     run([sys.executable, str(SCRIPTS / "24_q1_submission_gate_v3.py")], cwd=ROOT)
 
 
@@ -62,12 +63,16 @@ def compile_latex() -> None:
         return
 
     pdflatex = shutil.which("pdflatex")
-    bibtex = shutil.which("bibtex")
-    if not pdflatex or not bibtex:
-        raise RuntimeError("LaTeX compiler not found. Install latexmk (preferred) or pdflatex + bibtex.")
+    if not pdflatex:
+        raise RuntimeError("LaTeX compiler not found. Install latexmk (preferred) or pdflatex.")
 
+    main_text = (LATEX / "main.tex").read_text(encoding="utf-8")
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "main.tex"], cwd=LATEX)
-    run([bibtex, "main"], cwd=LATEX)
+    if "\\bibliography{" in main_text:
+        bibtex = shutil.which("bibtex")
+        if not bibtex:
+            raise RuntimeError("BibTeX is required by main.tex but was not found.")
+        run([bibtex, "main"], cwd=LATEX)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "main.tex"], cwd=LATEX)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "main.tex"], cwd=LATEX)
     run([pdflatex, "-interaction=nonstopmode", "-halt-on-error", "supplementary.tex"], cwd=LATEX)
@@ -105,20 +110,21 @@ def package_submission() -> None:
 
     fig_dir = PAPER / "results" / "figures"
     expected = [
-        "figure1_audit_framework_v3.pdf", "figure2_primary_effects_v3.pdf",
-        "figure3_acyclic_sensitivity_v3.pdf", "figure4_dominant_fragment_sensitivity_v3.pdf",
-        "figure5_candidate_budget_audit_v3.pdf", "figure6_collateral_diagnostics_v3.pdf",
-        "figureS1_dataset_construction_v3.pdf", "figureS2_budget_semantics_v3.pdf",
-        "figureS3_multicomponent_audit_v3.pdf", "figureS4_supporting_metrics_v3.pdf",
-        "figureS5_model_seed_sensitivity_v3.pdf",
+        "figure1_audit_framework_v3", "figure2_primary_effects_v3",
+        "figure3_acyclic_sensitivity_v3", "figure4_dominant_fragment_sensitivity_v3",
+        "figure5_candidate_budget_audit_v3", "figure6_collateral_diagnostics_v3",
+        "figureS1_dataset_construction_v3", "figureS2_budget_semantics_v3",
+        "figureS3_multicomponent_audit_v3", "figureS4_supporting_metrics_v3",
+        "figureS5_model_seed_sensitivity_v3",
     ]
     outfig = BUNDLE / "figures"
     outfig.mkdir(exist_ok=True)
-    for name in expected:
-        src = fig_dir / name
-        if not src.exists():
-            raise FileNotFoundError(src)
-        shutil.copy2(src, outfig / name)
+    for stem in expected:
+        for ext in [".pdf", ".tiff"]:
+            src = fig_dir / f"{stem}{ext}"
+            if not src.exists():
+                raise FileNotFoundError(src)
+            shutil.copy2(src, outfig / src.name)
 
     tables = PAPER / "results" / "tables"
     key_tables = [
@@ -135,6 +141,24 @@ def package_submission() -> None:
         if src.exists():
             shutil.copy2(src, outtables / name)
 
+    # Keep the journal-formatted LaTeX sources together with the exact review PDFs.
+    outsrc = BUNDLE / "latex_source"
+    outsrc.mkdir(exist_ok=True)
+    for name in [
+        "main.tex", "supplementary.tex", "statements.tex", "appendix_chemometrics.tex",
+        "supplementary_figures_v3.tex", "references_joc.tex",
+    ]:
+        src = LATEX / name
+        if src.exists():
+            shutil.copy2(src, outsrc / name)
+    for dirname in ["sections", "generated"]:
+        src = LATEX / dirname
+        dst = outsrc / dirname
+        if dst.exists():
+            shutil.rmtree(dst)
+        if src.exists():
+            shutil.copytree(src, dst)
+
     git_sha = capture(["git", "rev-parse", "HEAD"], ROOT)
     git_branch = capture(["git", "branch", "--show-current"], ROOT)
     audit = audit_latex_logs()
@@ -143,7 +167,10 @@ def package_submission() -> None:
         "commit": git_sha,
         "main_pdf": str((BUNDLE / "main.pdf").relative_to(ROOT)),
         "supplementary_pdf": str((BUNDLE / "supplementary.pdf").relative_to(ROOT)),
-        "figures": expected,
+        "figures_pdf_and_tiff": expected,
+        "reference_style": "Journal of Chemometrics / ACS-abbreviated journal titles",
+        "artwork_font": "Arial-family sans serif",
+        "artwork_max_size_mm": [140, 200],
         "latex_audit": audit,
     }
     (BUNDLE / "BUILD_MANIFEST.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
@@ -156,7 +183,7 @@ def package_submission() -> None:
 
 def main() -> None:
     print("=" * 78)
-    print("PAPER 1 Q1 FINAL SCIENTIFIC + VISUAL + REPRODUCIBILITY BUILD")
+    print("PAPER 1 Q1 FINAL SCIENTIFIC + JOC FORMAT + ARTWORK BUILD")
     print("=" * 78)
     run_model_seed_sensitivity()
     scientific_pipeline()
