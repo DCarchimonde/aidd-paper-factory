@@ -23,6 +23,7 @@ Q1_SCRIPTS = [
     SCRIPT_DIR / "24_q1_submission_gate_v3.py",
     SCRIPT_DIR / "25_finalize_submission_figures_v3.py",
     SCRIPT_DIR / "26_final_artwork_qc_v3.py",
+    SCRIPT_DIR / "27_joc_submission_artwork_v3.py",
 ]
 
 
