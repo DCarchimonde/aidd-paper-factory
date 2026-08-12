@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-"""Compatibility wrapper for the Paper 1 round-3 figure builder.
+"""Compatibility + Journal of Chemometrics artwork wrapper for Paper 1.
 
-Some Matplotlib versions reject ``wspace``/``hspace`` when they are passed
-straight to ``plt.subplots``.  The round-3 figure builder uses those kwargs in
-supplementary figure construction.  This wrapper translates them into
-``gridspec_kw`` before executing the frozen plotting module, preserving the
-figure design while making the build portable across Matplotlib releases.
+The frozen round-3 builder is retained as the scientific plotting source.  This
+wrapper adapts Matplotlib spacing across versions, switches publication lettering
+to an Arial-style sans serif, and caps the source canvas width so the exported
+artwork is generated close to the journal's intended reproduction width rather
+than being designed oversized and reduced later.
 """
 
 import importlib.util
@@ -14,6 +14,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TARGET = ROOT / "paper1_leakage_benchmark" / "scripts" / "21_build_manuscript_assets_v3_round3.py"
+JOC_CANVAS_WIDTH_IN = 5.30  # leaves room for tight-bbox labels under the 140-mm journal limit
 
 
 def load_target():
@@ -27,7 +28,19 @@ def load_target():
 
 def main() -> None:
     module = load_target()
+    module.plt.rcParams.update({
+        "font.family": "Arial",
+        "font.sans-serif": ["Arial", "Liberation Sans", "DejaVu Sans"],
+    })
+
+    original_figure = module.plt.figure
     original_subplots = module.plt.subplots
+
+    def journal_figure(*args, **kwargs):
+        figsize = kwargs.get("figsize")
+        if figsize is not None and float(figsize[0]) > JOC_CANVAS_WIDTH_IN:
+            kwargs["figsize"] = (JOC_CANVAS_WIDTH_IN, float(figsize[1]))
+        return original_figure(*args, **kwargs)
 
     def compatible_subplots(*args, **kwargs):
         wspace = kwargs.pop("wspace", None)
@@ -39,11 +52,15 @@ def main() -> None:
             if hspace is not None:
                 gridspec_kw["hspace"] = hspace
             kwargs["gridspec_kw"] = gridspec_kw
+        figsize = kwargs.get("figsize")
+        if figsize is not None and float(figsize[0]) > JOC_CANVAS_WIDTH_IN:
+            kwargs["figsize"] = (JOC_CANVAS_WIDTH_IN, float(figsize[1]))
         return original_subplots(*args, **kwargs)
 
+    module.plt.figure = journal_figure
     module.plt.subplots = compatible_subplots
     module.main()
-    print("ROUND-3 MATPLOTLIB COMPATIBILITY WRAPPER: PASS")
+    print("ROUND-3 JOC ARTWORK COMPATIBILITY WRAPPER: PASS")
 
 
 if __name__ == "__main__":
