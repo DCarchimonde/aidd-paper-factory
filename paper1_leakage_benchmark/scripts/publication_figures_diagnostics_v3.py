@@ -21,7 +21,7 @@ def figure4() -> None:
 
     fig, axs = plt.subplots(1, 2, figsize=(u.WIDTH_IN, 3.55),
                             gridspec_kw={"width_ratios": [0.82, 1.28]})
-    fig.subplots_adjust(left=0.11, right=0.98, top=0.91, bottom=0.18, wspace=0.44)
+    fig.subplots_adjust(left=0.11, right=0.98, top=0.91, bottom=0.25, wspace=0.44)
 
     ax = axs[0]
     u.panel(ax, "A", "Structural consequences")
@@ -44,11 +44,14 @@ def figure4() -> None:
     labels = [f"{r.dataset} · {r.model}" for r in comp.itertuples(index=False)]
     for yy, x1, x2 in zip(y, a, b):
         ax.plot([x1, x2], [yy, yy], color=u.C["mid"], lw=1.0, zorder=1)
-    ax.scatter(a, y, s=17, color=u.C["navy"], label="source-faithful", zorder=2)
-    ax.scatter(b, y, s=18, marker="s", color=u.C["orange"], label="dominant fragment", zorder=2)
+    p_source = ax.scatter(a, y, s=17, color=u.C["navy"], label="source-faithful", zorder=2)
+    p_fragment = ax.scatter(b, y, s=18, marker="s", color=u.C["orange"], label="dominant fragment", zorder=2)
     ax.axvline(0, color=u.C["gray"], ls="--", lw=0.8)
     ax.set_yticks(y, labels); ax.invert_yaxis(); ax.set_xlabel("AUC effect")
-    u.clean(ax, "x"); ax.legend(frameon=False, loc="lower right", fontsize=5.6)
+    u.clean(ax, "x")
+    fig.legend([p_source, p_fragment], ["source-faithful", "dominant fragment"],
+               frameon=False, loc="lower center", ncol=2, fontsize=5.7,
+               bbox_to_anchor=(0.72, 0.055), handletextpad=0.5, columnspacing=1.1)
     u.save(fig, "figure4_dominant_fragment_sensitivity_v3")
 
 
