@@ -115,7 +115,7 @@ def figure_s5() -> None:
               ("main_regression", "B", "Primary regression"),
               ("acyclic_singleton_sensitivity", "C", "Singleton regression")]
     fig, axs = plt.subplots(3, 1, figsize=(u.WIDTH_IN, 5.25))
-    fig.subplots_adjust(left=0.14, right=0.98, top=0.94, bottom=0.12, hspace=0.62)
+    fig.subplots_adjust(left=0.14, right=0.84, top=0.94, bottom=0.12, hspace=0.62)
     colors = {"BACE": u.C["navy"], "BBBP": u.C["teal"], "ClinTox": u.C["orange"],
               "HIV": u.C["purple"], "ESOL": u.C["navy"], "FreeSolv": u.C["teal"]}
     for ax, (freeze_label, letter, title) in zip(axs, panels):
@@ -132,9 +132,10 @@ def figure_s5() -> None:
         ax.axhline(0, color=u.C["gray"], ls=":", lw=0.8); ax.set_xticks([17, 29, 43])
         ax.set_xlabel("Model seed"); ax.set_ylabel("Mean paired effect"); u.clean(ax, "y")
         handles = [Line2D([0], [0], color=colors[d], lw=1.6, label=d) for d in datasets_here]
-        ax.legend(handles=handles, frameon=False, ncol=min(len(handles), 4), loc="upper right",
-                  fontsize=5.7, handlelength=1.3, columnspacing=0.7)
+        ax.legend(handles=handles, frameon=False, ncol=1, loc="upper left",
+                  bbox_to_anchor=(1.01, 1.0), borderaxespad=0.0,
+                  fontsize=5.7, handlelength=1.3, labelspacing=0.25)
     fig.legend(handles=[Line2D([0], [0], color=u.C["ink"], lw=1.2, linestyle="-", label="RF"),
                         Line2D([0], [0], color=u.C["ink"], lw=1.2, linestyle="--", label="XGB")],
-               loc="lower center", ncol=2, frameon=False, bbox_to_anchor=(0.55, 0.015))
+               loc="lower center", ncol=2, frameon=False, bbox_to_anchor=(0.52, 0.015))
     u.save(fig, "figureS5_model_seed_sensitivity_v3")
