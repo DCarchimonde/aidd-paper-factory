@@ -26,8 +26,7 @@ def _forest(ax, df, task, letter, title):
     ax.set_yticks(y, labels)
     ax.invert_yaxis()
     u.clean(ax, "x")
-    ax.set_xlabel("AUC effect: balanced − size-matched" if task == "classification"
-                  else "RMSE improvement: size − balanced")
+    ax.set_xlabel("AUC effect (balanced - size)" if task == "classification" else "RMSE improvement")
 
 
 def build():
@@ -35,9 +34,8 @@ def build():
     df = m.primary_frame()
     cls = df[df["task_type"].eq("classification")]
     reg = df[df["task_type"].eq("regression")]
-    fig, axs = plt.subplots(1, 2, figsize=(u.WIDTH_IN, 3.65),
-                            gridspec_kw={"width_ratios": [1.2, 0.9]})
+    fig, axs = plt.subplots(1, 2, figsize=(u.WIDTH_IN, 3.65), gridspec_kw={"width_ratios": [1.2, 0.9]})
     fig.subplots_adjust(left=0.22, right=0.98, top=0.91, bottom=0.17, wspace=0.60)
-    _forest(axs[0], cls, "classification", "A", "Classification · 0/12")
-    _forest(axs[1], reg, "regression", "B", "Regression · 6/6")
+    _forest(axs[0], cls, "classification", "A", "Classification - 0/12")
+    _forest(axs[1], reg, "regression", "B", "Regression - 6/6")
     u.save(fig, "figure2_primary_effects_v3")
