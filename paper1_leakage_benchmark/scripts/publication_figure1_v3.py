@@ -13,7 +13,7 @@ def build() -> None:
     u.configure()
     fig = plt.figure(figsize=(u.WIDTH_IN, 4.25))
     gs = fig.add_gridspec(2, 2)
-    fig.subplots_adjust(left=0.12, right=0.97, top=0.95, bottom=0.08, wspace=0.42, hspace=0.48)
+    fig.subplots_adjust(left=0.13, right=0.965, top=0.945, bottom=0.09, wspace=0.45, hspace=0.50)
 
     ax = fig.add_subplot(gs[0, 0])
     u.panel(ax, "A", "Audited molecular universe")
@@ -21,6 +21,9 @@ def build() -> None:
     cols = [u.C["navy"] if d in m.CLS else u.C["teal"] for d in m.DATASETS]
     ax.barh(y, vals, color=cols, height=0.56, zorder=2)
     ax.set_yticks(y, m.DATASETS); ax.invert_yaxis(); ax.set_xscale("log")
+    # Keep the displayed log decade range intentional; this also prevents
+    # unused off-view tick artists from crowding the fixed-size panel.
+    ax.set_xlim(5e2, 8e4)
     ax.set_xlabel("Clean molecules"); u.clean(ax, "x")
     for yy, value in zip(y, vals):
         ax.text(value * 1.05, yy, f"{value:,}", va="center", fontsize=6.3)
@@ -29,7 +32,7 @@ def build() -> None:
               frameon=False, loc="lower right", handlelength=1.2)
 
     ax = fig.add_subplot(gs[0, 1]); ax.set_axis_off()
-    u.panel(ax, "B", "Exact-size target-mean perturbation")
+    u.panel(ax, "B", "Exact-size paired selection")
     u.card(ax, (0.17, 0.73), 0.66, 0.16, "Target-blind\ncandidate pool", u.C["pale_blue"], u.C["navy"])
     u.arrow(ax, (0.50, 0.72), (0.50, 0.60))
     u.card(ax, (0.22, 0.47), 0.56, 0.14, "Same test-set size", u.C["white"], u.C["mid"])
@@ -37,7 +40,7 @@ def build() -> None:
     u.card(ax, (0.02, 0.16), 0.43, 0.17, "Size-matched\nbaseline", u.C["pale_gray"], u.C["mid"])
     u.card(ax, (0.55, 0.16), 0.43, 0.17, "Lower target-mean\ngap", u.C["pale_teal"], u.C["teal"])
     ax.text(0.50, 0.04, "seed · scaffold rule · search budget frozen pre-outcome",
-            transform=ax.transAxes, ha="center", fontsize=5.6, color=u.C["gray"])
+            transform=ax.transAxes, ha="center", fontsize=5.5, color=u.C["gray"])
 
     ax = fig.add_subplot(gs[1, 0]); ax.set_axis_off()
     u.panel(ax, "C", "Freeze before model outcomes")
@@ -57,7 +60,7 @@ def build() -> None:
             ha="center", fontsize=5.8, color=u.C["gray"])
 
     ax = fig.add_subplot(gs[1, 1]); ax.set_axis_off()
-    u.panel(ax, "D", "Predeclared protocol sensitivities")
+    u.panel(ax, "D", "Protocol sensitivities")
     u.card(ax, (0.09, 0.65), 0.82, 0.16, "Acyclic semantics\nsingle-group vs singleton",
            u.C["pale_blue"], u.C["navy"])
     u.card(ax, (0.09, 0.41), 0.82, 0.16, "Record representation\nfull record vs fragment",
