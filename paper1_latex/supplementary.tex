@@ -8,7 +8,10 @@
 \usepackage{placeins}
 \usepackage{microtype}
 \usepackage{setspace}
+\usepackage{seqsplit}
+\usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+\Urlmuskip=0mu plus 1mu\relax
 
 \doublespacing
 \graphicspath{{../paper1_leakage_benchmark/figures/}{../paper1_leakage_benchmark/results/figures/}}
@@ -29,10 +32,6 @@
 
 \begin{document}
 \maketitle
-\input{appendix_chemometrics}
-
-\paragraph{Submission-final reproducibility note.}
-The development-stage script sequence recorded above is retained for provenance, but the authoritative publication-final runner is \texttt{32\_build\_paper1\_publication\_final\_v3.py}. It consumes frozen scientific result artifacts, regenerates only manuscript tables and narratives, redraws all eleven figures exactly once through \texttt{31\_publication\_artwork\_final\_v3.py}, applies the source and post-build submission checks, compiles the main manuscript and Supporting Information, and packages the submission bundle. No model fitting, partition generation, or inferential recomputation occurs in this publication-final pass.
-
+\input{appendix_chemometrics_submission}
 \input{supplementary_figures_v3}
 \end{document}
