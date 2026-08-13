@@ -254,13 +254,18 @@ def make_tiffs() -> None:
             image.save(FIG / f"{stem}.tiff", format="TIFF", compression="tiff_lzw", dpi=(600, 600))
 
 
-def pdf_dimensions_mm(path: Path) -> tuple[float, float]:
-    try:
-        from pypdf import PdfReader  # type: ignore
-    except Exception:
-        from PyPDF2 import PdfReader  # type: ignore
-    page = PdfReader(str(path)).pages[0]
-    return float(page.mediabox.width) * 25.4 / 72.0, float(page.mediabox.height) * 25.4 / 72.0
+def tiff_dimensions_mm(path: Path) -> tuple[float, float]:
+    """Read physical artwork dimensions without optional PDF libraries."""
+    with Image.open(path) as image:
+        dpi = image.info.get("dpi", (600.0, 600.0))
+        try:
+            dpi_x = float(dpi[0])
+            dpi_y = float(dpi[1])
+        except Exception:
+            dpi_x = dpi_y = 600.0
+        if dpi_x <= 0 or dpi_y <= 0:
+            dpi_x = dpi_y = 600.0
+        return image.width * 25.4 / dpi_x, image.height * 25.4 / dpi_y
 
 
 def preflight() -> None:
@@ -268,10 +273,12 @@ def preflight() -> None:
     for stem in EXPECTED:
         pdf = FIG / f"{stem}.pdf"
         tiff = FIG / f"{stem}.tiff"
-        if not pdf.exists() or not tiff.exists():
-            raise FileNotFoundError(f"Missing final artwork for {stem}")
-        w, h = pdf_dimensions_mm(pdf)
-        print(f"  {stem}: {w:.1f} x {h:.1f} mm")
+        if not pdf.exists() or pdf.stat().st_size == 0:
+            raise FileNotFoundError(f"Missing/empty vector artwork for {stem}")
+        if not tiff.exists() or tiff.stat().st_size == 0:
+            raise FileNotFoundError(f"Missing/empty TIFF artwork for {stem}")
+        w, h = tiff_dimensions_mm(tiff)
+        print(f"  {stem}: {w:.1f} x {h:.1f} mm (600-dpi TIFF companion)")
         if w > MAX_WIDTH_MM + 0.5 or h > MAX_HEIGHT_MM + 0.5:
             raise AssertionError(f"Artwork envelope exceeded: {stem} = {w:.1f} x {h:.1f} mm")
 
