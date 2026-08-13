@@ -41,6 +41,29 @@ def compact_si_save(module, original_save):
     return save
 
 
+def report_all_dimensions(base) -> None:
+    """Print every artwork size before failing, so one run exposes all violations."""
+    print("\nFINAL ARTWORK DIMENSIONS")
+    violations: list[str] = []
+    for stem in base.EXPECTED:
+        pdf = base.FIG / f"{stem}.pdf"
+        tiff = base.FIG / f"{stem}.tiff"
+        if not pdf.exists() or pdf.stat().st_size == 0:
+            violations.append(f"{stem}: missing/empty PDF")
+            print(f"  {stem}: MISSING/EMPTY PDF")
+            continue
+        if not tiff.exists() or tiff.stat().st_size == 0:
+            violations.append(f"{stem}: missing/empty TIFF")
+            print(f"  {stem}: MISSING/EMPTY TIFF")
+            continue
+        w, h = base.tiff_dimensions_mm(tiff)
+        print(f"  {stem}: {w:.1f} x {h:.1f} mm (600-dpi TIFF companion)")
+        if w > base.MAX_WIDTH_MM + 0.5 or h > base.MAX_HEIGHT_MM + 0.5:
+            violations.append(f"{stem} = {w:.1f} x {h:.1f} mm")
+    if violations:
+        raise AssertionError("Artwork envelope violations: " + "; ".join(violations))
+
+
 def main() -> None:
     base = load_base()
 
@@ -78,7 +101,7 @@ def main() -> None:
     base.figure1(m21)
 
     base.make_tiffs()
-    base.preflight()
+    report_all_dimensions(base)
     print("SUBMISSION-FINAL STRICT ARTWORK BUILDER: PASS")
 
 
