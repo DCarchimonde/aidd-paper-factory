@@ -126,21 +126,34 @@ def journal_format_gate() -> None:
 
 
 def pdf_pages(path: Path) -> int | None:
+    """Dependency-free page counting with optional pdfinfo acceleration."""
     pdfinfo = shutil.which("pdfinfo")
     if pdfinfo:
-        out = subprocess.check_output([pdfinfo, str(path)], text=True, errors="ignore")
-        m = re.search(r"^Pages:\s+(\d+)", out, re.M)
+        try:
+            out = subprocess.check_output([pdfinfo, str(path)], text=True, errors="ignore")
+            m = re.search(r"^Pages:\s+(\d+)", out, re.M)
+            if m:
+                return int(m.group(1))
+        except Exception:
+            pass
+
+    # Standard LaTeX PDFs retain page dictionaries with /Type /Page.
+    try:
+        raw = path.read_bytes()
+        count = len(re.findall(rb"/Type\s*/Page(?!s)\b", raw))
+        if count > 0:
+            return count
+    except Exception:
+        pass
+
+    # pdflatex/latexmk logs also record the final page count.
+    log = path.with_suffix(".log")
+    if log.exists():
+        text = log.read_text(encoding="utf-8", errors="ignore")
+        m = re.search(r"Output written on .*?\((\d+) pages?[,)]", text, re.I | re.S)
         if m:
             return int(m.group(1))
-    try:
-        from pypdf import PdfReader  # type: ignore
-        return len(PdfReader(str(path)).pages)
-    except Exception:
-        try:
-            from PyPDF2 import PdfReader  # type: ignore
-            return len(PdfReader(str(path)).pages)
-        except Exception:
-            return None
+    return None
 
 
 def source_gate() -> None:
@@ -188,9 +201,10 @@ def source_gate() -> None:
         PAPER / "results" / "tables" / "q1_model_seed_summary_v3.csv",
         PAPER / "results" / "tables" / "q1_cleaning_accounting_v3.csv",
         PAPER / "results" / "tables" / "q1_raw_source_provenance_v3.csv",
+        PAPER / "scripts" / "21_build_manuscript_assets_v3_round3.py",
         PAPER / "scripts" / "25_finalize_submission_figures_v3.py",
         PAPER / "scripts" / "26_final_artwork_qc_v3.py",
-        PAPER / "scripts" / "27_joc_submission_artwork_v3.py",
+        PAPER / "scripts" / "28_build_submission_final_artwork_v3.py",
         LATEX / "references_joc.tex",
     ]
     for stem in figure_stems:
