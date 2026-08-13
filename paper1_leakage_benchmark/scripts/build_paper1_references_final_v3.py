@@ -28,16 +28,25 @@ def blocks(text: str) -> dict[str, str]:
     return out
 
 
+def final_block(key: str, block: str) -> str:
+    if key == "pedregosa2011scikit" and "jmlr.org" not in block.lower():
+        block = block.rstrip()
+        if block.endswith("."):
+            block = block[:-1]
+        block += ". \\url{https://www.jmlr.org/papers/v12/pedregosa11a.html}. Accessed August 13, 2026."
+    return block
+
+
 def main() -> None:
     found = blocks(SOURCE.read_text(encoding="utf-8"))
     missing = [key for key in ORDER if key not in found]
     if missing:
         raise AssertionError("Missing bibliography keys: " + ", ".join(missing))
     output = "\\begin{thebibliography}{99}\n\n"
-    output += "\n\n".join(found[key] for key in ORDER)
+    output += "\n\n".join(final_block(key, found[key]) for key in ORDER)
     output += "\n\n\\end{thebibliography}\n"
     OUTPUT.write_text(output, encoding="utf-8")
-    print(f"FINAL REFERENCES: PASS ({len(ORDER)})")
+    print(f"FINAL REFERENCES: PASS ({len(ORDER)} cited entries in first-appearance order)")
 
 
 if __name__ == "__main__":
