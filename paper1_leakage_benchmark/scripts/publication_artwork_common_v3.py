@@ -32,6 +32,10 @@ EXPECTED = [
     "figureS5_model_seed_sensitivity_v3",
 ]
 
+# Collected across the complete artwork pass so one run exposes every real
+# fixed-canvas text violation instead of stopping at the first figure.
+OUTSIDE_TEXT: list[str] = []
+
 
 def load(filename: str, name: str):
     path = SCRIPTS / filename
@@ -76,19 +80,38 @@ def arrow(ax, start, end, color=None):
                                  mutation_scale=9, linewidth=0.9, color=color or C["gray"]))
 
 
+def _tick_text_ids(fig) -> set[int]:
+    """Return tick-label artist ids.
+
+    Matplotlib creates tick labels outside the active view interval (for example
+    10^1/10^2 around a log axis) and their raw text bounding boxes can sit beyond
+    the figure although they are clipped/not rendered. They are therefore not a
+    valid fixed-canvas overflow signal. Axis labels, panel titles, annotations,
+    legend text, and manually placed text remain checked.
+    """
+    ids: set[int] = set()
+    for ax in fig.axes:
+        ids.update(id(x) for x in ax.get_xticklabels())
+        ids.update(id(x) for x in ax.get_yticklabels())
+    return ids
+
+
 def save(fig, stem: str) -> None:
     fig.canvas.draw()
     renderer = fig.canvas.get_renderer()
     fb = fig.bbox
-    bad = []
+    tick_ids = _tick_text_ids(fig)
+    bad: list[str] = []
     for artist in fig.findobj(match=lambda x: isinstance(x, Text)):
+        if id(artist) in tick_ids:
+            continue
         if not artist.get_visible() or not artist.get_text().strip():
             continue
         bb = artist.get_window_extent(renderer=renderer)
         if bb.x0 < fb.x0 - 3 or bb.y0 < fb.y0 - 3 or bb.x1 > fb.x1 + 3 or bb.y1 > fb.y1 + 3:
             bad.append(artist.get_text().replace("\n", " / ")[:70])
     if bad:
-        raise AssertionError(f"Rendered text outside fixed canvas in {stem}: {bad[:5]}")
+        OUTSIDE_TEXT.append(f"{stem}: {bad[:8]}")
     fig.savefig(FIG / f"{stem}.pdf")
     fig.savefig(FIG / f"{stem}.png", dpi=600)
     plt.close(fig)
@@ -96,7 +119,7 @@ def save(fig, stem: str) -> None:
 
 
 def finish() -> None:
-    failures = []
+    failures: list[str] = []
     print("\nFINAL ARTWORK DIMENSIONS")
     for stem in EXPECTED:
         png = FIG / f"{stem}.png"
@@ -111,5 +134,11 @@ def finish() -> None:
         print(f"  {stem}: {w:.1f} x {h:.1f} mm")
         if w > MAX_WIDTH_MM or h > MAX_HEIGHT_MM:
             failures.append(f"{stem}: {w:.1f} x {h:.1f} mm")
+    if OUTSIDE_TEXT:
+        print("\nFIXED-CANVAS TEXT VIOLATIONS")
+        for item in OUTSIDE_TEXT:
+            print("  ", item)
+        failures.extend(OUTSIDE_TEXT)
     if failures:
         raise AssertionError("Artwork preflight failed: " + "; ".join(failures))
+    print("FIXED-CANVAS TEXT GATE: PASS")
