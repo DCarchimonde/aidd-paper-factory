@@ -15,6 +15,8 @@ LEGACY_GATE = SCRIPTS / "24_q1_submission_gate_v3.py"
 ARTWORK = SCRIPTS / "31_publication_artwork_final_v3.py"
 REFERENCES = SCRIPTS / "build_paper1_references_final_v3.py"
 FINAL_REFS = LATEX / "references_joc_submission.tex"
+SI_SOURCE = LATEX / "appendix_chemometrics.tex"
+SI_FINAL = LATEX / "appendix_chemometrics_submission.tex"
 
 
 def load(path: Path, name: str):
@@ -46,6 +48,44 @@ def citation_order() -> list[str]:
     return seen
 
 
+def build_si_submission_source() -> None:
+    text = SI_SOURCE.read_text(encoding="utf-8")
+
+    hash_re = re.compile(
+        r"The frozen production registry recorded partition-registry SHA-256 "
+        r"\\texttt\{([0-9a-f]+)\} and artifact-registry SHA-256 "
+        r"\\texttt\{([0-9a-f]+)\}\."
+    )
+    match = hash_re.search(text)
+    if match is None:
+        raise AssertionError("Frozen registry hashes were not found in Supporting Information source")
+    partition_hash, artifact_hash = match.groups()
+    hash_block = (
+        "The frozen production registry hashes are preserved below for exact artifact verification:\n\n"
+        "\\begin{quote}\n\\small\n"
+        "\\textbf{Partition registry SHA-256:}\\\\\n"
+        f"{{\\ttfamily\\seqsplit{{{partition_hash}}}}}\\\\[0.35em]\n"
+        "\\textbf{Artifact registry SHA-256:}\\\\\n"
+        f"{{\\ttfamily\\seqsplit{{{artifact_hash}}}}}\n"
+        "\\end{quote}"
+    )
+    text = hash_re.sub(lambda _: hash_block, text, count=1)
+
+    marker = "\\section{Reproducibility and Artifact Map}"
+    if marker not in text:
+        raise AssertionError("Supporting Information reproducibility section not found")
+    prefix = text.split(marker, 1)[0]
+    repro = r"""\section{Reproducibility and Artifact Map}
+\label{sec:si-repro}
+
+The scientific workflow separates frozen analysis from publication-only rendering. Molecular identity and row lineage are defined in \path{shared_utils/cleaning_policy_v2.py}; scaffold semantics and partition hashing in \path{shared_utils/scaffold_identity.py}; and target-blind candidate generation with exact-size pairing in \path{shared_utils/split_candidate_pool_v3.py}. Scripts 05--12 perform split auditing, protocol freezing, model readiness, fitting, completeness checks, and partition-level inference; scripts 13--15 implement the disconnected-component sensitivity. The frozen protocols are recorded in \path{REBUILD_PROTOCOL_V3.md}, \path{MODEL_PROTOCOL_V3.md}, and \path{PARENT_FRAGMENT_SENSITIVITY_PROTOCOL_V3.md}.
+
+The authoritative publication-final runner is \path{paper1_leakage_benchmark/scripts/32_build_paper1_publication_final_v3.py}. It consumes the frozen scientific result artifacts, regenerates manuscript tables and result narratives, constructs the cited reference list, redraws all eleven publication figures exactly once through \path{paper1_leakage_benchmark/scripts/31_publication_artwork_final_v3.py}, applies source and post-build gates, compiles the main manuscript and Supporting Information, and packages the submission bundle. This publication-final pass does not refit models, regenerate partitions, or recompute inferential statistics.
+"""
+    SI_FINAL.write_text(prefix + repro, encoding="utf-8")
+    print("FINAL SUPPORTING-INFORMATION SOURCE: PASS")
+
+
 def source_gate(gate) -> None:
     words = gate.abstract_word_count()
     keywords = gate.keyword_count()
@@ -64,13 +104,23 @@ def source_gate(gate) -> None:
         raise AssertionError(f"Outdated manuscript wording remains: main={banned}; SI={si_banned}")
 
     main = (LATEX / "main.tex").read_text(encoding="utf-8")
+    supplementary = (LATEX / "supplementary.tex").read_text(encoding="utf-8")
+    si_final = SI_FINAL.read_text(encoding="utf-8")
     results = (LATEX / "sections" / "results_chemometrics.tex").read_text(encoding="utf-8")
     refs = FINAL_REFS.read_text(encoding="utf-8")
-    required = ["\\usepackage[margin=3cm]{geometry}", "\\doublespacing",
+    required = ["\\usepackage[margin=3cm]{geometry}", "\\doublespacing", "\\usepackage{xurl}",
                 "\\renewcommand{\\thetable}{\\Roman{table}}", "\\input{references_joc_submission}"]
     missing = [token for token in required if token not in main]
     if missing:
         raise AssertionError("Submission format tokens missing: " + "; ".join(missing))
+    si_required = ["\\usepackage{seqsplit}", "\\usepackage{xurl}", "\\input{appendix_chemometrics_submission}"]
+    si_missing = [token for token in si_required if token not in supplementary]
+    if si_missing:
+        raise AssertionError("Supporting Information formatting tokens missing: " + "; ".join(si_missing))
+    if "32_build_paper1_publication_final_v3.py" not in si_final or "31_publication_artwork_final_v3.py" not in si_final:
+        raise AssertionError("Authoritative publication-final workflow is not documented in Supporting Information")
+    if "22_build_paper1_q1_final_v3.py" in si_final or "The final submission build uses" in si_final:
+        raise AssertionError("Outdated final-build wording remains in publication Supporting Information")
     if results.count("width=0.895\\textwidth") != 6:
         raise AssertionError("All six main figures must retain the intended manuscript placement width")
 
@@ -92,6 +142,24 @@ def source_gate(gate) -> None:
     print("PUBLICATION SOURCE + REFERENCE GATE: PASS")
 
 
+def overfull_box_gate() -> None:
+    build = LATEX / "build_q1_final_v3"
+    failures: list[str] = []
+    pattern = re.compile(r"Overfull \\[hv]box \(([0-9.]+)pt too (?:wide|high)\)")
+    for log_name in ["main.log", "supplementary.log"]:
+        path = build / log_name
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8", errors="ignore")
+        widths = [float(x) for x in pattern.findall(text)]
+        material = [x for x in widths if x > 0.5]
+        if material:
+            failures.append(f"{log_name}: max overfull box {max(material):.3f} pt; count={len(material)}")
+    if failures:
+        raise AssertionError("Material LaTeX overfull boxes remain: " + "; ".join(failures))
+    print("LATEX OVERFULL-BOX GATE: PASS")
+
+
 def main() -> None:
     r = load(LEGACY, "paper1_submission_library")
     gate = load(LEGACY_GATE, "paper1_gate_library")
@@ -101,21 +169,25 @@ def main() -> None:
     r.verify_frozen_inputs()
     r.reset_outputs()
     r.refresh_manuscript_assets()
+    build_si_submission_source()
     r.run([sys.executable, str(REFERENCES)], cwd=ROOT)
     r.run([sys.executable, str(ARTWORK)], cwd=ROOT)
     source_gate(gate)
     r.compile_latex()
     gate.post_build_gate()
+    overfull_box_gate()
     r.package_submission()
 
     outsrc = r.BUNDLE / "latex_source"
     shutil.copy2(FINAL_REFS, outsrc / FINAL_REFS.name)
+    shutil.copy2(SI_FINAL, outsrc / SI_FINAL.name)
     manifest_path = r.BUNDLE / "BUILD_MANIFEST.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["final_artwork_builder"] = "paper1_leakage_benchmark/scripts/31_publication_artwork_final_v3.py"
     manifest["reference_file"] = "paper1_latex/references_joc_submission.tex"
     manifest["reference_count"] = 19
-    manifest["pipeline"] = "frozen science -> generated cited references -> fixed-size artwork -> source gate -> LaTeX -> post-build gate -> bundle"
+    manifest["si_source_file"] = "paper1_latex/appendix_chemometrics_submission.tex"
+    manifest["pipeline"] = "frozen science -> final SI source -> generated cited references -> fixed-size artwork -> source gate -> LaTeX -> post-build/overfull gates -> bundle"
     manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
     print("\n" + "=" * 78)
