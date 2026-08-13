@@ -4,8 +4,8 @@ from __future__ import annotations
 
 This is a thin orchestration layer over the consolidated artwork utilities in
 script 28. It keeps the scientific state frozen and renders each final figure
-exactly once. Statistical/SI figures use a conservative source width so that
-labels and colorbars included by ``bbox_inches='tight'`` remain comfortably
+exactly once. Statistical/SI figures use conservative source widths so labels,
+legends, and colorbars included by ``bbox_inches='tight'`` remain comfortably
 inside the Journal of Chemometrics 140-mm artwork envelope.
 """
 
@@ -33,10 +33,10 @@ def compact_si_save(module, original_save):
         if title is not None:
             if stem == "figureS4_supporting_metrics_v3":
                 title.set_text("Supporting metrics: metric-dependent effects")
-                title.set_fontsize(8.2)
+                title.set_fontsize(8.0)
             elif stem == "figureS5_model_seed_sensitivity_v3":
                 title.set_text("RF/XGB model-seed sensitivity")
-                title.set_fontsize(8.2)
+                title.set_fontsize(8.0)
         original_save(fig, stem)
     return save
 
@@ -44,19 +44,18 @@ def compact_si_save(module, original_save):
 def main() -> None:
     base = load_base()
 
-    # Base/diagnostic figures already had substantial margin below 140 mm at
-    # 5.00 inches, so keep that size for readability.
+    # Base figures already had comfortable margin below 140 mm at 5.00 inches.
     base.TARGET_WIDTH_IN = 5.00
     m21 = base.load_module(base.M21, "paper1_final_base_figures_strict")
     base.configure_module(m21)
     m21.figure3()
     m21.supplementary_figures()
 
-    # S4 has a colorbar and long row labels, so its tight bounding box is wider
-    # than the nominal source canvas. 4.85 inches gives ~3% deterministic margin
-    # (the prior 5.00-inch render measured 140.8 mm) without relaxing the 140-mm
-    # gate or shrinking figure text below the journal-readable font settings.
-    base.TARGET_WIDTH_IN = 4.85
+    # S4's colorbar + long row labels make its tight bounding box much wider than
+    # its nominal canvas. The previous 5.00-inch render measured 140.8 mm. Use
+    # 4.65 inches for the complete m25 group, giving a robust margin rather than
+    # living on the 140-mm boundary. Font point sizes are unchanged.
+    base.TARGET_WIDTH_IN = 4.65
     m25 = base.load_module(base.M25, "paper1_final_effect_figures_strict")
     base.configure_module(m25)
     original_save = m25.save
@@ -65,7 +64,7 @@ def main() -> None:
     m25.figure_s4()
     m25.figure_s5()
 
-    # Diagnostic figures remain at 5.00 inches; they were all <=129 mm.
+    # Diagnostic figures remain at 5.00 inches; all previously measured <=129 mm.
     base.TARGET_WIDTH_IN = 5.00
     m26 = base.load_module(base.M26, "paper1_final_diagnostic_figures_strict")
     base.configure_module(m26)
@@ -73,7 +72,7 @@ def main() -> None:
     m26.figure5()
     m26.figure6()
 
-    # Figure 1 keeps its separately validated, roomier layout. Card overflow is
+    # Figure 1 keeps its separately validated roomier layout; card overflow is
     # checked by the renderer before export.
     base.TARGET_WIDTH_IN = 5.15
     base.figure1(m21)
