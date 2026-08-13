@@ -25,7 +25,7 @@ def figure_s1() -> None:
     ax.legend(frameon=False, ncol=2, loc="upper left")
     for i, r in cleaning.iterrows():
         reduction = int(r.raw_rows - r.final_clean_unique_molecules)
-        ax.annotate(f"−{reduction}" if reduction else "0", xy=(i, float(r.final_clean_unique_molecules)),
+        ax.annotate(f"-{reduction}" if reduction else "0", xy=(i, float(r.final_clean_unique_molecules)),
                     xytext=(0, 6), textcoords="offset points", ha="center", fontsize=6.2, color=u.C["orange2"])
     ax.set_title("Audited raw-to-clean molecular-data construction", loc="left", fontweight="bold")
     u.save(fig, "figureS1_dataset_construction_v3")
@@ -54,7 +54,7 @@ def figure_s3() -> None:
     logged = np.log10(vals + 1)
     cmap = LinearSegmentedColormap.from_list("audit", ["#FFF8DB", "#92D3B5", "#2E9DB6", "#153B73"])
     fig, ax = plt.subplots(figsize=(u.WIDTH_IN, 2.35))
-    fig.subplots_adjust(left=0.15, right=0.90, top=0.85, bottom=0.19)
+    fig.subplots_adjust(left=0.15, right=0.82, top=0.85, bottom=0.19)
     im = ax.imshow(logged, cmap=cmap, aspect="auto")
     ax.set_xticks(range(4), ["Multi-component", "Scaffold changed", "Similarity < 0.90", "Conflict groups"])
     ax.set_yticks(range(3), ds)
@@ -62,8 +62,8 @@ def figure_s3() -> None:
         for j in range(4):
             ax.text(j, i, f"{int(vals[i, j]):,}", ha="center", va="center", fontsize=7.2,
                     color="white" if logged[i, j] > 2.2 else u.C["ink"], fontweight="bold")
-    cax = fig.add_axes([0.92, 0.19, 0.018, 0.66]); cb = fig.colorbar(im, cax=cax)
-    cb.set_label("log10(count + 1)", fontsize=7.0)
+    cax = fig.add_axes([0.86, 0.19, 0.018, 0.66]); cb = fig.colorbar(im, cax=cax)
+    cb.ax.set_title("log10\n(count+1)", fontsize=6.2, pad=3)
     ax.set_title("Disconnected-component structural audit", loc="left", fontweight="bold")
     u.save(fig, "figureS3_multicomponent_audit_v3")
 
@@ -94,7 +94,7 @@ def figure_s4() -> None:
     cmap = LinearSegmentedColormap.from_list("signed", [u.C["orange"], u.C["white"], u.C["teal"]])
     norm = TwoSlopeNorm(vmin=-1, vcenter=0, vmax=1)
     fig = plt.figure(figsize=(u.WIDTH_IN, 4.35)); gs = fig.add_gridspec(2, 1, height_ratios=[1.35, 0.82])
-    fig.subplots_adjust(left=0.23, right=0.86, top=0.92, bottom=0.12, hspace=0.50)
+    fig.subplots_adjust(left=0.23, right=0.96, top=0.92, bottom=0.19, hspace=0.50)
     ax = fig.add_subplot(gs[0, 0]); u.panel(ax, "A", "Classification supporting metrics")
     im = ax.imshow(cls_mat, cmap=cmap, norm=norm, aspect="auto")
     ax.set_yticks(range(len(cls_rows)), cls_rows); ax.set_xticks(range(len(cls_cols)), cls_cols)
@@ -103,8 +103,8 @@ def figure_s4() -> None:
     ax.imshow(reg_mat, cmap=cmap, norm=norm, aspect="auto")
     ax.set_yticks(range(len(reg_rows)), reg_rows); ax.set_xticks(range(len(reg_cols)), reg_cols)
     for spine in ax.spines.values(): spine.set_visible(False)
-    cax = fig.add_axes([0.89, 0.17, 0.02, 0.67]); cbar = fig.colorbar(im, cax=cax)
-    cbar.set_label("Signed mean effect\n(normalized within metric)", fontsize=7.0)
+    cax = fig.add_axes([0.34, 0.07, 0.32, 0.022]); cbar = fig.colorbar(im, cax=cax, orientation="horizontal")
+    cbar.set_label("Normalized signed effect", fontsize=6.4, labelpad=2)
     u.save(fig, "figureS4_supporting_metrics_v3")
 
 
