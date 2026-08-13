@@ -31,7 +31,7 @@
 \maketitle
 \input{appendix_chemometrics}
 
-\noindent\textbf{Final Journal of Chemometrics artwork pass.} After the reproducibility sequence documented in Section~S12, \texttt{27\_joc\_submission\_artwork\_v3.py} applies the submission-only typography and intended-size artwork pass, generates 600-dpi TIFF companions, verifies the 140\,mm $\times$ 200\,mm artwork envelope, and fails if Figure~1 card text cannot be contained within its boxes. This stage changes presentation only and does not recompute scientific results.
+\noindent\textbf{Submission-final artwork pass.} The one-command entrypoint \texttt{17\_build\_paper1\_visual\_submission\_v3.py} delegates to \texttt{30\_build\_paper1\_submission\_final\_v3.py}. Final figures are redrawn once by \texttt{29\_build\_submission\_artwork\_strict\_v3.py} from frozen result artifacts at fixed physical size, with PDF and 600-dpi TIFF output and automated canvas and size checks. This presentation-only stage does not refit models, regenerate partitions, or recompute inferential statistics.
 
 \input{supplementary_figures_v3}
 \end{document}
