@@ -5,6 +5,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.patches import FancyArrowPatch, FancyBboxPatch
+from matplotlib.text import Text
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -80,7 +81,7 @@ def save(fig, stem: str) -> None:
     renderer = fig.canvas.get_renderer()
     fb = fig.bbox
     bad = []
-    for artist in fig.findobj(match=lambda x: isinstance(x, plt.Text)):
+    for artist in fig.findobj(match=lambda x: isinstance(x, Text)):
         if not artist.get_visible() or not artist.get_text().strip():
             continue
         bb = artist.get_window_extent(renderer=renderer)
