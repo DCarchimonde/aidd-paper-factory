@@ -39,7 +39,7 @@ def figure4() -> None:
     ax.legend(frameon=False, loc="upper left", fontsize=5.3, handlelength=1.2, labelspacing=0.22)
 
     ax = axs[1]
-    u.panel(ax, "B", "Effect direction under representation change")
+    u.panel(ax, "B", "Representation-sensitive effects")
     y = np.arange(len(comp)); a = comp[main_col].astype(float).to_numpy(); b = comp[frag_col].astype(float).to_numpy()
     labels = [f"{r.dataset} · {r.model}" for r in comp.itertuples(index=False)]
     for yy, x1, x2 in zip(y, a, b):
@@ -47,7 +47,7 @@ def figure4() -> None:
     ax.scatter(a, y, s=17, color=u.C["navy"], label="source-faithful", zorder=2)
     ax.scatter(b, y, s=18, marker="s", color=u.C["orange"], label="dominant fragment", zorder=2)
     ax.axvline(0, color=u.C["gray"], ls="--", lw=0.8)
-    ax.set_yticks(y, labels); ax.invert_yaxis(); ax.set_xlabel("AUC effect: balanced − size-matched")
+    ax.set_yticks(y, labels); ax.invert_yaxis(); ax.set_xlabel("AUC effect")
     u.clean(ax, "x"); ax.legend(frameon=False, loc="lower right", fontsize=5.6)
     u.save(fig, "figure4_dominant_fragment_sensitivity_v3")
 
@@ -59,7 +59,7 @@ def figure5() -> None:
 
     for j, ds in enumerate(m21.REG):
         ax = axs[0, j]
-        u.panel(ax, "A" if j == 0 else "B", f"{ds} · single-group")
+        u.panel(ax, "A" if j == 0 else "B", f"{ds} - single-group")
         x = np.array(list(m21.BUDGET_SINGLE[ds])); y = np.array(list(m21.BUDGET_SINGLE[ds].values()))
         color = u.C["teal"] if ds == "ESOL" else u.C["navy"]
         ax.plot(x, y, marker="o", ms=3.0, lw=1.15, color=color)
@@ -78,16 +78,13 @@ def figure5() -> None:
     ax.set_ylabel("Gap / 100-candidate gap"); u.clean(ax, "both"); ax.legend(frameon=False)
 
     ax = axs[1, 1]
-    u.panel(ax, "D", "Exact test-size pairing")
+    u.panel(ax, "D", "Exact-size pairing")
     yy = np.arange(len(m21.DATASETS)); vals = np.array([m21.TEST_N[d] for d in m21.DATASETS], float)
     ax.scatter(vals, yy, s=25, color=u.C["navy"], label="size-matched", zorder=3)
     ax.scatter(vals, yy, s=18, marker="s", facecolor=u.C["white"], edgecolor=u.C["teal"],
                linewidth=1.0, label="target-balanced", zorder=4)
     ax.set_yticks(yy, m21.DATASETS); ax.invert_yaxis(); ax.set_xscale("log"); ax.set_xlabel("Test molecules")
     u.clean(ax, "x")
-    for x0, y0 in zip(vals, yy):
-        ax.annotate(f"{int(x0):,}", xy=(x0, y0), xytext=(5, 0), textcoords="offset points",
-                    va="center", fontsize=5.8, color=u.C["gray"])
     ax.legend(frameon=False, loc="lower right", fontsize=5.6)
     u.save(fig, "figure5_candidate_budget_audit_v3")
 
@@ -147,7 +144,7 @@ def figure6() -> None:
         ax.scatter(x, delta, s=9, alpha=0.55, color=u.C["orange"], edgecolors="none")
         ax.scatter([i], [np.mean(delta)], s=25, marker="D", color=u.C["navy2"], zorder=4)
     ax.axhline(0, color=u.C["gray"], ls="--", lw=0.8)
-    ax.set_xticks(range(6), m25.DATASETS, rotation=30, ha="right"); ax.set_ylabel("Balanced − size"); u.clean(ax, "y")
+    ax.set_xticks(range(6), m25.DATASETS, rotation=30, ha="right"); ax.set_ylabel("Balanced - size"); u.clean(ax, "y")
 
     ax = fig.add_subplot(gs[1, 1])
     u.panel(ax, "D", "Effective scaffold number")
