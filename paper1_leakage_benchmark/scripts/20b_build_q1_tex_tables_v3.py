@@ -59,7 +59,8 @@ def mean_only_table() -> None:
     lines = [
         "\\begin{table}[!htbp]", "\\centering",
         "\\caption{Mean-only regression control. The predictor assigns every test molecule the training-set target mean. Positive RMSE effects indicate lower error for the target-mean-balanced partition.}",
-        "\\label{tab:si-mean-only}", "\\begin{tabular}{llrrrrr}", "\\toprule",
+        "\\label{tab:si-mean-only}",
+        "\\resizebox{\\textwidth}{!}{%", "\\begin{tabular}{llrrrrr}", "\\toprule",
         "Analysis & Dataset & Size RMSE & Balanced RMSE & Mean effect & 95\\% CI & Descriptive $P$ \\\\", "\\midrule",
     ]
     for r in df.itertuples(index=False):
@@ -68,7 +69,7 @@ def mean_only_table() -> None:
             f"{label} & {r.dataset} & {fmt(r.mean_size_intercept_rmse)} & {fmt(r.mean_balanced_intercept_rmse)} & "
             f"{fmt(r.mean_effect_size_minus_balanced_rmse)} & [{fmt(r.bootstrap_ci_low)}, {fmt(r.bootstrap_ci_high)}] & {fmt_p(r.wilcoxon_p_descriptive)} \\\\"
         )
-    lines += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
+    lines += ["\\bottomrule", "\\end{tabular}%", "}", "\\end{table}"]
     write("q1_mean_only_table_v3.tex", lines)
 
 
@@ -93,7 +94,6 @@ def collateral_table() -> None:
         for metric in keep:
             r = df[(df.dataset == ds) & (df.metric == metric)].iloc[0]
             ratio = r.mean_ratio_balanced_over_size
-            # Ratios of fractions with structural zeros are unstable and not scientifically useful.
             if metric == "acyclic_test_fraction" or str(ratio) == "" or pd.isna(ratio):
                 ratio_text = "--"
             else:
