@@ -48,6 +48,17 @@ def citation_order() -> list[str]:
     return seen
 
 
+def _hash_lines(value: str) -> str:
+    """Render a SHA-256 as two fixed 32-character lines.
+
+    This is intentionally more deterministic than relying on discretionary TeX
+    line breaks inside a 64-character monospaced token.
+    """
+    if len(value) != 64:
+        raise AssertionError(f"Expected 64-character SHA-256, found {len(value)} characters")
+    return f"\\texttt{{{value[:32]}}}\\\\\n\\texttt{{{value[32:]}}}"
+
+
 def build_si_submission_source() -> None:
     text = SI_SOURCE.read_text(encoding="utf-8")
 
@@ -63,11 +74,12 @@ def build_si_submission_source() -> None:
     hash_block = (
         "The frozen production registry hashes are preserved below for exact artifact verification:\n\n"
         "\\begin{quote}\n\\small\n"
-        "\\textbf{Partition registry SHA-256:}\\\\\n"
-        f"{{\\ttfamily\\seqsplit{{{partition_hash}}}}}\\\\[0.35em]\n"
-        "\\textbf{Artifact registry SHA-256:}\\\\\n"
-        f"{{\\ttfamily\\seqsplit{{{artifact_hash}}}}}\n"
-        "\\end{quote}"
+        "\\textbf{Partition registry SHA-256}\\\\[0.20em]\n"
+        + _hash_lines(partition_hash)
+        + "\\\\[0.60em]\n"
+        "\\textbf{Artifact registry SHA-256}\\\\[0.20em]\n"
+        + _hash_lines(artifact_hash)
+        + "\n\\end{quote}"
     )
     text = hash_re.sub(lambda _: hash_block, text, count=1)
 
@@ -75,12 +87,16 @@ def build_si_submission_source() -> None:
     if marker not in text:
         raise AssertionError("Supporting Information reproducibility section not found")
     prefix = text.split(marker, 1)[0]
+
+    # Keep the publication-facing prose readable. Exact long filenames and paths are
+    # already machine-recorded in BUILD_MANIFEST.json; spelling them out in prose was
+    # the source of large overfull hboxes in the SI.
     repro = r"""\section{Reproducibility and Artifact Map}
 \label{sec:si-repro}
 
-The scientific workflow separates frozen analysis from publication-only rendering. Molecular identity and row lineage are defined in \path{shared_utils/cleaning_policy_v2.py}; scaffold semantics and partition hashing in \path{shared_utils/scaffold_identity.py}; and target-blind candidate generation with exact-size pairing in \path{shared_utils/split_candidate_pool_v3.py}. Scripts 05--12 perform split auditing, protocol freezing, model readiness, fitting, completeness checks, and partition-level inference; scripts 13--15 implement the disconnected-component sensitivity. The frozen protocols are recorded in \path{REBUILD_PROTOCOL_V3.md}, \path{MODEL_PROTOCOL_V3.md}, and \path{PARENT_FRAGMENT_SENSITIVITY_PROTOCOL_V3.md}.
+The scientific workflow separates frozen analysis from publication-only rendering. Dedicated shared utilities define molecular identity and row lineage, scaffold semantics and partition hashing, and target-blind candidate generation with exact-size pairing. The frozen protocol documents record the split construction, predictive-model configuration, and dominant-fragment sensitivity. Scripts 05--15 perform the scientific audit, protocol freezing, model fitting, completeness checks, partition-level inference, and disconnected-component sensitivity.
 
-The authoritative publication-final runner is \path{paper1_leakage_benchmark/scripts/32_build_paper1_publication_final_v3.py}. It consumes the frozen scientific result artifacts, regenerates manuscript tables and result narratives, constructs the cited reference list, redraws all eleven publication figures exactly once through \path{paper1_leakage_benchmark/scripts/31_publication_artwork_final_v3.py}, applies source and post-build gates, compiles the main manuscript and Supporting Information, and packages the submission bundle. This publication-final pass does not refit models, regenerate partitions, or recompute inferential statistics.
+The authoritative publication-final pass is implemented by script 32, with all eleven publication figures rendered exactly once by script 31. This pass consumes only frozen scientific result artifacts, regenerates manuscript tables and result narratives, constructs the cited reference list, applies source and post-build quality gates, compiles the main manuscript and Supporting Information, and packages the submission bundle. It does not refit models, regenerate partitions, or recompute inferential statistics. Exact script paths, source files, and the validated Git commit are recorded in the machine-readable \texttt{BUILD\_MANIFEST.json} supplied with the submission bundle.
 """
     SI_FINAL.write_text(prefix + repro, encoding="utf-8")
     print("FINAL SUPPORTING-INFORMATION SOURCE: PASS")
@@ -113,11 +129,11 @@ def source_gate(gate) -> None:
     missing = [token for token in required if token not in main]
     if missing:
         raise AssertionError("Submission format tokens missing: " + "; ".join(missing))
-    si_required = ["\\usepackage{seqsplit}", "\\usepackage{xurl}", "\\input{appendix_chemometrics_submission}"]
+    si_required = ["\\usepackage{xurl}", "\\input{appendix_chemometrics_submission}"]
     si_missing = [token for token in si_required if token not in supplementary]
     if si_missing:
         raise AssertionError("Supporting Information formatting tokens missing: " + "; ".join(si_missing))
-    if "32_build_paper1_publication_final_v3.py" not in si_final or "31_publication_artwork_final_v3.py" not in si_final:
+    if "publication-final pass is implemented by script 32" not in si_final or "rendered exactly once by script 31" not in si_final:
         raise AssertionError("Authoritative publication-final workflow is not documented in Supporting Information")
     if "22_build_paper1_q1_final_v3.py" in si_final or "The final submission build uses" in si_final:
         raise AssertionError("Outdated final-build wording remains in publication Supporting Information")
@@ -150,11 +166,22 @@ def overfull_box_gate() -> None:
         path = build / log_name
         if not path.exists():
             continue
-        text = path.read_text(encoding="utf-8", errors="ignore")
-        widths = [float(x) for x in pattern.findall(text)]
-        material = [x for x in widths if x > 0.5]
+        lines = path.read_text(encoding="utf-8", errors="ignore").splitlines()
+        material: list[tuple[float, str]] = []
+        for i, line in enumerate(lines):
+            m = pattern.search(line)
+            if not m:
+                continue
+            amount = float(m.group(1))
+            if amount <= 0.5:
+                continue
+            context = " | ".join(lines[i:i + 3])[:350]
+            material.append((amount, context))
         if material:
-            failures.append(f"{log_name}: max overfull box {max(material):.3f} pt; count={len(material)}")
+            print(f"MATERIAL OVERFULL BOXES IN {log_name}")
+            for amount, context in material:
+                print(f"  {amount:.3f} pt :: {context}")
+            failures.append(f"{log_name}: max overfull box {max(x[0] for x in material):.3f} pt; count={len(material)}")
     if failures:
         raise AssertionError("Material LaTeX overfull boxes remain: " + "; ".join(failures))
     print("LATEX OVERFULL-BOX GATE: PASS")
