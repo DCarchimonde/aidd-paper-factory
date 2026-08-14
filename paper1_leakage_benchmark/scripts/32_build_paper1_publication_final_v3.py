@@ -17,6 +17,7 @@ REFERENCES = SCRIPTS / "build_paper1_references_final_v3.py"
 FINAL_REFS = LATEX / "references_joc_submission.tex"
 SI_SOURCE = LATEX / "appendix_chemometrics.tex"
 SI_FINAL = LATEX / "appendix_chemometrics_submission.tex"
+MEAN_ONLY_TEX = LATEX / "generated" / "q1_mean_only_table_v3.tex"
 
 
 def load(path: Path, name: str):
@@ -49,14 +50,24 @@ def citation_order() -> list[str]:
 
 
 def _hash_lines(value: str) -> str:
-    """Render a SHA-256 as two fixed 32-character lines.
-
-    This is intentionally more deterministic than relying on discretionary TeX
-    line breaks inside a 64-character monospaced token.
-    """
     if len(value) != 64:
         raise AssertionError(f"Expected 64-character SHA-256, found {len(value)} characters")
     return f"\\texttt{{{value[:32]}}}\\\\\n\\texttt{{{value[32:]}}}"
+
+
+def _fit_acyclic_table(text: str) -> str:
+    """Constrain the one direct SI table that is naturally wider than the text block."""
+    anchor = "\\label{tab:si-acyclic}"
+    if anchor not in text:
+        raise AssertionError("Acyclic-sensitivity SI table label not found")
+    left, right = text.split(anchor, 1)
+    begin = "\\begin{tabular}{llrrrrr}"
+    end = "\\end{tabular}\n\\end{table}"
+    if begin not in right or end not in right:
+        raise AssertionError("Acyclic-sensitivity SI table structure not found")
+    right = right.replace(begin, "\\resizebox{\\textwidth}{!}{%\n" + begin, 1)
+    right = right.replace(end, "\\end{tabular}%\n}\n\\end{table}", 1)
+    return left + anchor + right
 
 
 def build_si_submission_source() -> None:
@@ -82,15 +93,13 @@ def build_si_submission_source() -> None:
         + "\n\\end{quote}"
     )
     text = hash_re.sub(lambda _: hash_block, text, count=1)
+    text = _fit_acyclic_table(text)
 
     marker = "\\section{Reproducibility and Artifact Map}"
     if marker not in text:
         raise AssertionError("Supporting Information reproducibility section not found")
     prefix = text.split(marker, 1)[0]
 
-    # Keep the publication-facing prose readable. Exact long filenames and paths are
-    # already machine-recorded in BUILD_MANIFEST.json; spelling them out in prose was
-    # the source of large overfull hboxes in the SI.
     repro = r"""\section{Reproducibility and Artifact Map}
 \label{sec:si-repro}
 
@@ -122,6 +131,7 @@ def source_gate(gate) -> None:
     main = (LATEX / "main.tex").read_text(encoding="utf-8")
     supplementary = (LATEX / "supplementary.tex").read_text(encoding="utf-8")
     si_final = SI_FINAL.read_text(encoding="utf-8")
+    mean_only = MEAN_ONLY_TEX.read_text(encoding="utf-8")
     results = (LATEX / "sections" / "results_chemometrics.tex").read_text(encoding="utf-8")
     refs = FINAL_REFS.read_text(encoding="utf-8")
     required = ["\\usepackage[margin=3cm]{geometry}", "\\doublespacing", "\\usepackage{xurl}",
@@ -137,6 +147,10 @@ def source_gate(gate) -> None:
         raise AssertionError("Authoritative publication-final workflow is not documented in Supporting Information")
     if "22_build_paper1_q1_final_v3.py" in si_final or "The final submission build uses" in si_final:
         raise AssertionError("Outdated final-build wording remains in publication Supporting Information")
+    if "\\label{tab:si-acyclic}\n\\resizebox{\\textwidth}{!}{%" not in si_final:
+        raise AssertionError("Acyclic-sensitivity SI table is not width-constrained")
+    if "\\resizebox{\\textwidth}{!}{%" not in mean_only:
+        raise AssertionError("Mean-only SI table is not width-constrained")
     if results.count("width=0.895\\textwidth") != 6:
         raise AssertionError("All six main figures must retain the intended manuscript placement width")
 
