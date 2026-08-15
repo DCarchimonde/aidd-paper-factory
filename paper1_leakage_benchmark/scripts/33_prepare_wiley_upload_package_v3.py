@@ -10,8 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 BUNDLE = ROOT / "paper1_submission_q1_final_v3"
 LATEX_SOURCE = BUNDLE / "latex_source"
-OUT = ROOT / "paper1_wiley_upload_v1_1"
-EXPECTED_COMMIT = "cbd15c8004d453f11eb72b6a72195540c1c600b8"
+OUT = ROOT / "paper1_wiley_upload_v1_2"
 
 MAIN_FIGURES = [
     "figure1_audit_framework_v3",
@@ -29,14 +28,18 @@ def require(path: Path) -> Path:
     return path
 
 
-def verify_bundle() -> dict:
+def current_head() -> str:
+    return subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=str(ROOT), text=True).strip()
+
+
+def verify_bundle(expected_commit: str) -> dict:
     manifest_path = require(BUNDLE / "BUILD_MANIFEST.json")
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     commit = str(manifest.get("commit", "")).strip()
-    if commit != EXPECTED_COMMIT:
+    if commit != expected_commit:
         raise AssertionError(
-            f"Submission bundle commit mismatch: found {commit or '<missing>'}, expected {EXPECTED_COMMIT}. "
-            "Rebuild the final manuscript from paper1-submission-v1.1 before packaging."
+            f"Submission bundle commit mismatch: found {commit or '<missing>'}, expected current HEAD {expected_commit}. "
+            "Run script 32 after pulling the final branch, then run script 33 again."
         )
     require(BUNDLE / "main.pdf")
     require(BUNDLE / "supplementary.pdf")
@@ -128,7 +131,7 @@ def compile_tex(tex_path: Path, cwd: Path, output_name: str) -> Path:
     return destination
 
 
-def build_main_archive(standalone_tex: Path) -> None:
+def build_main_archive(standalone_tex: Path, expected_commit: str) -> None:
     stage = OUT / "_main_latex_bundle"
     if stage.exists():
         shutil.rmtree(stage)
@@ -141,7 +144,7 @@ def build_main_archive(standalone_tex: Path) -> None:
         shutil.copy2(BUNDLE / "figures" / f"{stem}.pdf", figures / f"{stem}.pdf")
     (stage / "README.txt").write_text(
         "Journal of Chemometrics main-manuscript LaTeX bundle\n"
-        f"Frozen manuscript commit: {EXPECTED_COMMIT}\n"
+        f"Frozen manuscript commit: {expected_commit}\n"
         "Compile: latexmk -pdf main.tex\n"
         "The compiled peer-review PDF is included as Main_Manuscript_Peer_Review.pdf.\n",
         encoding="utf-8",
@@ -209,22 +212,16 @@ def copy_submission_files() -> None:
         shutil.copy2(BUNDLE / "figures" / f"{stem}.tiff", figures / f"Figure_{index}.tiff")
 
 
-def write_upload_map() -> None:
-    text = """JOURNAL OF CHEMOMETRICS — WILEY UPLOAD MAP
+def write_upload_map(expected_commit: str) -> None:
+    text = f"""JOURNAL OF CHEMOMETRICS — WILEY UPLOAD MAP
 
-Preferred archive route shown by the Research Exchange upload page:
-1. Main Manuscript -> 01_Main_Manuscript_LaTeX_Bundle.zip
-   The archive contains main.tex, the compiled peer-review PDF, and six PDF figures required for compilation.
-2. Figure -> upload Figures/Figure_1.tiff through Figures/Figure_6.tiff in numerical order.
-3. Supplementary Material for Review -> 03_Supporting_Information.pdf
-4. Cover Letter / Comments -> 04_Cover_Letter.pdf
+Verified source commit: {expected_commit}
 
-Alternative route if the portal insists on separate LaTeX designations:
-- Main Document - LaTeX .tex File -> 01_Main_Document_LaTeX.tex
-- Main Document - LaTeX PDF -> 02_Main_Manuscript_Peer_Review.pdf
-- LaTeX Supplementary File -> 05_LaTeX_Supplementary_Files.zip
-- Supporting Information -> 03_Supporting_Information.pdf
-- Figure -> Figure_1.tiff through Figure_6.tiff
+Main Document - LaTeX .tex File -> 01_Main_Document_LaTeX.tex
+Main Document - LaTeX PDF -> 02_Main_Manuscript_Peer_Review.pdf
+LaTeX Supplementary File -> 05_LaTeX_Supplementary_Files.zip
+Supplementary Material for Review -> 03_Supporting_Information.pdf
+Figure -> Figures/Figure_1.tiff through Figures/Figure_6.tiff
 
 Do not upload PNG versions, result CSV files, BUILD_MANIFEST.json, build directories, or supplementary figures separately. They are already contained in the final Supporting Information PDF or are not publication files.
 """
@@ -232,16 +229,19 @@ Do not upload PNG versions, result CSV files, BUILD_MANIFEST.json, build directo
 
 
 def main() -> None:
-    verify_bundle()
+    expected_commit = current_head()
+    verify_bundle(expected_commit)
     if OUT.exists():
         shutil.rmtree(OUT)
     OUT.mkdir()
     standalone = write_standalone_main()
     copy_submission_files()
-    build_main_archive(standalone)
+    build_main_archive(standalone, expected_commit)
     build_cover_letter()
-    write_upload_map()
+    write_upload_map(expected_commit)
+    (OUT / "FINAL_SOURCE_COMMIT.txt").write_text(expected_commit + "\n", encoding="utf-8")
     print("\nWILEY UPLOAD PACKAGE: PASS")
+    print("Source commit:", expected_commit)
     print("Folder:", OUT)
     for path in sorted(OUT.iterdir()):
         if path.is_file():
