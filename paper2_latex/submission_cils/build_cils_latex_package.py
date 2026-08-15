@@ -4,6 +4,11 @@
 The archive contains only publication sources, the generated Supporting
 Information tables, and the six vector main figures. It intentionally excludes
 auxiliary LaTeX files, PNG previews, model artifacts, and row-level data.
+
+Elsevier Editorial Manager cannot process LaTeX submissions with subfolders,
+so every archive member is deliberately written at the ZIP root. The packaged
+copy of ``main.tex`` is rewritten to use those flat paths; the repository source
+retains its more maintainable directory structure.
 """
 
 from __future__ import annotations
@@ -54,10 +59,27 @@ def source_map() -> dict[str, Path]:
         "references_2026.bib": LATEX_DIR / "references_2026.bib",
     }
     for name in ("abstract", "introduction", "methods", "results", "discussion"):
-        files[f"sections/{name}.tex"] = LATEX_DIR / "sections" / f"{name}.tex"
+        files[f"{name}.tex"] = LATEX_DIR / "sections" / f"{name}.tex"
     for stem in FIGURE_STEMS:
-        files[f"figures/{stem}.pdf"] = FIGURE_DIR / f"{stem}.pdf"
+        files[f"{stem}.pdf"] = FIGURE_DIR / f"{stem}.pdf"
     return files
+
+
+def flattened_main_bytes() -> bytes:
+    """Return the submission copy of main.tex with root-level dependencies."""
+
+    text = (LATEX_DIR / "main.tex").read_text(encoding="utf-8")
+    text = text.replace(
+        "\\graphicspath{{figures/}{../paper2_admet_benchmark/results/manuscript_assets/figures/}}",
+        "\\graphicspath{{./}}",
+    )
+    for name in ("abstract", "introduction", "methods", "results", "discussion"):
+        text = text.replace(f"\\input{{sections/{name}}}", f"\\input{{{name}}}")
+    forbidden = ("sections/", "figures/", "../paper2_admet_benchmark/")
+    leftovers = [token for token in forbidden if token in text]
+    if leftovers:
+        raise RuntimeError(f"Flat main.tex still contains directory paths: {leftovers}")
+    return text.encode("utf-8")
 
 
 def readme_bytes() -> bytes:
@@ -67,8 +89,8 @@ Manuscript: main.tex
 Supporting Information: supplementary.tex
 Authors: Siyuan Tong and Yuechen Wang
 
-The six publication figures are in figures/. main.tex first searches that
-directory, so the archive compiles independently of the research repository.
+All TeX, BibTeX, and figure files are at the ZIP root, as required by Elsevier
+Editorial Manager. The archive compiles independently of the research repository.
 
 Suggested build commands:
   latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error main.tex
@@ -99,7 +121,11 @@ def build() -> Path:
         )
 
     payloads = {name: path.read_bytes() for name, path in sources.items()}
+    payloads["main.tex"] = flattened_main_bytes()
     payloads["README_SUBMISSION.txt"] = readme_bytes()
+    nested = sorted(name for name in payloads if "/" in name or "\\" in name)
+    if nested:
+        raise RuntimeError(f"Editorial Manager archive contains subfolders: {nested}")
     manifest = ["sha256  bytes  file"]
     for name in sorted(payloads):
         data = payloads[name]

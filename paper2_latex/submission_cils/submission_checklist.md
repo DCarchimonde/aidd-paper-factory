@@ -10,6 +10,7 @@ Publishing route: Subscription (no publication fee charged to authors)
 - Self-contained editable LaTeX archive: `CILS_Paper2_TAME_LaTeX_Source.zip`
 - Bibliography files: `references.bib` and `references_2026.bib`
 - Six vector manuscript figure PDFs from the frozen audit/TAME asset package
+- Flat ZIP layout: all TeX, BibTeX, and figure files are at one folder level for Editorial Manager
 - Final Supporting Information PDF: `CILS_Paper2_TAME_Supplementary.pdf`
 - Supporting Information LaTeX source and generated tables
 - `submission_cils/highlights.txt`

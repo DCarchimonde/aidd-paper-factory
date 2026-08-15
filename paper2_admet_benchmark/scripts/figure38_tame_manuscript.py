@@ -85,7 +85,11 @@ ARTWORK_WIDTH = 7.4
 def configure_style() -> None:
     plt.rcParams.update(
         {
-            "font.family": "DejaVu Sans",
+            # Nimbus Sans is the metrically compatible, redistributable
+            # Helvetica implementation available in the build environment.
+            # Helvetica/Arial are among Elsevier's preferred artwork fonts.
+            "font.family": "Nimbus Sans",
+            "mathtext.fontset": "stixsans",
             "font.size": 9.6,
             "axes.titlesize": 10.2,
             "axes.labelsize": 9.4,
@@ -408,8 +412,8 @@ def figure3_reliability_illusion() -> list[Path]:
     conformal["method_label"] = conformal["method"].map(method_labels)
     development_summary = read_csv(C4_DEV_DIR / "development_summary.csv")
 
-    fig = plt.figure(figsize=(ARTWORK_WIDTH, 8.0))
-    grid = fig.add_gridspec(2, 2, height_ratios=[1.0, 1.05], hspace=0.42, wspace=0.34)
+    fig = plt.figure(figsize=(ARTWORK_WIDTH, 8.25))
+    grid = fig.add_gridspec(2, 2, height_ratios=[1.0, 1.05], hspace=0.55, wspace=0.34)
 
     # A: the marginal-coverage illusion in ClinTox.
     ax = fig.add_subplot(grid[0, 0])
@@ -437,7 +441,16 @@ def figure3_reliability_illusion() -> list[Path]:
     ax.set_ylabel("Empirical coverage")
     ax.set_title("ClinTox: class-conditional coverage", loc="left", pad=9, fontweight="bold")
     clean_axis(ax)
-    ax.legend(frameon=False, loc="lower right")
+    ax.legend(
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.20),
+        ncol=3,
+        fontsize=8.3,
+        columnspacing=0.65,
+        handletextpad=0.35,
+        borderaxespad=0.0,
+    )
     panel_label(ax, "A")
 
     # B: class coverage versus ambiguity across split designs.
@@ -482,7 +495,26 @@ def figure3_reliability_illusion() -> list[Path]:
         plt.Line2D([0], [0], marker="o", color="none", markerfacecolor=endpoint_colors[e], markeredgecolor=endpoint_colors[e], markersize=6, label=("BBBP" if e == "bbbp" else "ClinTox"))
         for e in ["bbbp", "clintox"]
     ]
-    ax.legend(handles=method_handles + endpoint_handles, frameon=False, loc="lower right", ncol=2, columnspacing=0.9, handletextpad=0.4)
+    ax.legend(
+        # Matplotlib fills multi-column legends column-first. Reordering keeps
+        # the three method symbols together on the first displayed row and the
+        # two endpoint colours together on the second.
+        handles=[
+            method_handles[0],
+            endpoint_handles[0],
+            method_handles[1],
+            endpoint_handles[1],
+            method_handles[2],
+        ],
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.20),
+        ncol=3,
+        fontsize=8.3,
+        columnspacing=0.65,
+        handletextpad=0.30,
+        borderaxespad=0.0,
+    )
     panel_label(ax, "B")
 
     # C: a public-development counterexample; near-perfect coverage can be useless.
@@ -540,7 +572,7 @@ def figure3_reliability_illusion() -> list[Path]:
     ax.text(0.02, 0.772, "Bubble area scales with ambiguity", fontsize=9.0, color=COLORS["muted"])
     panel_label(ax, "C")
 
-    fig.subplots_adjust(left=0.090, right=0.975, bottom=0.080, top=0.955, hspace=0.42, wspace=0.34)
+    fig.subplots_adjust(left=0.090, right=0.975, bottom=0.075, top=0.955, hspace=0.55, wspace=0.34)
     return save_figure(fig, "figure_3_reliability_illusion")
 
 
@@ -570,7 +602,7 @@ def figure4_domain_retention() -> list[Path]:
     continuous = table("table_rq2_ad_continuous.csv")
     selective = table("table_rq2_rq3_selective_prediction.csv")
 
-    fig, axes = plt.subplots(2, 2, figsize=(ARTWORK_WIDTH, 8.0))
+    fig, axes = plt.subplots(2, 2, figsize=(ARTWORK_WIDTH, 8.45))
     endpoint_order = ["bbbp", "clintox", "esol", "lipophilicity"]
     row_labels = ["BBBP", "ClinTox", "ESOL", "Lipophilicity"]
     columns = ["Random", "Scaffold", "Cluster"]
@@ -584,7 +616,7 @@ def figure4_domain_retention() -> list[Path]:
             subset = continuous[continuous["endpoint"] == endpoint].set_index("split_type")
             matrix[i, :] = [float(subset.loc[split, metric]) for split in SPLITS]
         heatmap_panel(ax, matrix, row_labels, columns, title, vmin=-0.36, vmax=0.36)
-        panel_label(ax, label, x=-0.16)
+        panel_label(ax, label, x=-0.16, y=1.12)
 
     # C: positive retention in ClinTox at 50% retained sample coverage.
     ax = axes[1, 0]
@@ -603,12 +635,27 @@ def figure4_domain_retention() -> list[Path]:
             ax.text(xx, value + 0.012, f"{100*value:.0f}%", ha="center", fontsize=9.0)
     ax.axhline(0.50, color=COLORS["muted"], linestyle="--", linewidth=0.9)
     ax.set_xticks(x, columns)
-    ax.set_ylim(0, 0.57)
+    # Reserve a deliberate legend band above the tallest value label so that
+    # the legend never masks the data at final manuscript scale.
+    ax.set_ylim(0, 0.68)
     ax.set_ylabel("Positive-class retention")
-    ax.set_title("ClinTox positive retention\nat 50% coverage", loc="left", pad=9, fontweight="bold")
+    ax.set_title(
+        "ClinTox positive-class retention\nat 50% sample retention",
+        loc="left",
+        pad=10,
+        fontweight="bold",
+    )
     clean_axis(ax)
-    ax.legend(frameon=False, loc="upper right", ncol=2, columnspacing=1.2, handletextpad=0.5)
-    panel_label(ax, "C", x=-0.16)
+    ax.legend(
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.985),
+        ncol=2,
+        columnspacing=1.0,
+        handletextpad=0.4,
+        borderaxespad=0.0,
+    )
+    panel_label(ax, "C", x=-0.16, y=1.18)
 
     # D: endpoint dependence of similarity-based regression rejection.
     ax = axes[1, 1]
@@ -624,11 +671,25 @@ def figure4_domain_retention() -> list[Path]:
         ax.bar(endpoint_x + offset, values, width=width, color=SPLIT_COLORS[split], edgecolor=COLORS["white"], label=SPLIT_SHORT[split])
     ax.axhline(0, color=COLORS["muted"], linewidth=0.9)
     ax.set_xticks(endpoint_x, ["ESOL", "Lipophilicity"])
+    ax.set_ylim(-0.15, 0.48)
     ax.set_ylabel("Risk improvement vs random rejection")
-    ax.set_title("Regression risk after\nsimilarity rejection", loc="left", pad=9, fontweight="bold")
+    ax.set_title(
+        "Regression risk improvement\nafter similarity rejection",
+        loc="left",
+        pad=10,
+        fontweight="bold",
+    )
     clean_axis(ax)
-    ax.legend(frameon=False, loc="upper left", ncol=3)
-    panel_label(ax, "D", x=-0.16)
+    ax.legend(
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, 0.985),
+        ncol=3,
+        columnspacing=0.75,
+        handletextpad=0.35,
+        borderaxespad=0.0,
+    )
+    panel_label(ax, "D", x=-0.16, y=1.18)
 
     fig.text(
         0.5,
@@ -640,7 +701,14 @@ def figure4_domain_retention() -> list[Path]:
         fontsize=9.0,
         color=COLORS["muted"],
     )
-    fig.tight_layout(rect=(0.02, 0.065, 1, 1), h_pad=2.4, w_pad=2.8)
+    fig.subplots_adjust(
+        left=0.105,
+        right=0.975,
+        bottom=0.085,
+        top=0.950,
+        hspace=0.58,
+        wspace=0.42,
+    )
     return save_figure(fig, "figure_4_domain_retention")
 
 
