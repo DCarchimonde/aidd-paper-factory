@@ -1,0 +1,22 @@
+{
+  "clean_class_0_n": 5917,
+  "clean_class_1_n": 307,
+  "clean_unique_structures": 6224,
+  "cleaned_byte_sha256": "c421535112474dc2d3db835cd497d66c8eddc6af06cdd54477f0751a49145b4f",
+  "cleaning_script_byte_sha256": "9f6fc5240fa53b5dcc3cffbc38ac5a2c89c0f20d9eb6381605111564e1b68da1",
+  "conflicting_structure_groups_excluded": 54,
+  "duplicate_rows_aggregated": 1776,
+  "endpoint": "Tox21_SR_HSE",
+  "endpoint_observed_label_rows": 8150,
+  "missing_label_rows": 3614,
+  "murcko_scaffold_count": 3291,
+  "rdkit_version": "2026.03.4",
+  "rejections_byte_sha256": "3bc3a00fec86c0c3657fe74e739644a831f3f6dead2dbb0e96c348cf09897f12",
+  "role_input_byte_sha256": "0e5e1440911429029d24629211acdbfce54aa7f894d50c337a640e5243202c43",
+  "similarity_cluster_status": "pending",
+  "source_archive_rows": 11764,
+  "source_archive_sha256": "024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b",
+  "source_member_sha256": "d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206",
+  "standardization_id": "racer_c_rdkit_2026_03_4_v1",
+  "standardized_candidate_rows": 8148
+}

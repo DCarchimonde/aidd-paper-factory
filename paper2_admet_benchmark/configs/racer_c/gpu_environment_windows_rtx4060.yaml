@@ -1,0 +1,69 @@
+status: candidate_pending_windows_rtx4060_verification
+lock_version: 0.4
+python: 3.11.13
+platform: windows_amd64
+
+inputs:
+  clean_sha256: 2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0
+  role_input_sha256: edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900
+
+gpu:
+  required: true
+  count: 1
+  device_name_contains: RTX 4060 Laptop GPU
+  minimum_vram_gib: 7.0
+  torch_cuda_build: "13.0"
+  minimum_driver_version: "580.00"
+
+packages:
+  torch: 2.13.0
+  chemprop: 2.3.0
+  transformers: 5.12.1
+  rdkit: 2026.3.4
+  numpy: 2.3.5
+  scipy: 1.17.1
+  pandas: 2.2.3
+  scikit-learn: 1.9.0
+  xgboost: 3.2.0
+  pyyaml: 6.0.3
+
+molformer:
+  model_id: ibm-research/MoLFormer-XL-both-10pct
+  revision: 361063d0ad524ef77cf39b08469f6be770dc550f
+  tokenizer_json_sha256: 3df1f2219653c44fac9fa03b7f788b372eb2544ecc176737bb9aca8411b471a5
+  trust_remote_code: true
+  deterministic_eval: true
+  input_column: standardized_smiles
+  pooling: pooler_output
+  embedding_dtype: float32
+  inference_batch_size: 8
+  max_tokens_including_special_tokens: 202
+  truncation: false
+  overlength_action: exclude_before_role_assignment_and_all_component_fits
+
+chemprop:
+  task_type: classification
+  loss_function: bce
+  message_hidden_dim: 300
+  depth: 3
+  dropout: 0.0
+  aggregation: mean
+  ffn_hidden_dim: 300
+  ffn_num_layers: 2
+  batch_size: 64
+  epochs: 50
+  patience: 10
+  init_lr: 0.0001
+  max_lr: 0.001
+  final_lr: 0.0001
+  internal_validation_fraction: 0.10
+  internal_validation_assignment: label_blind_group_size_seeded
+  accelerator: gpu
+  devices: "1"
+  training_regime: unweighted
+
+runtime_lock_outputs:
+  - environment_audit.json
+  - pip_freeze.txt
+  - pip_freeze.sha256
+  - nvidia_smi.txt

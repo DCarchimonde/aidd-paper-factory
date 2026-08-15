@@ -1,0 +1,14 @@
+{
+  "access_layer": "TDC",
+  "distribution_identifier": "doi:10.7910/DVN/21LKWG",
+  "endpoint": "CYP3A4_Veith",
+  "license_evidence_url": "https://tdcommons.ai/single_pred_tasks/adme/",
+  "loader_identifier": "ADME:CYP3A4_Veith",
+  "raw_byte_sha256": "4c85a4cea9ffadd36fdd188f96b866d1d8db5d333a6d423172cf4363a585565a",
+  "retrieved_at_utc": "2026-08-01T18:28:22+00:00",
+  "source_bytes": 746183,
+  "source_code_commit": "c310c35f27e3f506411018ac43d97b8ba23ca652",
+  "source_file_id": "4259582",
+  "source_license_statement": "CC BY 4.0",
+  "source_url": "https://dataverse.harvard.edu/api/access/datafile/4259582"
+}

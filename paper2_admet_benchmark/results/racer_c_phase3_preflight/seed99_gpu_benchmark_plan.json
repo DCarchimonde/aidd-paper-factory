@@ -1,0 +1,159 @@
+{
+  "allocation": "50_20_15_15",
+  "class_0_n": 2669,
+  "class_1_n": 257,
+  "clean_input_sha256": "2a6217e66e3300e437d11fad68637b291526abc610c091effbbef4955d7d54a0",
+  "config_sha256": "d409f5eccf1ecf49aa12b27a353fb9bf3c474355d6dee866c92e93d423de7395",
+  "dev_n": 2926,
+  "dmpnn_final_fit_equivalents_per_endpoint_track_seed": 6.0,
+  "dmpnn_fit_jobs_per_endpoint_track_seed": 9,
+  "endpoint": "Tox21_NR_ER",
+  "endpoint_decisions_sha256": "07be0597ee683c5e903920e694f5737b87ba2da4d95919cd0994a28273682677",
+  "jobs": [
+    {
+      "fit_class_0_n": 888,
+      "fit_class_1_n": 87,
+      "fit_n": 975,
+      "job_id": "outer_0_inner_0",
+      "predict_class_0_n": 890,
+      "predict_class_1_n": 85,
+      "predict_n": 975,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 890,
+      "fit_class_1_n": 85,
+      "fit_n": 975,
+      "job_id": "outer_0_inner_1",
+      "predict_class_0_n": 888,
+      "predict_class_1_n": 87,
+      "predict_n": 975,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1778,
+      "fit_class_1_n": 172,
+      "fit_n": 1950,
+      "job_id": "outer_0_final",
+      "predict_class_0_n": 891,
+      "predict_class_1_n": 85,
+      "predict_n": 976,
+      "stage": "outer_final"
+    },
+    {
+      "fit_class_0_n": 909,
+      "fit_class_1_n": 66,
+      "fit_n": 975,
+      "job_id": "outer_1_inner_0",
+      "predict_class_0_n": 881,
+      "predict_class_1_n": 95,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 881,
+      "fit_class_1_n": 95,
+      "fit_n": 976,
+      "job_id": "outer_1_inner_1",
+      "predict_class_0_n": 909,
+      "predict_class_1_n": 66,
+      "predict_n": 975,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1790,
+      "fit_class_1_n": 161,
+      "fit_n": 1951,
+      "job_id": "outer_1_final",
+      "predict_class_0_n": 879,
+      "predict_class_1_n": 96,
+      "predict_n": 975,
+      "stage": "outer_final"
+    },
+    {
+      "fit_class_0_n": 889,
+      "fit_class_1_n": 86,
+      "fit_n": 975,
+      "job_id": "outer_2_inner_0",
+      "predict_class_0_n": 881,
+      "predict_class_1_n": 95,
+      "predict_n": 976,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 881,
+      "fit_class_1_n": 95,
+      "fit_n": 976,
+      "job_id": "outer_2_inner_1",
+      "predict_class_0_n": 889,
+      "predict_class_1_n": 86,
+      "predict_n": 975,
+      "stage": "inner_oof"
+    },
+    {
+      "fit_class_0_n": 1770,
+      "fit_class_1_n": 181,
+      "fit_n": 1951,
+      "job_id": "outer_2_final",
+      "predict_class_0_n": 899,
+      "predict_class_1_n": 76,
+      "predict_n": 975,
+      "stage": "outer_final"
+    }
+  ],
+  "meta_folds": 3,
+  "model_eligibility": {
+    "contract": {
+      "input_column": "standardized_smiles",
+      "max_tokens_including_special_tokens": 202,
+      "model_id": "ibm-research/MoLFormer-XL-both-10pct",
+      "overlength_action": "exclude_before_role_assignment_and_all_component_fits",
+      "revision": "361063d0ad524ef77cf39b08469f6be770dc550f",
+      "tokenizer_json_sha256": "3df1f2219653c44fac9fa03b7f788b372eb2544ecc176737bb9aca8411b471a5",
+      "truncation": false
+    },
+    "contract_sha256": "014e976fb17a36785eef8e1e91e8174d945ab797682eeef2613703ff78723c9e",
+    "eligible_cohort_sha256": "cc6c795b612dfb1aa46c3121dc3ed412f3fdebc7de4787c5a4f6455cc20b3e68",
+    "eligible_max_tokens_observed": 200,
+    "eligible_n": 5852,
+    "excluded": [
+      {
+        "source_record_id": "26917",
+        "standardized_smiles_sha256": "5dc07a98dee02100b094a6db6176eea82eb9b664e50a01f61d85d8f585d4f456",
+        "structure_id": "c11237b677bdb88d48823048cbcaf8c9afb82f95a01d8a58ce4ab057beb401fb",
+        "token_count_including_special_tokens": 239
+      },
+      {
+        "source_record_id": "6076",
+        "standardized_smiles_sha256": "98636b9160454e1c04a3be43a3684351902d2b8dec784721b99e1696e08d737a",
+        "structure_id": "ef625b22d31fa7ba0619714484ec891a11d2879c407d7ea580da3d5cfc258e1e",
+        "token_count_including_special_tokens": 242
+      },
+      {
+        "source_record_id": "20625",
+        "standardized_smiles_sha256": "df6a3d41084cd751eb272ddbb8e50324d8ffeda36ba986643367c97d644a9231",
+        "structure_id": "fda5dfc33520bba2657e4eef51e4c966ba133e1770dc4cf515c3183de2d52d4b",
+        "token_count_including_special_tokens": 227
+      }
+    ],
+    "excluded_n": 3,
+    "selection_uses_labels": false,
+    "source_max_tokens_observed": 242,
+    "source_n": 5855
+  },
+  "performance_metrics_permitted": false,
+  "policy_conformal_test_predictions_generated": false,
+  "primary_endpoint_count": 4,
+  "primary_endpoint_track_seed_cells": 60,
+  "primary_seeds": 5,
+  "primary_tracks": 3,
+  "role_input_sha256": "edbe26eeee9cb9aa188e941f5884967b1775b3fe36d92349656a42b5b6bee900",
+  "scientific_interpretation": "technical timing and lineage only; not a model result",
+  "script_sha256": "8fe76a9850d93b5daa16f0e354c6903b23170239b865e1f0781d9924601f7e8e",
+  "seed": 99,
+  "status": "ready_for_target_gpu_component_benchmark",
+  "track": "strict_scaffold",
+  "trainer_label_roles": [
+    "dev"
+  ]
+}

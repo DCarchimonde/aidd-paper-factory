@@ -5,7 +5,8 @@ from __future__ import annotations
 This script does not claim to replace publisher-level DOI verification.  It checks
 that the locally verified bibliography remains internally consistent after edits:
 
-- every citation key in the manuscript exists in references.bib;
+- every citation key in the manuscript exists in one of the bibliography files
+  loaded by main.tex;
 - bibliography keys are unique;
 - cited recent references (2021--2026) meet the manuscript minimum;
 - cited journal articles contain a DOI or a complete verified journal record;
@@ -18,7 +19,7 @@ from collections import Counter
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-BIB_PATH = ROOT / "references.bib"
+BIB_PATHS = [ROOT / "references.bib", ROOT / "references_2026.bib"]
 TEX_PATHS = [ROOT / "main.tex", *sorted((ROOT / "sections").glob("*.tex"))]
 RECENT_START = 2021
 RECENT_END = 2026
@@ -64,7 +65,7 @@ def complete_doi_less_article(entry: dict[str, str]) -> bool:
 
 
 def main() -> None:
-    bib_text = BIB_PATH.read_text(encoding="utf-8")
+    bib_text = "\n".join(path.read_text(encoding="utf-8") for path in BIB_PATHS)
     raw_keys = re.findall(r"@\w+\s*\{\s*([^,\s]+)\s*,", bib_text)
     duplicates = sorted(key for key, count in Counter(raw_keys).items() if count > 1)
     entries = parse_entries(bib_text)

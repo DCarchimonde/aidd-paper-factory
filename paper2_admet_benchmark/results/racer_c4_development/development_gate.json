@@ -1,0 +1,28 @@
+{
+  "checks": {
+    "baseline_inclusion": true,
+    "coverage_nonnegative": true,
+    "macro_csy_noninferiority": true,
+    "no_empty_sets": true,
+    "no_new_singletons": true,
+    "primary_cell_count": true,
+    "two_view_activity": true,
+    "wrong_singleton_nonpositive": true
+  },
+  "final_labels_downloaded_or_parsed": false,
+  "mean_deltas": {
+    "class_0_coverage_delta": 0.054394060433592094,
+    "class_0_wrong_singleton_exposure_delta": -0.0543940604335921,
+    "class_1_coverage_delta": 0.0,
+    "class_1_wrong_singleton_exposure_delta": 0.0,
+    "macro_csy_delta": -0.04916890235833873
+  },
+  "passed": true,
+  "status": "pass",
+  "structural_invariants": {
+    "baseline_inclusion_violations": 0,
+    "new_singletons": 0,
+    "tame_empty_sets": 0
+  },
+  "two_view_active_cell_fraction": 0.8
+}

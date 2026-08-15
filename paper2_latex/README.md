@@ -1,73 +1,87 @@
 # Paper 2 LaTeX manuscript
 
-## Main file
+## Pull the manuscript branch
 
-Open `paper2_latex/main.tex` in VSCode and build with LaTeX Workshop, or use the command-line workflow below.
-
-## Recommended final refresh
-
-From the repository root:
-
-```powershell
+~~~powershell
 cd E:\AIDD_Paper_Factory
-git pull origin main
+git switch paper2-racer-c4-development-2026
+git pull --ff-only origin paper2-racer-c4-development-2026
+~~~
+
+## Compile directly in VS Code
+
+Open `paper2_latex/main.tex` and run **LaTeX Workshop: Build LaTeX project**. The manuscript uses `latexmk` and BibTeX. All six publication figure PDFs are versioned in the repository, so compiling the article does **not** require Python, model fitting, or figure regeneration.
+
+If a clean command-line build is useful:
+
+~~~powershell
+cd E:\AIDD_Paper_Factory\paper2_latex
+latexmk -C main.tex
+latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error main.tex
+~~~
+
+The main figure path is:
+
+~~~text
+../paper2_admet_benchmark/results/manuscript_assets/figures/
+~~~
+
+## Optional: rebuild the six figures
+
+The reporting script reads only frozen Stage I tables and frozen TAME-under-RACER-C4 summaries. It does not fit a model, regenerate a prediction, open a sealed label, or change an inferential quantity.
+
+~~~powershell
+cd E:\AIDD_Paper_Factory
 conda activate aidd_paper
 python paper2_admet_benchmark/scripts/34_build_main_figures.py
-```
+~~~
 
-The figure refresh does not refit models or change frozen numerical results. It rebuilds the publication assets from frozen manuscript tables and reuses frozen figures when the large row-level selective-curve source is unavailable.
+The entrypoint creates both vector PDF and high-resolution PNG assets and refreshes `main_figure_integrity_manifest.csv`.
 
-## Recommended manuscript build
+## Supporting Information
 
-```powershell
-cd E:\AIDD_Paper_Factory\paper2_latex
-latexmk -C
-latexmk -pdf -bibtex -interaction=nonstopmode -file-line-error -halt-on-error main.tex
-```
+The audit tables are generated from the versioned manuscript CSVs before `supplementary.tex` is compiled:
 
-## Supporting Information build
-
-The standalone Supporting Information is generated only from the versioned, integrity-checked CSV files under `paper2_admet_benchmark/results/manuscript_assets/`. It does not require local model files, row-level predictions, or historical intermediate aggregation tables.
-
-Use the clean wrapper, which runs the frozen-asset builder and validates that the generated TeX contains no illegal control characters:
-
-```powershell
+~~~powershell
 cd E:\AIDD_Paper_Factory
-git pull origin main
 conda activate aidd_paper
 python paper2_admet_benchmark/scripts/36_build_clean_supporting_information.py
 
 cd paper2_latex
 latexmk -C supplementary.tex
 latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplementary.tex
-```
+~~~
 
-The Python step writes and sanitizes `paper2_latex/generated_supplementary_tables.tex`. It performs no model fitting, split construction, conformal threshold estimation, result selection, or additional hypothesis testing. Script 35 is the underlying table builder; script 36 is the submission-facing wrapper and should be used for final builds.
-
-Clean generated LaTeX files when needed:
-
-```powershell
-latexmk -C
-```
-
-## Figure source
-
-The manuscript does not duplicate figure binaries. `main.tex` reads the PDF figures directly from:
-
-```text
-../paper2_admet_benchmark/results/manuscript_assets/figures/
-```
+The builder writes `paper2_latex/generated_supplementary_tables.tex`. This generated file is intentionally ignored by Git; the frozen CSVs and builder are authoritative.
 
 ## Evidence boundary
 
-Scientific conclusions are restricted to frozen confirmatory outputs. Development checks and seed 99 are excluded from manuscript conclusions. Random and scaffold analyses use confirmatory seeds 101--110; similarity-cluster analyses use seeds 101--105. Model families are not treated as independent inferential replicates, and method contrasts are paired within endpoint, split, model, regime, and seed.
+- Stage I: four public endpoints; confirmatory seeds 101--110 for random/scaffold and 101--105 for cluster splitting; seed 99 excluded.
+- Stage II development: public Tox21 leaderboard cohort, six primary endpoints, seeds 101--105.
+- Stage II independent evaluation: final EPA cohort, the same six primary endpoints, fresh seeds 211--215.
+- Final predictions and the label-blind transport audit were hashed before final labels were opened.
+- Publication inference uses the deterministic repaired interval; no model, prediction, label, point estimate, or efficiency estimate changed during that repair.
+- TAME does not claim exact coverage under arbitrary shift, conditional coverage, clinical safety, or universal superiority.
 
-## Current status
+## Manuscript package
 
-- Confirmatory experiments: frozen
-- Main numerical result package: integrity checks passed
-- Abstract, Introduction, Methods, Results, Discussion, and Conclusion: complete and under final language polishing
-- Figures 1--6: publication assets linked and integrity-manifested
-- Supporting Information source and clean self-contained table builder: added
-- Bibliography: 41 cited entries; duplicate, missing-key, metadata, and unused-entry audits passed
-- Remaining pre-submission tasks: generate and inspect `supplementary.pdf`, create the repository archival release/persistent identifier, prepare the cover letter, and package the journal submission
+- `main.tex`: submission manuscript
+- `supplementary.tex`: Supporting Information
+- `sections/`: abstract, introduction, methods, results, and discussion
+- `references.bib` and `references_2026.bib`: bibliography
+- `submission_cils/`: cover letter, highlights, and checklist for *Chemometrics and Intelligent Laboratory Systems*
+
+## Build the submission-ready LaTeX archive
+
+The packaging script creates one self-contained archive containing the main
+manuscript, Supporting Information, bibliography, generated SI tables, and the
+six vector figures. It excludes auxiliary build files and row-level data.
+
+~~~powershell
+cd E:\AIDD_Paper_Factory
+python paper2_latex\submission_cils\build_cils_latex_package.py
+~~~
+
+Upload the generated
+`paper2_latex/submission_cils/CILS_Paper2_TAME_LaTeX_Source.zip` using the
+Editorial Manager item type **LaTeX source files**.

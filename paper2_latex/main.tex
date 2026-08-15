@@ -2,6 +2,7 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 \usepackage[margin=3cm]{geometry}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -15,20 +16,20 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{setspace}
-\usepackage[super,sort&compress]{natbib}
+% CILS requires numbered citations in square brackets rather than superscripts.
+\usepackage[numbers,sort&compress]{natbib}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 
 \doublespacing
 \raggedbottom
-\graphicspath{{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
+% The first path makes the submission ZIP self-contained; the second keeps the
+% repository build connected to the frozen publication assets.
+\graphicspath{{figures/}{../paper2_admet_benchmark/results/manuscript_assets/figures/}}
 
-% Permit figures to share pages with neighboring Results text.  The original
-% structural draft marked every figure [p] and followed it with a hard
-% \FloatBarrier, which forced sparse float-only pages.  Legacy placement
-% arguments are normalized here and the old per-figure barriers are disabled.
-% No hard barrier is placed between Results and Discussion: all six Results
-% figures occur before the integrated-result subsection, and the previous
-% boundary barrier created an otherwise empty orphan page.
+% Permit figures to share pages with neighboring text while keeping each float
+% inside the paragraph boundary at which it is introduced.  A local
+% \FloatBarrier follows every main figure; this prevents a delayed float from
+% interrupting a later sentence without forcing all figures to use [H].
 \setcounter{topnumber}{3}
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{5}
@@ -36,17 +37,14 @@
 \renewcommand{\bottomfraction}{0.85}
 \renewcommand{\textfraction}{0.06}
 \renewcommand{\floatpagefraction}{0.75}
-\renewcommand{\FloatBarrier}{}
-\makeatletter
-\let\paperoriginalxfloat\@xfloat
-\def\@xfloat#1[#2]{\paperoriginalxfloat{#1}[!htbp]}
-\makeatother
+\setlength{\textfloatsep}{16pt plus 3pt minus 4pt}
+\setlength{\intextsep}{14pt plus 3pt minus 3pt}
 
-\title{Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift}
+\title{Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope}
 \author{
 \begin{minipage}{0.94\textwidth}
 \centering
-S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
+Siyuan Tong$^{1,*}$ and Yuechen Wang$^{2}$\\[0.45em]
 \small $^{1}$Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia\\
 \small $^{2}$Faculty of Data Science, City University of Macau, Macau SAR, China\\[0.30em]
 \small $^{*}$Corresponding author: \texttt{25064241@siswa.um.edu.my}
@@ -58,7 +56,7 @@ S. Tong$^{1,*}$ and Y. Wang$^{2}$\\[0.45em]
 \maketitle
 
 \begin{center}
-\small\textbf{Short title:} Reliability Diagnostics for ADMET Prediction
+\small\textbf{Short title:} Auditable ADMET Reliability under Molecular Shift
 \end{center}
 
 \input{sections/abstract}

@@ -6,18 +6,19 @@ Publishing route: Subscription (no publication fee charged to authors)
 
 ## Files
 
-- Main manuscript PDF compiled from `paper2_latex/main.tex`
-- Editable LaTeX source files under `paper2_latex/`
+- Final review manuscript PDF: `CILS_Paper2_TAME_Manuscript.pdf`
+- Self-contained editable LaTeX archive: `CILS_Paper2_TAME_LaTeX_Source.zip`
 - Bibliography files: `references.bib` and `references_2026.bib`
-- Six manuscript figure PDFs from the frozen manuscript asset package
-- Supporting Information PDF compiled from `paper2_latex/supplementary.tex`
+- Six vector manuscript figure PDFs from the frozen audit/TAME asset package
+- Flat ZIP layout: all TeX, BibTeX, and figure files are at one folder level for Editorial Manager
+- Final Supporting Information PDF: `CILS_Paper2_TAME_Supplementary.pdf`
 - Supporting Information LaTeX source and generated tables
 - `submission_cils/highlights.txt`
 - `submission_cils/cover_letter.md`
 
 ## Metadata to confirm before entering the submission system
 
-- Full given and family names for both authors
+- Full author names confirmed: Siyuan Tong and Yuechen Wang
 - Author order and affiliations
 - Corresponding-author email and postal address
 - ORCID identifiers, when available
@@ -28,21 +29,19 @@ Publishing route: Subscription (no publication fee charged to authors)
 ## Submission choices
 
 - Select the subscription publishing agreement rather than paid open access
-- Upload editable `.tex` sources as well as the review PDF
+- Upload `CILS_Paper2_TAME_LaTeX_Source.zip` as **LaTeX source files**
 - Upload highlights as a separate editable file
-- Upload Supporting Information as a separate file
-- Enter the public GitHub repository in the data/code availability field
+- Upload `CILS_Paper2_TAME_Supplementary.pdf` as **Supplementary material**
+- Keep `CILS_Paper2_TAME_Manuscript.pdf` as the final review copy; upload it only if the system requests a manuscript PDF in addition to the LaTeX source archive
+- Enter the public GitHub repository and `paper2-racer-c4-development-2026` branch in the data/code availability field
 - Do not claim a Zenodo DOI or archival identifier unless one is later created
 
-## Final local build
+## Final local sync
 
 ```powershell
 cd E:\AIDD_Paper_Factory
-git pull origin main
-conda activate aidd_paper
-cd paper2_latex
-latexmk -C main.tex
-latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error main.tex
+git switch paper2-racer-c4-development-2026
+git pull --ff-only origin paper2-racer-c4-development-2026
 ```
 
-The final PDF should be visually checked after this build because the new 2026 citation changes reference numbering and may alter pagination.
+The versioned ZIP and final PDFs are ready after this pull; no local rebuild is required for submission.

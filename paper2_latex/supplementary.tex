@@ -2,12 +2,14 @@
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{lmodern}
 \usepackage[margin=2.2cm]{geometry}
 \usepackage{booktabs}
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{pdflscape}
 \usepackage{microtype}
+\usepackage{amsmath}
 \usepackage{setspace}
 \usepackage{xurl}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
@@ -22,8 +24,8 @@
 \raggedbottom
 
 \title{Supporting Information\\[0.5em]
-\large Beyond Accuracy in ADMET Prediction: Applicability-Domain Diagnostics and Conformal Calibration under Chemical Distribution Shift}
-\author{S. Tong and Y. Wang}
+\large Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope}
+\author{Siyuan Tong and Yuechen Wang}
 \date{}
 
 \begin{document}
@@ -31,9 +33,11 @@
 
 \section{Scope and frozen evidence boundary}
 
-This Supporting Information accompanies the confirmatory ADMET reliability benchmark reported in the main manuscript. The evidence boundary is identical to that of the main analysis. Development splits and seed~99 were excluded from scientific conclusions. Random and scaffold analyses used confirmatory seeds 101--110, and similarity-cluster analyses used seeds 101--105. Model families were not treated as independent inferential replicates. Method contrasts were paired within the same endpoint, split, seed, model, and classification imbalance regime.
+This Supporting Information accompanies the two-stage ADMET reliability study reported in the main manuscript. Stage~I is the frozen four-endpoint diagnostic audit. Development splits and seed~99 were excluded from its scientific conclusions. Random and scaffold analyses used confirmatory seeds 101--110, and similarity-cluster analyses used seeds 101--105. Model families were not treated as independent inferential replicates. Method contrasts were paired within the same endpoint, split, seed, model, and classification imbalance regime.
 
-The tables below are generated directly from the versioned, integrity-checked manuscript result package. The generation step performs no model fitting, split construction, conformal threshold estimation, method selection, or additional hypothesis testing. Descriptive cross-model averages are used for compact endpoint- and split-level reporting. Where inferential stability is discussed, paired-effect tables report the number of frozen model-specific cross-seed 95\% confidence intervals that lie entirely above or below zero in the stated direction.
+Stage~II evaluates TAME under the prospectively separated RACER-C4 protocol. The public Tox21 leaderboard batch and seeds 101--105 were used for architecture development only. The independent EPA batch used fresh seeds 211--215. The executable lock, method, protected label, primary endpoints, promotion checks, efficiency guardrail, final-label hash, and negative-result policy were fixed before final-label access. Final predictions and the label-blind transport audit were hashed into the promotion record before the locked label file was acquired or parsed.
+
+The Stage~I tables below are generated directly from the versioned, integrity-checked manuscript result package. The generation step performs no model fitting, split construction, conformal threshold estimation, method selection, or additional hypothesis testing. Descriptive cross-model averages are used for compact endpoint- and split-level reporting. Where inferential stability is discussed, paired-effect tables report the number of frozen model-specific cross-seed 95\% confidence intervals that lie entirely above or below zero in the stated direction. The Stage~II tables are transcribed from the frozen publication report, endpoint summary, transport-audit summary, and exclusion record.
 
 \section{Reproducibility and machine-readable files}
 
@@ -48,6 +52,114 @@ latexmk -pdf -interaction=nonstopmode -file-line-error -halt-on-error supplement
 \end{verbatim}
 
 The clean builder reads only the frozen CSV files under \path{paper2_admet_benchmark/results/manuscript_assets/}. It does not require local row-level prediction files, trained model binaries, or intermediate aggregation tables. Its post-processing is limited to LaTeX safety, readable display labels, landscape-page placement, and print formatting; it does not alter any numerical result. The machine-readable CSVs remain the authoritative source for full decimal precision, complete SHA-256 hashes, and secondary metrics. High-domain ClinTox subgroup results under scaffold and similarity-cluster splitting should be treated as descriptive because positive-class support can be sparse. No sparse or adverse result was removed after inspection.
+
+\section{Frozen TAME method and RACER-C4 evaluation specification}
+
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Prospectively separated data roles and evaluation units.}}
+\small
+\begin{tabular}{p{0.25\textwidth}p{0.20\textwidth}p{0.45\textwidth}}
+\toprule
+Cohort & Seeds & Locked role \\
+\midrule
+Tox21 10K training & Per run & 60\% fit, 20\% logit router, 20\% internal class-conditional conformal calibration \\
+Public leaderboard (296 structures) & 101--105 & Architecture development and promotion gate only \\
+Final EPA file (647 structures) & 211--215 & One label-firewalled independent evaluation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Complete transport certificate applied separately to each candidate view.} A view was active only when every row passed.}
+\small
+\begin{tabular}{p{0.52\textwidth}p{0.30\textwidth}}
+\toprule
+Diagnostic & Frozen acceptance threshold \\
+\midrule
+Source and target sample size & Both $\geq100$ \\
+Internal conformal support & Each true class $\geq20$ \\
+Total and per-class effective sample size & Each $\geq25\%$ of raw count \\
+Weights at lower or upper clipping bound & Each fraction $\leq30\%$ \\
+Five-fold cross-fitted domain ROC--AUC & $\leq0.99$ \\
+Weighted/unweighted standardized mean-gap ratio & $\leq1.05$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The approved views were nine physicochemical descriptors and five component/router logits. A 2048-bit ECFP view was audited as a mandatory diagnostic but was ineligible for the envelope after failing public development. Working odds were prior-corrected by the source-to-target sample-size ratio and clipped to $[0.05,20]$. If both approved views passed, TAME could add label~0 only when both corresponding weighted Mondrian sets contained label~0. It could never remove an ordinary baseline label. If either view failed, the transport augmentation was disabled. An ordinary empty set was converted to $\{0,1\}$ in either branch.
+
+\section{Public development gate}
+
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Frozen TAME promotion checks on six primary endpoints by five development seeds.}}
+\small
+\begin{tabular}{lrl}
+\toprule
+Quantity & Observed & Gate result \\
+\midrule
+Completed primary endpoint--seed cells & 30/30 & Pass \\
+Mean class-0 coverage change & $+5.4394$ pp & Pass \\
+Mean class-1 coverage change & $0.0000$ pp & Pass \\
+Mean MacroCSY change & $-4.9169$ pp & Pass ($\geq-5$ pp) \\
+Baseline-inclusion violations & 0 & Pass \\
+TAME empty sets & 0 & Pass \\
+Newly created singletons & 0 & Pass \\
+Both-view activity & 24/30 & Pass ($\geq80\%$) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The score view passed 30/30 development cells and the physicochemical view 24/30. The exact ordinary fallback handled the other six. The ECFP diagnostic passed 0/30 because of effective-sample-size and/or clipping failures. These values are architecture-development evidence and were not pooled with independent results.
+
+\section{Independent primary endpoint results}
+
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Endpoint means for TAME minus ordinary routed Mondrian prediction on the final EPA cohort.} Each row averages five fresh seeds. Values are percentage points.}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Endpoint & Minimum-class coverage & MacroCSY & Class-0 coverage \\
+\midrule
+NR-AhR & $+2.1644$ & $-1.8571$ & $+2.5049$ \\
+NR-ER & $+1.2362$ & $-0.2128$ & $+1.2362$ \\
+SR-ARE & $+2.1461$ & $-2.6374$ & $+2.3982$ \\
+SR-ATAD5 & $\phantom{+}0.0000$ & $-1.4286$ & $+1.4363$ \\
+SR-MMP & $+1.1489$ & $-2.2222$ & $+1.1489$ \\
+SR-p53 & $+1.4936$ & $-1.2821$ & $+1.4936$ \\
+\midrule
+Primary endpoint--seed-equal mean & $+1.3649$ & $-1.6067$ & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The primary 95\% interval was $+0.5827$ to $+2.0051$ percentage points. It used 2000 hierarchical-bootstrap draws with seed~44021, resampling endpoints first and compounds within endpoint and true class second while retaining all five seeds. The point estimate was positive and the MacroCSY point estimate was inside the frozen $-5$-point efficiency guardrail. On the class-balanced MacroCSY scale, the guardrail permits at most five fewer correct singleton outputs per 100 cases. It was fixed after public development as an architecture-selection tolerance and before final-label access; it was not calibrated to clinical or regulatory utility. The executable lock retains the historical field name \texttt{macro\_csy\_noninferiority\_margin} and result code \texttt{coverage\_gain\_with\_efficiency\_noninferiority}. Because no MacroCSY confidence-interval criterion was prespecified, the manuscript does not claim formal non-inferiority. The lock also explicitly prohibited an arbitrary-shift coverage guarantee or automatic scientific-superiority claim.
+
+\section{Final transport audit, invariants, and exclusions}
+
+\begin{table}[!htbp]
+\centering
+\caption{\textbf{Label-blind final transport activity across all 12 endpoints and five prospective seeds.}}
+\small
+\begin{tabular}{lrl}
+\toprule
+View & Active cells & Frozen outcome \\
+\midrule
+Physicochemical descriptors & 60/60 & Approved envelope view \\
+Component and routed logits & 60/60 & Approved envelope view \\
+ECFP bits & 0/60 & Diagnostic only; certificate failed \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+All 60 final endpoint--seed cells completed. Across development and final evaluation, TAME had zero baseline-inclusion violations, zero newly created singletons, and zero emitted empty sets. Two final external structures failed the frozen RDKit standardizer; their public sample identities were retained with full-set exclusions. Standardized overlaps with the 10K training cohort were excluded separately by endpoint, yielding 308 recorded endpoint--structure overlap pairs.
+
+A post-evaluation code audit found that the original percentile bootstrap iterated unique drawn endpoints through an unordered Python set. A hash-verified inference-only repair preserved first-occurrence order. It changed only the percentile interval, from the original sealed $[+0.5827,+1.9696]$ points to the deterministic publication interval $[+0.5827,+2.0051]$ points after rounding. Predictions, labels, metric tables, the $+1.3649$-point estimate, the $-1.6067$-point MacroCSY change, and the predeclared interpretation were unchanged. The original and repaired reports are both retained.
+
+\section{Stage I generated audit tables}
 
 \IfFileExists{generated_supplementary_tables.tex}{%
   \input{generated_supplementary_tables.tex}

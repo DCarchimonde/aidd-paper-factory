@@ -1,0 +1,13 @@
+# Candidate runtime for the pre-freeze Windows RTX-4060 Laptop seed-99 benchmark.
+# PyTorch is installed separately from the official cu130 wheel index.
+chemprop==2.3.0
+transformers==5.12.1
+rdkit==2026.3.4
+numpy==2.3.5
+# SciPy 1.18+ requires Python >=3.12; this runtime is fixed to Python 3.11.13.
+scipy==1.17.1
+pandas==2.2.3
+scikit-learn==1.9.0
+# XGBoost 3.3+ requires Python >=3.12; 3.2.0 is the Python-3.11 Windows lock.
+xgboost==3.2.0
+pyyaml==6.0.3

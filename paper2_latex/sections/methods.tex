@@ -1,9 +1,9 @@
 \section{Methods}
 \label{sec:methods}
 
-\subsection{Confirmatory design and evidence boundary}
+\subsection{Stage I: confirmatory audit and evidence boundary}
 
-The analysis was organized as a frozen confirmatory benchmark rather than a post hoc search for favorable endpoint--method combinations. Development splits and seed~99 were used only for implementation checks and exploratory debugging. Scientific conclusions were restricted to previously unseen confirmatory splits: seeds 101--110 for random and scaffold designs and seeds 101--105 for similarity-cluster designs. Model families, imbalance regimes, conformal methods, applicability-domain definitions, selective-prediction metrics, and stopping rules were fixed before confirmatory outputs were inspected. No endpoint, model, seed, threshold, or unfavorable result was removed after inspection. This separation follows recent recommendations that molecular machine-learning comparisons distinguish practical effects, paired evaluation units, and repeated-split uncertainty rather than treating model architectures as independent replicates \citep{ash2025comparison}.
+The diagnostic stage was organized as a frozen confirmatory benchmark rather than a post hoc search for favorable endpoint--method combinations. Development splits and seed~99 were used only for implementation checks and exploratory debugging. Scientific conclusions were restricted to previously unseen confirmatory splits: seeds 101--110 for random and scaffold designs and seeds 101--105 for similarity-cluster designs. Model families, imbalance regimes, conformal methods, applicability-domain definitions, selective-prediction metrics, and stopping rules were fixed before confirmatory outputs were inspected. No endpoint, model, seed, threshold, or unfavorable result was removed after inspection. This separation follows recommendations that molecular machine-learning comparisons distinguish practical effects, paired evaluation units, and repeated-split uncertainty rather than treating model architectures as independent replicates \citep{ash2025comparison}.
 
 \subsection{Endpoint acquisition and structure standardization}
 
@@ -16,6 +16,7 @@ Raw files were downloaded from the public DeepChem dataset distribution and hash
 \caption{\textbf{Core endpoint composition after structure cleaning and duplicate resolution.} Classification prevalence is the fraction labeled positive. Regression ranges are reported in the native target scale distributed with MoleculeNet/DeepChem.}
 \label{tab:endpoints}
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{llrrrrl}
 \toprule
 Endpoint & Task & Raw $n$ & Clean $n$ & Removed & Conflicts & Prevalence or target range \\
@@ -26,6 +27,7 @@ ESOL & Regression & 1128 & 1117 & 11 & 6 & $-11.60$ to $1.58$ \\
 Lipophilicity & Regression & 4200 & 4200 & 0 & 0 & $-1.50$ to $4.50$ \\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
 \subsection{Molecular representation}
@@ -72,7 +74,7 @@ For regression, standard split conformal intervals used absolute calibration res
 
 The shift-aware baseline followed the weighted-conformal principle that target-domain coverage can be recovered under covariate shift when the relevant likelihood ratio is known or estimated sufficiently accurately \citep{tibshirani2019covariate}. In each run, calibration ECFP4 vectors were assigned domain label~0 and the unlabeled test ECFP4 vectors domain label~1. Density ratios were estimated with five-fold cross-fitted $\ell_2$ logistic regression using $C=1.0$, liblinear optimization, and no class weighting. Domain-classifier odds were multiplied by $n_{\mathrm{cal}}/n_{\mathrm{test}}$ and clipped to $[0.05,20]$. Weighted conformal quantiles included the test-point mass at infinity. We recorded domain-classifier AUC, effective sample size of the calibration weights, infinite-threshold frequency, empirical coverage, and efficiency.
 
-Because the ratios were estimated from finite molecular samples rather than known analytically, these results are described as empirical shift-aware diagnostics, not as exact guarantees under arbitrary chemical shift. CoDrug provides a recent molecular example of density-aware conformal correction under covariate shift, but uses a different density-estimation strategy \citep{laghuvarapu2023codrug}.
+Because the ratios were estimated from finite molecular samples rather than known analytically, these results are described as empirical shift-aware diagnostics, not as exact guarantees under arbitrary molecular distribution shift. CoDrug provides a recent molecular example of density-aware conformal correction under covariate shift, but uses a different density-estimation strategy \citep{laghuvarapu2023codrug}.
 
 \subsection{Adaptive normalized regression intervals}
 
@@ -98,9 +100,60 @@ The area metric was explicitly reported as partial AURC because integration cove
 
 Metrics were first summarized within a fixed endpoint, split type, seed, model, and imbalance regime. Model-specific means, standard deviations, and two-sided 95\% Student-$t$ intervals were then calculated across confirmatory seeds. Method contrasts were paired within the same endpoint, split, seed, model, and regime. Cross-model headline averages were used only as compact descriptive summaries; model families were not treated as independent inferential replicates. For each paired effect, we additionally counted how many frozen model or model--regime combinations had a model-specific confidence interval entirely above or below zero. No multiplicity-adjusted null-hypothesis testing across model families was used, and null or adverse effects were retained.
 
-\begin{figure}[!htbp]
-\centering
-\includegraphics[width=\textwidth,height=0.66\textheight,keepaspectratio]{figure_1_confirmatory_design.pdf}
-\caption{\textbf{Confirmatory reliability-evaluation workflow.} Four core endpoints and frozen ECFP-based model families were evaluated under random, label-blind scaffold, and label-blind similarity-cluster designs with separate training, calibration, and test roles. Confirmatory analyses used ten seeds for random and scaffold splitting and five seeds for similarity-cluster splitting. Method contrasts were paired within endpoint, split, model, regime, and seed.}
-\label{fig:workflow}
-\end{figure}
+\subsection{Stage II: Tox21 cohorts and prospective roles}
+\label{sec:methods_tox21}
+
+The design stage used the official Tox21 Challenge cohorts, which comprise nuclear-receptor and stress-response assays measured on environmental chemicals and drugs \citep{huang2016tox21challenge}. The Tox21 10K training collection supplied open labels for model fitting, routing, and internal conformal calibration. A public leaderboard batch of 296 structures supplied architecture-development labels. A separate official file of 647 final structures was the unlabeled target for one independent evaluation. All URLs, archive members, SHA-256 hashes, endpoint order, preprocessing rules, seeds, audit thresholds, promotion gates, and failure actions were recorded in an executable lock before final-label access.
+
+Six primary endpoints---NR-AhR, NR-ER, SR-ARE, SR-ATAD5, SR-MMP, and SR-p53---were selected by the frozen rule of at least 20 positive labels in the public development batch, not by TAME performance. The six remaining official assays were retained as secondary small-sample stress tests and were never used to enlarge the primary denominator. Development used seeds 101--105; independent evaluation used fresh seeds 211--215. Standardized structures overlapping the 10K training cohort were excluded from external domain fitting and endpoint evaluation. An unparseable external structure retained its public identity, received the non-actionable full set $\{0,1\}$, and was excluded with an explicit reason code.
+
+\subsection{Frozen base predictor and ordinary Mondrian set}
+
+For each endpoint and seed, the Tox21 training cohort was partitioned by a stratified, seed-fixed 60/20/20 allocation into fit, router, and internal conformal roles. Four ECFP4 classifiers were fitted on the fit role: logistic regression, random forest, extra trees, and Bernoulli naive Bayes. The tree ensembles used 120 estimators and square-root feature sampling; the two linear-probabilistic models and all remaining hyperparameters were fixed in the executable lock. An $\ell_2$ logistic router was trained on the four component logits in the router role.
+
+For routed probability $p(x)$, the candidate-label nonconformity scores were $s_0(x)=p(x)$ and $s_1(x)=1-p(x)$. Ordinary class-conditional Mondrian thresholds at $\alpha_0=\alpha_1=0.10$ formed the protected baseline $S_M(x)$. Within class $y$, the finite-sample rank was
+\begin{equation}
+ k_y=\left\lceil(n_y+1)(1-\alpha_y)\right\rceil ,
+\end{equation}
+with an unavailable rank mapped to positive infinity. This base layer was fixed before either external cohort was evaluated.
+
+\subsection{Label-free transport views and audit certificate}
+\label{sec:methods_transport}
+
+TAME estimated source-to-target density ratios from two complementary views that used external structures and model outputs but no external labels. The physicochemical view contained molecular weight, logP, topological polar surface area, hydrogen-bond donor and acceptor counts, rotatable-bond count, ring count, fraction sp$^3$, and heavy-atom count. The score view contained the four component logits and the routed logit. A 2048-bit ECFP domain classifier was retained as a mandatory diagnostic comparator but was not eligible to enter the envelope after failing its development certificate.
+
+Each view used five-fold cross-fitted $\ell_2$ logistic domain classification for the domain-AUC audit and the same regularized estimator refitted on all unlabeled source and target covariates for the working density ratio. Posterior odds were prior-corrected by $n_{\mathrm{source}}/n_{\mathrm{target}}$ and clipped to $[0.05,20]$. The weighted source scores and query mass at positive infinity then defined candidate-specific weighted Mondrian thresholds \citep{tibshirani2019covariate,laghuvarapu2023codrug}. Unlike KMM-CP, which estimates covariate-shift weights through constrained kernel mean matching and adds a support-overlap selection step \citep{laghuvarapu2026kmmcp}, TAME retained the frozen logistic ratio estimator and used the complete certificate below as an activation gate. KMM-CP was not part of the locked comparator suite; adding a new final-label comparison after unsealing would violate the evidence boundary, so a head-to-head test requires a new prospectively locked study.
+
+A view was active only if all six prespecified checks passed: (i) at least 100 source and 100 target structures; (ii) at least 20 internal conformal examples in each true class; (iii) total and per-class effective sample size at least 25\% of the corresponding raw count; (iv) no more than 30\% of weights at either clipping boundary; (v) cross-fitted domain AUC no greater than 0.99; and (vi) the weighted standardized mean gap no more than 1.05 times the unweighted gap. These diagnostics are empirical transport certificates. They do not prove that estimated ratios are correct or restore exact coverage under arbitrary molecular distribution shift.
+
+\subsection{TAME envelope, fallback, and structural invariants}
+\label{sec:methods_tame}
+
+Public development showed a mean coverage deficit for label~0 greater than two percentage points and no mean deficit for label~1. The protected label was therefore frozen as label~0 before the final EPA evaluation. This label choice used public development outcomes; only the application of the two transport views to the final target was label free.
+
+Let $\bar S_M(x)=S_M(x)$ when the baseline is nonempty and $\bar S_M(x)=\{0,1\}$ otherwise. Let $S_{\mathrm{phys}}(x)$ and $S_{\mathrm{score}}(x)$ be the two weighted Mondrian sets. If both views pass their complete audits,
+\begin{equation}
+ S_{\mathrm{TAME}}(x)
+ =\bar S_M(x)\cup
+ \left\{0:\,0\in S_{\mathrm{phys}}(x)\cap S_{\mathrm{score}}(x)\right\}.
+ \label{eq:tame}
+\end{equation}
+If either approved view fails, every transport augmentation is disabled and $S_{\mathrm{TAME}}(x)=\bar S_M(x)$. Thus a failed audit is observable and produces an exact ordinary-baseline fallback rather than a silently relaxed certificate.
+
+Equation~\ref{eq:tame} yields three target-label-independent invariants: the TAME set contains the ordinary Mondrian set, TAME emits no empty set, and every TAME singleton was already a baseline singleton. Consequently, empirical coverage for either class cannot decrease on the same rows, and wrong-singleton exposure cannot increase. TAME can convert a baseline singleton into an explicit two-label defer, but cannot create a new confident singleton. Correct-singleton yield can therefore decrease but cannot increase; this motivated a prespecified efficiency guardrail rather than an efficiency-superiority claim.
+
+\subsection{Development gate and prediction-to-label firewall}
+\label{sec:methods_firewall}
+
+The public development denominator was fixed at six primary endpoints by five seeds (30 endpoint--seed cells). Promotion required all cells to complete, zero baseline-inclusion violations, zero TAME empty sets, zero newly created singletons, nonnegative mean coverage change for both classes, nonpositive wrong-singleton-exposure change for both classes, mean MacroCSY change of at least $-0.05$, and both approved views active in at least 80\% of cells. Failure of any check would stop execution before final-label download or parsing, and the failed gate would remain recorded.
+
+After the gate passed, fresh-seed models generated every comparator and TAME prediction from the 647 final structures. The sealed prediction file, final transport-audit table, and executable lock were hashed into a promotion record with \texttt{final\_labels\_opened=false}. Only then could the locked final-label bytes be acquired, their hash verified, and labels identity-joined for a single evaluation. The parser had no callable path around the promotion record, and contract tests exercised missing or invalid records. No endpoint, seed, transport view, threshold, protected label, or margin could be changed after final-label inspection.
+
+\subsection{Primary estimand, efficiency metric, and inference}
+\label{sec:methods_inference}
+
+For class $y$, coverage was the fraction of true-$y$ compounds whose set contained $y$. The primary endpoint-level quantity was the smaller of the two class coverages. Correct-singleton yield for class $y$ was the fraction of true-$y$ compounds receiving the singleton $\{y\}$; MacroCSY was the unweighted mean of the two class-specific yields. Wrong-singleton exposure was analogously the fraction receiving the singleton containing the incorrect label. Ambiguous and empty rates completed the descriptive set metrics.
+
+The primary estimand was the endpoint--seed-equal mean change in minimum-class coverage for TAME versus the ordinary routed Mondrian baseline across the six primary endpoints and five independent seeds. Its 95\% interval used a frozen hierarchical bootstrap: endpoints were resampled first; within every drawn endpoint, labeled final compounds were then resampled separately within true class, preserving class counts; all five seeds were retained. The procedure used 2000 draws and seed~44021. Secondary estimands included MacroCSY change, class-specific coverage, wrong-singleton exposure, ambiguity, and empty-set rate. Interpretation was hierarchical: a positive primary point estimate had to be accompanied by a MacroCSY point estimate no worse than the frozen $-5$-point guardrail. On the class-balanced MacroCSY scale, this threshold permits at most five fewer correct singleton outputs per 100 cases. It was fixed after public development as an architecture-selection tolerance and before final-label access; it was not calibrated to clinical or regulatory utility. The executable lock names the field a non-inferiority margin, but no confidence-interval-based non-inferiority test for MacroCSY was prespecified. We therefore treat it as a point-estimate efficiency guardrail and make no formal non-inferiority claim. No multiplicity-adjusted secondary superiority claim was authorized automatically.
+
+A post-evaluation implementation audit found that the first bootstrap report traversed unique resampled endpoints through an unordered Python set. This affected only how a fixed random stream was assigned within the percentile calculation. A hash-verified inference-only repair preserved first-occurrence endpoint order and recomputed the interval without refitting a model, regenerating a prediction, changing a label, or altering either point estimate. The repaired deterministic interval is the publication-facing value reported here; the original sealed report remains versioned in the audit chain.

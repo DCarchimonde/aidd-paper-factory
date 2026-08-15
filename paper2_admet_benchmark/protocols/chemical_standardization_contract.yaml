@@ -1,0 +1,88 @@
+status: draft_pre_freeze
+contract_version: 0.1
+
+input_contract:
+  required_source_fields: [source_record_id, raw_smiles, target]
+  retain_verbatim_fields: true
+  source_row_order_is_not_an_identifier: true
+
+standardization:
+  applicability: classification_endpoints_v1
+  implementation: scripts/racer_c/prepare_classification_endpoint.py
+  rdkit_version: 2026.03.4
+  code_commit: pending
+  parse_and_sanitize: required
+  cleanup: rdMolStandardize.Cleanup
+  fragment_policy: rdMolStandardize.FragmentParent_preferOrganic_true
+  salt_and_solvent_policy: discard_non_parent_fragments_and_log_source_row
+  charge_policy: rdMolStandardize.Uncharger_canonicalOrder_true
+  isotope_policy: retain
+  stereochemistry_policy: retain
+  tautomer_policy: no_enumeration
+  canonical_smiles: canonical_isomeric_smiles
+  structure_id: sha256_of_frozen_standardized_representation
+  scaffold: rdkit_bemis_murcko_achiral
+  acyclic_scaffold: unique_ACYCLIC_structure_id_group
+  similarity_fingerprint: {kind: Morgan, radius: 2, n_bits: 2048, chirality: false}
+
+duplicate_policy:
+  grouping_key: structure_id
+  classification_same_label: retain_lexicographically_first_source_record_and_log_others
+  classification_conflict: exclude_entire_standardized_structure_group
+  regression_aggregation: endpoint_specific_pending
+  majority_vote_allowed_without_endpoint_rule: false
+  groups_must_not_cross_outer_roles: true
+  groups_must_not_cross_crossfit_folds: true
+
+required_hashes:
+  - raw_byte_sha256
+  - standardization_contract_sha256
+  - cleaning_code_commit
+  - cleaned_byte_sha256
+  - cleaned_canonical_csv_sha256
+  - rejection_log_byte_sha256
+  - role_input_canonical_csv_sha256
+
+rejection_log:
+  required_columns:
+    - endpoint
+    - source_record_id
+    - raw_row_number
+    - raw_smiles
+    - stage
+    - reason_code
+    - detail
+    - structure_id_if_available
+  allowed_reason_codes:
+    - missing_smiles
+    - missing_target
+    - invalid_target
+    - parse_failure
+    - sanitize_failure
+    - fragment_policy_failure
+    - standardization_failure
+    - scaffold_failure
+    - conflicting_label_excluded
+    - duplicate_aggregated
+    - unit_or_threshold_unresolved
+    - species_or_assay_unresolved
+
+clean_output:
+  required_columns:
+    - endpoint
+    - source_record_id
+    - raw_smiles
+    - standardized_smiles
+    - structure_id
+    - target
+    - murcko_scaffold_id
+    - standardization_status
+  deterministic_sort: [structure_id, source_record_id]
+  line_endings_for_canonical_hash: LF
+  encoding: UTF-8
+
+freeze_blockers:
+  - cleaning_code_commit_locked
+  - regression_standardization_and_aggregation_rules_if_regression_is_retained
+  - raw_and_cleaned_hashes_populated
+  - rejection_reason_reconciliation_passes

@@ -1,0 +1,22 @@
+{
+  "clean_class_0_n": 6081,
+  "clean_class_1_n": 162,
+  "clean_unique_structures": 6243,
+  "cleaned_byte_sha256": "eab5ce1b5db8c3b9119c0e65ef8e9c048b7bc0fa5fb0b35af3535b0f51caeb6f",
+  "cleaning_script_byte_sha256": "9f6fc5240fa53b5dcc3cffbc38ac5a2c89c0f20d9eb6381605111564e1b68da1",
+  "conflicting_structure_groups_excluded": 15,
+  "duplicate_rows_aggregated": 1905,
+  "endpoint": "Tox21_NR_PPAR_gamma",
+  "endpoint_observed_label_rows": 8184,
+  "missing_label_rows": 3580,
+  "murcko_scaffold_count": 3334,
+  "rdkit_version": "2026.03.4",
+  "rejections_byte_sha256": "a7bee558fd9ed38d7ada148399e7b495e61c24fa1b83a0bcc0b512b9e772582a",
+  "role_input_byte_sha256": "f968de30b7a80e360807217228203ef1f244dde31ba652bcfcd4384b7a54022c",
+  "similarity_cluster_status": "pending",
+  "source_archive_rows": 11764,
+  "source_archive_sha256": "024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b",
+  "source_member_sha256": "d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206",
+  "standardization_id": "racer_c_rdkit_2026_03_4_v1",
+  "standardized_candidate_rows": 8182
+}

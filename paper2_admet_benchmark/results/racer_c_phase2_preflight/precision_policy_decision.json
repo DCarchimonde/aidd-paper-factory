@@ -1,0 +1,17 @@
+{
+  "bonferroni_tests": 108,
+  "critical_selected_error_ceiling": 0.1,
+  "exact_interval_precision_sha256": "e4220b5fc8e5d47ae1f95f79a9cced9dba3a843dc3800e8ef7511d4d3542b8c9",
+  "familywise_alpha": 0.05,
+  "paired_effect_simulation_sha256": "40e5b0bef05751dbb0815a508739ef5cf4fd3fa985da6b5506683753e6742cfa",
+  "policy_candidate_pairs": 36,
+  "policy_grid_error_control_sha256": "985d5cf87760697dec4cf167350396e3dacf2aefbdbb84558920f0a6086f45e4",
+  "precision_power_inputs_sha256": "813bed0d2cbe29e04ff324c5d792095c4ac3a7467857e69c26587975fd035edb",
+  "primary_count_rule": "all tracks and seeds pass under selected allocation",
+  "retention_floor": 0.5,
+  "role_count_input_sha256": "4fc2dc8ce1555c8d11f0625b4ad61a0b311d840a1361ea00ae5fc44740ee19b7",
+  "selected_allocation": "50_20_15_15",
+  "selection_uses_model_outputs": false,
+  "simultaneous_constraints_per_pair": 3,
+  "status": "pre_freeze_precision_complete"
+}

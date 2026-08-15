@@ -1,0 +1,27 @@
+{
+  "algorithm": "RACER-C3",
+  "cell_count": 60,
+  "fallback_identity_pass_count": 60,
+  "freeze_gate_passed": false,
+  "frontier_activation_by_track": {
+    "random_grouped": 0,
+    "similarity_cluster": 0,
+    "strict_scaffold": 20
+  },
+  "frontier_always_delta_pp_by_track": {
+    "random_grouped": -0.18615895090152074,
+    "similarity_cluster": -0.6941877297178445,
+    "strict_scaffold": 0.20974797162295528
+  },
+  "known_test_labels_used": true,
+  "prospective_test_predictions_authorized": false,
+  "routed_all_cell_delta_pp": 0.06991599054098509,
+  "routed_delta_pp_by_track": {
+    "random_grouped": 0.0,
+    "similarity_cluster": 0.0,
+    "strict_scaffold": 0.20974797162295528
+  },
+  "scientific_superiority_claim_authorized": false,
+  "status": "known_v1_panel_retrospective_architecture_only",
+  "test_labels_used_for_current_architecture_search": true
+}

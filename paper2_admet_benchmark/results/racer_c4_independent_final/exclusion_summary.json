@@ -1,0 +1,30 @@
+{
+  "invalid_external_structures": [
+    {
+      "sample_id": "NCGC00357062-01",
+      "reason": "excluded_parse_failure",
+      "structure_id": "invalid-10f424cc730c52c3f422245de1a110d1e848f8ea969d507618249d93634ff79b"
+    },
+    {
+      "sample_id": "NCGC00357026-01",
+      "reason": "excluded_parse_failure",
+      "structure_id": "invalid-c44982e4548e82e8ac8e819e4600824309a6a325945637861e6138c728a5a77d"
+    }
+  ],
+  "invalid_external_structure_count": 2,
+  "standardized_training_overlap_pairs_by_endpoint": {
+    "Tox21_NR_AR": 29,
+    "Tox21_NR_AhR": 29,
+    "Tox21_NR_AR_LBD": 25,
+    "Tox21_NR_ER": 22,
+    "Tox21_NR_ER_LBD": 28,
+    "Tox21_NR_Aromatase": 24,
+    "Tox21_NR_PPAR_gamma": 25,
+    "Tox21_SR_ARE": 22,
+    "Tox21_SR_ATAD5": 29,
+    "Tox21_SR_HSE": 26,
+    "Tox21_SR_MMP": 23,
+    "Tox21_SR_p53": 26
+  },
+  "standardized_training_overlap_pair_count": 308
+}

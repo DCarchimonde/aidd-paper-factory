@@ -1,0 +1,176 @@
+lock_status: candidate_frozen_before_final_epa_label_open
+algorithm: RACER-C4/TAME
+algorithm_long_name: transport_audited_multiview_conformal_envelope
+algorithm_version: 4.0.0-rc1
+parent_algorithm: RACER-C-v1.0
+scientific_scope: NCATS_Tox21_2014_assay_family_only
+
+data_sources:
+  training_archive:
+    url: "https://tripod.nih.gov/tox21/challenge/download?id=tox21_10k_data_allsdf&sec="
+    filename: tox21_10k_data_allsdf.zip
+    sha256: 024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b
+    member: tox21_10k_data_all.sdf
+    member_sha256: d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206
+    role: model_fit_router_and_internal_conformal
+  leaderboard_development_labels:
+    url: "https://tripod.nih.gov/tox21/challenge/download?id=tox21_10k_challenge_testsdf&sec="
+    filename: tox21_10k_challenge_test.sdf.zip
+    sha256: 7ab05627b78db60f5a8426dc18d3bd50904ddab0e4ba1b2f33ad883f5087afd9
+    member: tox21_10k_challenge_test.sdf
+    member_sha256: 98ef9e89a030962ec27c5b437d6daf415234a45479dc4c86c72006f9e3b9b4db
+    expected_structure_count: 296
+    role: architecture_development_only
+  final_epa_structures:
+    url: "https://tripod.nih.gov/tox21/challenge/download?id=tox21_10k_challenge_scoresmiles&sec="
+    filename: tox21_10k_challenge_score.smiles
+    sha256: 57e4fef6d42f7867486967fe6c1a9e98c42aaed43023745c460ff0d102ce5786
+    expected_structure_count: 647
+    role: unlabeled_final_target
+  final_epa_labels:
+    url: "https://tripod.nih.gov/tox21/challenge/download?id=tox21_10k_challenge_scoretxt&sec="
+    filename: tox21_10k_challenge_score.txt
+    sha256: 293438f8407c996a0212bedce86d7b9a278f5548df7e7b45ade2126c6dd2770d
+    role: sealed_until_predictions_and_promotion_record_are_hashed
+
+endpoint_order:
+  - Tox21_NR_AR
+  - Tox21_NR_AhR
+  - Tox21_NR_AR_LBD
+  - Tox21_NR_ER
+  - Tox21_NR_ER_LBD
+  - Tox21_NR_Aromatase
+  - Tox21_NR_PPAR_gamma
+  - Tox21_SR_ARE
+  - Tox21_SR_ATAD5
+  - Tox21_SR_HSE
+  - Tox21_SR_MMP
+  - Tox21_SR_p53
+
+primary_endpoints:
+  - Tox21_NR_AhR
+  - Tox21_NR_ER
+  - Tox21_SR_ARE
+  - Tox21_SR_ATAD5
+  - Tox21_SR_MMP
+  - Tox21_SR_p53
+primary_endpoint_rule: at_least_20_positive_labels_in_public_development_batch
+secondary_endpoint_policy: retain_all_other_endpoints_without_primary_pooling
+
+roles:
+  internal_fit_fraction: 0.60
+  internal_router_fraction: 0.20
+  internal_conformal_fraction: 0.20
+  development_seeds: [101, 102, 103, 104, 105]
+  prospective_seeds: [211, 212, 213, 214, 215]
+  prospective_seeds_were_not_used_in_architecture_development: true
+  standardized_structure_overlap_action: exclude_from_domain_fit_and_evaluation
+  invalid_external_structure_action: retain_identity_full_set_and_exclude_from_domain_fit_and_evaluation
+
+base_predictor:
+  fingerprint:
+    radius: 2
+    n_bits: 2048
+    include_chirality: false
+  components:
+    - {name: logistic, C: 1.0, solver: liblinear, max_iter: 1000}
+    - {name: random_forest, n_estimators: 120, max_features: sqrt, min_samples_leaf: 1, n_jobs: -1}
+    - {name: extra_trees, n_estimators: 120, max_features: sqrt, min_samples_leaf: 1, n_jobs: -1}
+    - {name: bernoulli_nb, alpha: 1.0}
+  router:
+    estimator: logistic_regression
+    C: 1.0
+    solver: lbfgs
+    max_iter: 1000
+    inputs: component_logits
+
+conformal:
+  alpha_by_class: {0: 0.10, 1: 0.10}
+  calibration: class_conditional_mondrian
+  quantile: ceil_n_plus_1_times_one_minus_alpha
+  weighted_query_mass: infinity
+  probability_clip: 0.000001
+
+transport:
+  views:
+    - physchem_descriptors
+    - component_and_stack_logits
+  diagnostic_views:
+    - ecfp_bits
+  domain_estimator:
+    estimator: cross_fitted_auc_then_full_fit_l2_logistic_regression
+    folds: 5
+    C: 1.0
+    solver: liblinear
+    weight_min: 0.05
+    weight_max: 20.0
+  audit:
+    minimum_source_n: 100
+    minimum_target_n: 100
+    minimum_class_n: 20
+    minimum_ess_fraction: 0.25
+    maximum_clip_fraction: 0.30
+    maximum_domain_auc: 0.99
+    maximum_gap_ratio: 1.05
+
+envelope:
+  protected_labels: [0]
+  protected_label_selection_basis: public_development_mean_coverage_deficit_exceeded_0.02
+  quorum: all
+  minimum_active_views: 2
+  always_contains_ordinary_mondrian_baseline: true
+  baseline_empty_action: full_set
+  insufficient_transport_views_action: ordinary_baseline_with_empty_to_full
+  new_singleton_creation: prohibited
+
+comparators:
+  - ordinary_mondrian_global_stack
+  - density_weighted_mondrian_ecfp
+  - density_weighted_mondrian_physchem
+  - density_weighted_mondrian_score_view
+  - ordinary_mondrian_equal_logit
+
+development_decisions:
+  known_v1_panel_used_for_prospective_claim: false
+  known_v1_panel_role: retrospective_regression_only
+  local_candidate_router_status: rejected
+  local_candidate_router_reason: apparent_macro_csy_gain_traded_approximately_3pp_class0_coverage
+  full_two_label_transport_envelope_status: rejected_as_primary
+  full_two_label_transport_envelope_reason: development_macro_csy_cost_too_large
+  high_dimensional_ecfp_transport_view_status: rejected_from_envelope_retained_as_comparator
+  high_dimensional_ecfp_transport_view_reason: failed_ess_and_clipping_audit_in_30_of_30_primary_development_cells
+  final_candidate: protected_label_multiview_consensus_envelope
+  final_candidate_public_development_gate:
+    primary_cells: 30
+    score_view_active_cells: 30
+    physchem_view_active_cells: 24
+    ecfp_diagnostic_active_cells: 0
+    mean_class_0_coverage_delta: 0.054394060433592094
+    mean_class_1_coverage_delta: 0.0
+    mean_macro_csy_delta: -0.04916890235833873
+    baseline_inclusion_violations: 0
+    new_singletons: 0
+    empty_sets: 0
+    gate_passed: true
+
+promotion_gate:
+  primary_cell_count: 30
+  require_zero_baseline_inclusion_violations: true
+  require_zero_tame_empty_sets: true
+  require_zero_new_singletons: true
+  require_mean_class_coverage_delta_nonnegative: true
+  require_mean_wrong_singleton_delta_nonpositive: true
+  macro_csy_noninferiority_margin: -0.05
+  minimum_two_view_active_cell_fraction: 0.80
+  failed_gate_action: stop_before_final_label_download_or_parse
+
+final_inference:
+  primary_estimand: endpoint_seed_equal_mean_minimum_class_coverage_delta_vs_ordinary_mondrian
+  secondary_estimands:
+    - endpoint_seed_equal_mean_macro_csy_delta
+    - class_specific_coverage_delta
+    - wrong_singleton_exposure_delta
+    - ambiguous_rate_delta
+  multiplicity: hierarchical_primary_then_descriptive_secondary
+  negative_result_policy: retain_and_report_without_retuning
+  estimated_density_ratio_claim: empirical_shift_aware_not_exact_arbitrary_shift_guarantee

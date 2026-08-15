@@ -85,7 +85,7 @@ def polish_generated_tex(path: Path) -> None:
     # clipped the class-balance-shift column in the rendered PDF.
     old_selective_layout = r"lllp{4.5cm}cccccc"
     new_selective_layout = (
-        r"p{1.3cm}p{1.8cm}p{1.4cm}p{4.0cm}"
+        r"p{1.7cm}p{1.7cm}p{1.4cm}p{4.0cm}"
         r"*{6}{>{\centering\arraybackslash}p{1.55cm}}"
     )
     selective_layout_updates = text.count(old_selective_layout)

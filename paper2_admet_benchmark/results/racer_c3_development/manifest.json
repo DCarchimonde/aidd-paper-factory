@@ -1,0 +1,12 @@
+{
+  "analysis_package_integrity_sha256": "c31d8005d442f882ee69da826ea067d80f60c9cd33884c20ed4ace0d393dd448",
+  "cell_metrics_sha256": "ee8c67ef4b437f163e551e9f89d4ce6bec5fde39833938415dfdc677b9b3f0df",
+  "development_lock_sha256": "ff1e5267b925d4154954faedc00b14e334479f318cc2d635eca7efc1148b453b",
+  "gate_audit_sha256": "ce0db037eb9d161a4909bbdf62f2cfd7fc9a97bc4ca13ad6190ae7e95766a35c",
+  "known_test_labels_used": true,
+  "paired_deltas_sha256": "1946227043c5aa8b3c98681c2752c8e982e8eef1074761e66c554ae29ee0b841",
+  "report_sha256": "63f9ec4d1cdceff4c1f1019fc77bc383a3d930e149c4c97fd883c280111760ef",
+  "scientific_superiority_claim_authorized": false,
+  "status": "complete_retrospective_architecture_audit",
+  "summary_sha256": "32cc6ba8695dfd7619fe3017bf1d22c36e2cd86921bd2b2f96ee84cb82fb2ef0"
+}

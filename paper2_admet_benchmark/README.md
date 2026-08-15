@@ -82,3 +82,79 @@ MVP requirements:
 - at least 5 random seeds where applicable;
 - baseline models: LR/Ridge, Random Forest, XGBoost, MLP on ECFP;
 - performance, calibration, conformal, applicability-domain, and selective-prediction analyses.
+
+## Post-v1 RACER-C3 development
+
+The isolated branch `paper2-racer-c3-development-2026` contains a new
+development-only algorithm candidate under `scripts/racer_c3/`. It has **not
+passed its architecture freeze gate**. RACER-C3 uses
+candidate-label-specific experts at a verified chemical frontier, an unlabeled
+permutation-invariant batch route, class-conditional calibration, and an exact
+fallback to the completed v1 no-gate RACER score.
+
+The four-endpoint v1 panel was already known when this architecture was chosen.
+Accordingly, `results/racer_c3_development/` is retrospective development
+evidence and cannot support a superiority claim. The algorithm specification,
+prior-art boundary, and prospective firewall are in:
+
+- `docs/racer_c3_algorithm_specification_v0.1.md`;
+- `docs/racer_c3_prior_art_boundary.md`; and
+- `protocols/racer_c3_prospective_protocol_draft.md`.
+
+Run the isolated numerical/contract tests with:
+
+```bash
+python -m unittest discover -s paper2_admet_benchmark/tests/racer_c3 -v
+```
+
+## RACER-C4 independent validation candidate
+
+RACER-C3 did not pass its freeze gate and remains retrospective. RACER-C4/TAME
+is a separate safety-first candidate built around two label-free transport
+views, explicit effective-sample-size/balance audits, a baseline-containing
+protected-label consensus envelope, and a fail-closed final-label firewall.
+
+The public Tox21 leaderboard batch is development-only. The independent EPA
+batch uses fresh seeds 211--215; its labels cannot be parsed until every final
+prediction is hashed into a promotion record. Exact method, source, gate, and
+non-claim boundaries are in:
+
+- `configs/racer_c4/prospective_lock_v1.yaml`;
+- `docs/racer_c4_algorithm_specification_v1.md`;
+- `docs/racer_c4_prior_art_boundary.md`; and
+- `protocols/racer_c4_independent_epa_validation_protocol.md`.
+
+Windows one-command reproduction after `git pull`:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File paper2_admet_benchmark\scripts\racer_c4\run_racer_c4_overnight.ps1
+```
+
+This is a from-source RACER-C4 reproduction, so it intentionally rebuilds the
+Tox21 10K training inputs before running the new C4 development gate and sealed
+EPA evaluation. It does not rerun, replace, or modify the completed RACER-C v1
+or seed-99 evidence. Before cleaning, the wrapper verifies the frozen RDKit
+runtime (`2026.03.4`). If the selected conda environment has another RDKit
+patch release, the wrapper installs only the exact `rdkit==2026.3.4` binary
+wheel with dependency changes disabled and then verifies the runtime again.
+
+If the sealed C4 run is already complete, the deterministic bootstrap repair
+uses the existing hash-bound predictions and does not retrain anything:
+
+```powershell
+conda run --no-capture-output -n aidd_paper python -u paper2_admet_benchmark\scripts\racer_c4\recompute_racer_c4_inference.py
+```
+
+The repair writes a separate verified package under
+`.local\racer_c4_deterministic_inference`. The hash-verified repair completed
+on 2026-08-10 and was promoted as a separate publication-facing report. The
+original sealed report and integrity manifest remain unchanged as audit
+artifacts; no model, prediction, label, point estimate, MacroCSY result, or
+interpretation changed.
+
+The sealed independent EPA run is complete. On the six-endpoint primary panel,
+minimum class coverage improved by 1.3649 percentage points (deterministic
+hierarchical-bootstrap 95% interval: +0.5827 to +2.0051 points) while mean
+MacroCSY changed by -1.6067 points, inside the frozen -5-point non-inferiority
+margin. Publication-facing results, the Windows repair record, and the preserved
+sealed audit artifacts are under `results/racer_c4_independent_final/`.

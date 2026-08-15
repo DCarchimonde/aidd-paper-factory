@@ -1,0 +1,23 @@
+{
+  "clean_class_0_n": 5589,
+  "clean_class_1_n": 700,
+  "clean_unique_structures": 6289,
+  "cleaned_byte_sha256": "70ddeea9b3a454cdb1a4e743947f3d36b682084c2c8a7bf12b16e4f48270234a",
+  "cleaning_script_byte_sha256": "9f6fc5240fa53b5dcc3cffbc38ac5a2c89c0f20d9eb6381605111564e1b68da1",
+  "conflicting_structure_groups_excluded": 61,
+  "duplicate_rows_aggregated": 1732,
+  "endpoint": "Tox21_NR_AhR",
+  "endpoint_observed_label_rows": 8169,
+  "missing_label_rows": 3595,
+  "murcko_scaffold_count": 3413,
+  "rdkit_version": "2026.03.4",
+  "rejections_byte_sha256": "f3ec6263ed30d0e22a14036bbc9cd0bc752bcff6545b2565dae491dc75279a5f",
+  "role_input_byte_sha256": "461c99d4a658c5e1eaee3ad4159761e8ef2bc2fa9041386be8b68dff4461178b",
+  "similarity_cluster_manifest": "paper2_admet_benchmark/data/manifests/racer_c/Tox21_NR_AhR_similarity_clusters.json",
+  "similarity_cluster_status": "complete",
+  "source_archive_rows": 11764,
+  "source_archive_sha256": "024a3ae2690bcd4a593e6e0b10b455470b9bcb1d8f299dd36f220a250181517b",
+  "source_member_sha256": "d66e1f9ec945ee528b1bea6e49af9c10d0bad546c2b304eb96004c8228824206",
+  "standardization_id": "racer_c_rdkit_2026_03_4_v1",
+  "standardized_candidate_rows": 8167
+}

@@ -1,0 +1,67 @@
+{
+  "repair": {
+    "final_label_sha256": "293438f8407c996a0212bedce86d7b9a278f5548df7e7b45ade2126c6dd2770d",
+    "frozen_lock_sha256": "cf78686fed4af3d413eb6b12a920e89cd6bef6031cf571bbfd1c013a1dbe4ded",
+    "inference_repair_git_head": "64453883bb0685f13327614f47772c332999e04c",
+    "labels_or_predictions_changed": false,
+    "model_refit_performed": false,
+    "original_manifest_sha256": "bdc27678afc46b70bf41d2655601580d483b71d7254febecbe966f2bfe7abc5f",
+    "original_primary_inference": {
+      "bootstrap_repetitions": 2000,
+      "bootstrap_seed": 44021,
+      "estimand": "endpoint_seed_equal_mean_minimum_class_coverage_delta",
+      "estimate": 0.01364872799931726,
+      "percentile_95_interval": [
+        0.005916062331461238,
+        0.019656277081309296
+      ]
+    },
+    "original_report_sha256": "12dfbdf5f475a2a5bd7c8ae20df238c6d013b501024145321b2390d1f720cec2",
+    "prediction_git_head": "5272d14136e1a10c41c56d76e04805854b63f50e",
+    "prediction_regeneration_performed": false,
+    "promotion_record_sha256": "165aa07e74aa3686c045c76ebea8db1750782922c5b2ae1ef4aa44d1d10fc9a5",
+    "repair_scope": "bootstrap_rng_endpoint_traversal_only",
+    "repaired_primary_inference": {
+      "bootstrap_repetitions": 2000,
+      "bootstrap_seed": 44021,
+      "estimand": "endpoint_seed_equal_mean_minimum_class_coverage_delta",
+      "estimate": 0.01364872799931726,
+      "percentile_95_interval": [
+        0.005826860594101873,
+        0.020050872223821615
+      ]
+    },
+    "repaired_report_sha256": "1011d016a1e15690596cf6b8d43c0608ce923496d5b582d2040f1ed79b7de572",
+    "sealed_prediction_sha256": "6540dcf853e274dfd7306e2909bde81a8566d8b565fd230868a84f7461fc6461",
+    "status": "complete_deterministic_inference_repair",
+    "unchanged_scientific_artifact_hashes_verified": {
+      "final_metrics_sha256": "a2dcbf76db0aa2852a3b6ac3d93f89f08faf1acc932d737905cb65b18baeff66",
+      "final_paired_sha256": "c263897708aa38c064af9769ddd8dadf24bfa56ee92f510d695b1a0dc30e802f",
+      "final_summary_sha256": "1d74338c6f164f057023556f4949cc0ae43e42212a2a016a3cf4d3ea14f8f0e2"
+    }
+  },
+  "report": {
+    "algorithm": "RACER-C4/TAME",
+    "arbitrary_shift_coverage_guarantee_claim_authorized": false,
+    "development_gate_passed": true,
+    "final_label_sha256": "293438f8407c996a0212bedce86d7b9a278f5548df7e7b45ade2126c6dd2770d",
+    "final_labels_opened_after_promotion": true,
+    "macro_csy_noninferiority_margin": -0.05,
+    "predictions_sealed_before_final_labels": true,
+    "primary_cell_count": 30,
+    "primary_inference": {
+      "bootstrap_repetitions": 2000,
+      "bootstrap_seed": 44021,
+      "estimand": "endpoint_seed_equal_mean_minimum_class_coverage_delta",
+      "estimate": 0.01364872799931726,
+      "percentile_95_interval": [
+        0.005826860594101873,
+        0.020050872223821615
+      ]
+    },
+    "primary_mean_macro_csy_delta": -0.016066860641328725,
+    "result_interpretation": "coverage_gain_with_efficiency_noninferiority",
+    "scientific_superiority_claim_authorized": false,
+    "status": "complete_independent_final_epa_evaluation"
+  }
+}

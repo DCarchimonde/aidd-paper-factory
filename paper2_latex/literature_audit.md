@@ -41,7 +41,7 @@ The table below records the intended evidentiary role of every citation. A refer
 | `fisch2022trading` | 2022 | Coverage-efficiency trade-off | Support joint analysis of coverage and precision/informativeness | Official ICLR record |
 | `teng2023feature` | 2023 | Feature-conditional conformal | Support feature-aware predictive inference context | Official ICLR record |
 | `einbinder2023labelnoise` | 2023 | Conformal robustness | Support robustness boundary discussion | Official ICLR record |
-| `gawlikowski2023survey` | 2023 | UQ survey | Define epistemic/aleatoric uncertainty and explain evaluation diversity | ACM publisher record; DOI 10.1145/3559752 |
+| `gawlikowski2023survey` | 2023 | UQ survey | Define epistemic/aleatoric uncertainty and explain evaluation diversity | Springer publisher record; DOI 10.1007/s10462-023-10562-9 |
 | `hullermeier2021aleatoric` | 2021 | UQ concepts | Conceptual distinction between aleatoric and epistemic uncertainty | Springer publisher record; DOI 10.1007/s10994-021-05946-3 |
 | `wu2018moleculenet` | 2018 | Dataset benchmark | Source and benchmark context for BBBP, ClinTox, ESOL, and Lipophilicity | RSC publisher page; DOI 10.1039/C7SC02664A |
 | `rogers2010ecfp` | 2010 | Molecular representation | Original extended-connectivity fingerprint definition | ACS publisher page; DOI 10.1021/ci100050t |
@@ -49,6 +49,16 @@ The table below records the intended evidentiary role of every citation. A refer
 | `martins2012bbbp` | 2012 | Dataset | Original BBBP modeling dataset context | ACS publisher page; DOI 10.1021/ci300124c |
 | `tibshirani2019covariate` | 2019 | Weighted conformal | Foundational weighted conformal method under covariate shift | Official NeurIPS proceedings |
 | `guo2017calibration` | 2017 | Calibration | Foundational modern probability-calibration reference | Official ICML proceedings |
+| `laghuvarapu2026kmmcp` | 2026 | Shift-aware conformal preprint | Distinguish TAME's audited logistic transport views from kernel mean matching and selective support overlap | arXiv record 2603.26415 |
+| `yang2026multidistribution` | 2026 | Robust conformal preprint | Distinguish one-source/unlabeled-target TAME from multi-source uniform-validity assumptions | arXiv record 2601.02998 |
+| `wang2025socop` | 2025 | Efficiency-focused conformal preprint | Contrast singleton optimization with TAME's structurally one-sided set expansion | arXiv record 2509.24095, revised 2026 |
+| `gazin2025batch` | 2025 | Batch conformal | Distinguish per-compound TAME sets from joint batch label-vector inference | Official PMLR/AISTATS record |
+
+The final pre-submission audit corrected publisher metadata or author names for
+`gawlikowski2023survey`, `xiong2021admetlab`, `tian2022admetboost`, and
+`zhang2022helix`; it also added the official proceedings DOI for
+`laghuvarapu2023codrug`. The verification anchors in this table therefore refer
+to the corrected records, not to earlier imported citation-manager metadata.
 
 ## Citation-placement safeguards
 
@@ -58,3 +68,4 @@ The table below records the intended evidentiary role of every citation. A refer
 4. Class-conditional and multivalid references motivate subgroup evaluation, but empirical ClinTox conclusions come only from the frozen outputs of this study.
 5. Recent ADMET platforms establish the practical modeling ecosystem; they do not validate the present benchmark numerically.
 6. Older references are not counted toward the requested recent-literature minimum.
+7. The three 2025--2026 arXiv entries are identified as preprints; they are used for positioning, not as reproduced experimental comparators.
