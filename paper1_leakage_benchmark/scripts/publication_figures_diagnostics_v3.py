@@ -92,6 +92,27 @@ def figure5() -> None:
     u.save(fig, "figure5_candidate_budget_audit_v3")
 
 
+def _assert_visible_yticklabels_inside(fig, ax, label: str) -> None:
+    """Guard against Wiley/TIFF clipping of long visible row labels.
+
+    The common artwork gate intentionally ignores tick labels because Matplotlib
+    creates off-view tick artists on logarithmic axes. Figure 6A has long, visible
+    categorical labels, so it receives a dedicated rendered-boundary check.
+    """
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    left_edge = fig.bbox.x0 + 4.0
+    outside = []
+    for text in ax.get_yticklabels():
+        if not text.get_visible() or not text.get_text().strip():
+            continue
+        bb = text.get_window_extent(renderer=renderer)
+        if bb.x0 < left_edge:
+            outside.append(text.get_text())
+    if outside:
+        raise AssertionError(f"{label} visible y tick labels exceed fixed canvas: {outside}")
+
+
 def figure6() -> None:
     u.configure()
     primary = m25.primary_frame()
@@ -101,7 +122,9 @@ def figure6() -> None:
 
     fig = plt.figure(figsize=(u.WIDTH_IN, 4.35))
     gs = fig.add_gridspec(2, 2)
-    fig.subplots_adjust(left=0.19, right=0.98, top=0.93, bottom=0.14, wspace=0.52, hspace=0.58)
+    # Reserve a true left safety margin for the longest categorical label
+    # ("FreeSolv · Mean-only") so both the PDF and 600-dpi TIFF remain intact.
+    fig.subplots_adjust(left=0.245, right=0.98, top=0.93, bottom=0.14, wspace=0.58, hspace=0.58)
 
     ax = fig.add_subplot(gs[0, 0])
     u.panel(ax, "A", "Mean-only vs learned models")
@@ -120,7 +143,10 @@ def figure6() -> None:
                     fmt="o" if model == "Mean-only" else "s", ms=3.0, color=color, lw=0.9, capsize=1.6)
         labels.append(f"{ds} · {model}")
     ax.axvline(0, color=u.C["gray"], ls="--", lw=0.8)
-    ax.set_yticks(np.arange(len(labels)), labels); ax.invert_yaxis(); ax.set_xlabel("RMSE improvement"); u.clean(ax, "x")
+    ax.set_yticks(np.arange(len(labels)), labels)
+    ax.tick_params(axis="y", labelsize=6.8, pad=2)
+    ax.invert_yaxis(); ax.set_xlabel("RMSE improvement"); u.clean(ax, "x")
+    _assert_visible_yticklabels_inside(fig, ax, "figure6 panel A")
 
     rng = np.random.default_rng(3)
     ax = fig.add_subplot(gs[0, 1])
