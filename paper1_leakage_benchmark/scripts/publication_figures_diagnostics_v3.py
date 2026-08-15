@@ -176,7 +176,9 @@ def figure6() -> None:
     ax.set_xticks(range(6), m25.DATASETS, rotation=30, ha="right"); ax.set_ylabel("Balanced - size"); u.clean(ax, "y")
 
     ax = fig.add_subplot(gs[1, 1])
-    u.panel(ax, "D", "Effective scaffold number")
+    # The full term remains in the caption and y-axis quantity; the shorter
+    # panel title prevents right-edge overflow after reserving the larger left margin.
+    u.panel(ax, "D", "Effective scaffolds")
     for i, ds in enumerate(m25.DATASETS):
         g = collateral[collateral["dataset"].eq(ds)]
         s = g["size_effective_test_scaffolds"].to_numpy(float); b = g["balanced_effective_test_scaffolds"].to_numpy(float)
