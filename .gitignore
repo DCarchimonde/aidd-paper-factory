@@ -80,3 +80,10 @@ paper2_admet_benchmark/results/applicability/applicability_details_*.csv
 *.synctex.gz
 paper1_latex/main.pdf
 paper2_admet_benchmark/manuscript/main.pdf
+
+# Paper 1 SAR/QSAR enhancement artifacts
+paper1_sarqsar/cache/
+paper1_sarqsar/results/
+paper1_sarqsar/build/
+paper1_sarqsar/logs/
+paper1_sarqsar_submission_package/

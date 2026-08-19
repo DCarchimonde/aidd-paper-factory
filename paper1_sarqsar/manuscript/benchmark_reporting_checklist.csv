@@ -1,0 +1,15 @@
+audit_item,minimum_report,risk_if_omitted
+Molecular identity,"Canonicalization, stereochemistry, invalid-record, duplicate, and conflicting-label rules",Unstable dataset identity; hidden train–test identity leakage
+Disconnected-component policy,"Full source record, salt/solvent removal, dominant-fragment rule, and tie-breaking","Fingerprints, scaffold identities, duplicate mappings, and labels can change"
+Scaffold semantics,"Scaffold algorithm, chirality setting, and explicit handling of empty/acyclic frameworks",“Unseen scaffold” has an undefined or implementation-dependent meaning
+Endpoint use in splitting,"Whether endpoint values or response summaries enter candidate generation, ranking, or stopping",Response-aware benchmark optimization may be mistaken for target-blind validation
+Candidate generation,"Generation algorithm, random seed, target blindness, duplicate removal, and candidate-space restrictions",The comparison cannot be reconstructed and may hide selective search
+Requested and realized test size,"Nominal fraction, realized molecule count, and exact pairing rule",Performance differences may be confounded by test-set cardinality
+Search budget,"Number of candidates, nestedness, stopping rule, and whether the budget was frozen pre-outcome",A hidden researcher degree of freedom can amplify extreme split selection
+Trivial response-only control,Training-mean or training-prevalence predictor evaluated on the paired partitions,Metric coupling can be misattributed to molecular-model generalization
+Collateral benchmark diagnostics,"Target variance/tails, scaffold concentration, acyclic fraction, similarity, and other non-optimized properties",A multidimensional partition change may be described as a single-variable intervention
+Inferential unit,Unique paired partition or other scientific replicate; model seeds kept as robustness checks,Pseudo-replication and artificially narrow uncertainty intervals
+Multiplicity and decision rule,"Primary hypothesis family, interval, test, correction, and handling of undefined metrics",Selective significance and inconsistent conclusions
+Protocol perturbations,"Predeclared scaffold, molecular-record, and representation sensitivities",A conclusion may depend on one undocumented implementation convention
+Provenance,"Molecule-level manifests, hashes, software versions, code release, and immutable commit/tag",Benchmark claims cannot be audited or reproduced
+Related-work separation,"Overlap in datasets, hypotheses, methods, figures, and conclusions with related manuscripts","Perceived salami slicing, duplicate publication, or undisclosed overlap"
