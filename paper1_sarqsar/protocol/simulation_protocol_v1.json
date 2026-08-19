@@ -1,0 +1,152 @@
+{
+  "protocol_name": "Molecular null-permutation audit of split-objective–metric coupling",
+  "protocol_version": "1.0.0",
+  "status": "pre-outcome frozen protocol",
+  "frozen_date": "2026-08-20",
+  "base_commit": "28a5dff363f4b2db1ef31b065116488ab45bec71",
+  "target_journal": "SAR and QSAR in Environmental Research",
+  "datasets": {
+    "classification": [
+      "BACE",
+      "BBBP",
+      "ClinTox",
+      "HIV"
+    ],
+    "regression": [
+      "ESOL",
+      "FreeSolv"
+    ]
+  },
+  "acyclic_semantics": {
+    "classification": [
+      "single_group"
+    ],
+    "regression": [
+      "single_group",
+      "singleton"
+    ]
+  },
+  "partition_seeds": [
+    42,
+    123,
+    2024,
+    2026,
+    3407,
+    7,
+    19,
+    71,
+    101,
+    211,
+    307,
+    401,
+    503,
+    601,
+    701,
+    809,
+    907,
+    1009,
+    1201,
+    1429
+  ],
+  "endpoint_permutations": 200,
+  "permutation_seed_base": 2026082001,
+  "permutation_block_size": 10,
+  "candidate_budgets": {
+    "classification_single_group": [
+      10,
+      30,
+      100,
+      300
+    ],
+    "regression_single_group": [
+      100,
+      300,
+      1000,
+      3000,
+      5000,
+      10000,
+      20000
+    ],
+    "regression_singleton": [
+      100,
+      300,
+      1000,
+      3000,
+      5000
+    ]
+  },
+  "candidate_generation": {
+    "target_blind": true,
+    "nested_prefixes": true,
+    "algorithm": "random scaffold-group permutation with closest-crossing prefix",
+    "test_fraction": 0.2,
+    "duplicate_candidates_removed": true,
+    "size_baseline": "minimum absolute realized test-size deviation with deterministic hash tie-break",
+    "balanced_counterpart": "minimum absolute train–test target-mean gap among candidates with exactly the same realized test size",
+    "same_candidate_pool_within_pair": true
+  },
+  "null_generation": {
+    "unit": "molecule row within cleaned dataset",
+    "operation": "permute endpoint values without replacement",
+    "preserved": [
+      "molecules",
+      "canonical molecular identities",
+      "scaffold groups",
+      "scaffold group-size distribution",
+      "endpoint marginal distribution"
+    ],
+    "destroyed": [
+      "structure–endpoint association"
+    ],
+    "same_permutation_across_partition_seeds": true,
+    "same_permutation_across_acyclic_semantics": true
+  },
+  "constant_predictors": {
+    "regression": "training-set arithmetic mean",
+    "classification": "training-set positive-class prevalence"
+  },
+  "metrics": {
+    "regression": [
+      "MSE",
+      "RMSE",
+      "MAE",
+      "R2",
+      "test variance",
+      "squared train–test mean gap"
+    ],
+    "classification": [
+      "ROC-AUC",
+      "average precision",
+      "Brier score",
+      "log loss",
+      "train/test prevalence"
+    ]
+  },
+  "effect_orientation": {
+    "loss_metrics": "size-matched minus response-aware; positive favors response-aware selection",
+    "score_metrics": "response-aware minus size-matched; positive favors response-aware selection"
+  },
+  "inference": {
+    "within_permutation": "average over 20 partition seeds",
+    "simulation_replicate": "endpoint permutation",
+    "number_of_simulation_replicates": 200,
+    "interval": "empirical 2.5th and 97.5th percentiles across permutations",
+    "pseudo_replication_prohibited": true
+  },
+  "quality_gates": {
+    "exact_test_size_within_pair": true,
+    "response_aware_gap_not_worse_than_baseline": true,
+    "mse_decomposition_max_absolute_error": 1e-10,
+    "complete_dataset_semantics_seed_permutation_budget_cells": true,
+    "protocol_hash_recorded_in_every_output": true,
+    "input_hash_recorded_in_every_output": true
+  },
+  "execution": {
+    "resume_unit": "dataset × acyclic semantics × partition seed × 10-permutation block",
+    "default_workers": 4,
+    "gpu_required": false,
+    "model_fitting": false,
+    "fail_closed": true
+  },
+  "protocol_sha256": "eb05576aaed9ce2035d66067929dd8201692767b73d8fe931e446ecaa050cc7e"
+}
