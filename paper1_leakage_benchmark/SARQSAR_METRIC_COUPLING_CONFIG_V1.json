@@ -1,0 +1,68 @@
+{
+  "protocol_version": "1.0",
+  "master_seed": 20260820,
+  "n_permutations": 200,
+  "partition_seeds": [
+    42,
+    123,
+    2024,
+    2026,
+    3407,
+    7,
+    19,
+    71,
+    101,
+    211,
+    307,
+    401,
+    503,
+    601,
+    701,
+    809,
+    907,
+    1009,
+    1201,
+    1429
+  ],
+  "datasets": {
+    "BACE": {
+      "task_type": "classification",
+      "scaffold_modes": ["single_group"],
+      "budgets": [10, 30, 100, 300]
+    },
+    "BBBP": {
+      "task_type": "classification",
+      "scaffold_modes": ["single_group"],
+      "budgets": [10, 30, 100, 300]
+    },
+    "ClinTox": {
+      "task_type": "classification",
+      "scaffold_modes": ["single_group"],
+      "budgets": [10, 30, 100, 300]
+    },
+    "HIV": {
+      "task_type": "classification",
+      "scaffold_modes": ["single_group"],
+      "budgets": [10, 30, 100, 300]
+    },
+    "ESOL": {
+      "task_type": "regression",
+      "scaffold_modes": ["single_group", "singleton"],
+      "budgets": [100, 300, 1000, 3000, 5000, 10000, 20000]
+    },
+    "FreeSolv": {
+      "task_type": "regression",
+      "scaffold_modes": ["single_group", "singleton"],
+      "budgets": [100, 300, 1000, 3000, 5000, 10000, 20000]
+    }
+  },
+  "test_fraction": 0.2,
+  "endpoint_permutation_unit": "molecule",
+  "simulation_inference_unit": "endpoint_permutation_after_mean_across_20_partition_seeds",
+  "classification_metrics": ["roc_auc", "average_precision", "brier", "log_loss"],
+  "regression_metrics": ["rmse", "mse", "mae", "r2", "test_variance", "squared_mean_gap"],
+  "effect_orientation": "positive_favors_response_aware_selection",
+  "mse_decomposition_tolerance": 1e-9,
+  "auc_effect_tolerance": 1e-12,
+  "checkpoint_granularity": "dataset_scaffold_mode_partition_seed"
+}
