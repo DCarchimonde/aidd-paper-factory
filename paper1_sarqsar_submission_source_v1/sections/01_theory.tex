@@ -1,0 +1,25 @@
+\section{Theory and estimands}
+
+\subsection{Exact-size response-aware partition selection}
+
+For dataset $d$ and partition seed $s$, let $\mathcal C_{ds}$ be a target-blind pool of complete scaffold-group subsets. The size-matched baseline $c^{\mathrm{size}}_{ds}$ minimizes deviation from the requested test cardinality without using endpoint values. Response-aware selection is restricted to
+\begin{equation}
+\mathcal M_{ds}=\{c\in\mathcal C_{ds}:n_{\mathrm{test}}(c)=n_{\mathrm{test}}(c^{\mathrm{size}}_{ds})\},
+\end{equation}
+and chooses
+\begin{equation}
+c^{\mathrm{resp}}_{ds}=\arg\min_{c\in\mathcal M_{ds}}\left|\bar y_{\mathrm{test}}(c)-\bar y_{\mathrm{train}}(c)\right|.
+\label{eq:response-selection}
+\end{equation}
+The pair therefore shares the dataset, partition seed, target-blind candidate pool, scaffold rule, requested draw budget, and realized test size. It does not hold molecular or scaffold composition fixed.
+
+\subsection{Metric-coupling decompositions}
+
+For regression, subtracting the response-aware constant-predictor MSE from the size-matched counterpart gives
+\begin{equation}
+\Delta\mathrm{MSE}=\Delta\mathrm{Var}(y_{\mathrm{test}})+\Delta(\bar y_{\mathrm{test}}-\bar y_{\mathrm{train}})^2,
+\label{eq:mse-effect-decomposition}
+\end{equation}
+where $\Delta=\mathrm{size}-\mathrm{response\mbox{-}aware}$. We refer to the second term as the \emph{objective-aligned component} and to the first as the collateral test-variance component. Because response-aware selection minimizes the absolute mean gap, the squared-gap component is non-increasing by construction. The total MSE effect is not deterministic because test variance can change in either direction.
+
+For binary endpoints, the squared prevalence-gap component in Equation~\ref{eq:brier-decomposition} is likewise objective-aligned and non-increasing. The Bernoulli test-variance term $q(1-q)$ can offset or reinforce that component. Average precision and log loss depend on test prevalence and selected composition through different mechanisms, while constant-score ROC--AUC is 0.5 whenever both classes are present.
