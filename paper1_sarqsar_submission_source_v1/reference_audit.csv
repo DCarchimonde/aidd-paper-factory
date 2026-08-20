@@ -1,0 +1,15 @@
+key,doi,verification_source
+racz2015consistency,10.1080/1062936X.2015.1084647,Taylor & Francis article page
+chatterjee2022crossvalidation,10.1080/1062936X.2022.2081255,Taylor & Francis article page
+heberger2023validation,10.1080/1062936X.2023.2214871,Taylor & Francis article page
+rucker2007yrandomization,10.1021/ci700157b,ACS article page and PubMed
+phipson2010permutation,10.2202/1544-6115.1585,PubMed and publisher page
+wu2018moleculenet,10.1039/C7SC02664A,RSC article metadata
+bemis1996properties,10.1021/jm9602928,ACS article metadata
+yang2019learned,10.1021/acs.jcim.9b00237,ACS article metadata
+deng2023systematic,10.1038/s41467-023-41948-6,Nature article metadata
+joeres2025datasail,10.1038/s41467-025-58606-8,Nature article metadata
+landrum2023simpd,10.1186/s13321-023-00787-9,Journal of Cheminformatics article metadata
+li2026partition,10.1021/acs.jcim.5c02465,ACS article page
+nael2026dataset,10.1021/acs.jcim.6c00514,ACS article page
+rdkit2026,10.5281/zenodo.21291217,Zenodo record
