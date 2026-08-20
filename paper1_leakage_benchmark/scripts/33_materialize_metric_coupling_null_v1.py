@@ -8,7 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "paper1_leakage_benchmark" / "scripts"
-SOURCE = SCRIPTS / "34_run_metric_coupling_null_v1.py"
+SOURCE = SCRIPTS / "_templates" / "34_run_metric_coupling_null_v1.py.in"
 GENERATED_DIR = SCRIPTS / "_generated"
 OUTPUT = GENERATED_DIR / "34_run_metric_coupling_null_v1_materialized.py"
 MANIFEST = GENERATED_DIR / "34_run_metric_coupling_null_v1_materialized.json"
