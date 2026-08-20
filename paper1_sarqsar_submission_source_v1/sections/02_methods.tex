@@ -1,0 +1,55 @@
+\section{Materials and methods}
+
+\subsection{Datasets and audited molecular identity}
+
+The empirical audit used BACE, BBBP, ClinTox, and HIV for classification and ESOL and FreeSolv for regression \citep{wu2018moleculenet}. Source SMILES were parsed and canonicalized with RDKit \citep{rdkit2026}. Molecular identity was canonical isomeric SMILES. Consistent classification duplicates were collapsed, conflicting-label identities were excluded, and regression duplicates were aggregated by arithmetic mean. Primary analyses preserved disconnected components found in the source-faithful record. Table~\ref{tab:datasets} gives the closed accounting.
+
+\begin{table}[!htbp]
+\centering
+\caption{Audited molecular-property datasets. The null experiment preserved each final clean molecular universe and its endpoint marginal.}
+\label{tab:datasets}
+\begin{tabular}{llrr}
+\toprule
+Dataset & Task & Raw rows & Final unique molecules \\
+\midrule
+BACE & Classification & 1,513 & 1,513 \\
+BBBP & Classification & 2,050 & 1,965 \\
+ClinTox & Classification & 1,484 & 1,442 \\
+HIV & Classification & 41,127 & 41,120 \\
+ESOL & Regression & 1,128 & 1,117 \\
+FreeSolv & Regression & 642 & 642 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Scaffold identity and acyclic semantics}
+
+Bemis--Murcko scaffolds were recomputed with chirality excluded \citep{bemis1996properties}. The primary convention assigned all acyclic molecules to one explicit scaffold identity; the regression sensitivity assigned each acyclic molecule a molecule-specific identity. Every partition was required to assign each molecule exactly once and to have zero train--test scaffold overlap.
+
+\subsection{Empirical exact-size paired audit}
+
+For each of 20 pre-specified partition seeds, a fixed-budget target-blind scaffold candidate pool was generated. The size-matched baseline minimized deviation from the requested 20\% test size without endpoint information. Response-aware selection was then restricted to candidates with exactly the same realized test size and minimized the absolute train--test endpoint-mean gap. Candidate generation, test cardinality, scaffold rule, search budget, and partition seed were thus controlled at the protocol level, but molecular and scaffold composition were not.
+
+The primary audit used 300 requested draws per seed for classification, 20,000 for ESOL and FreeSolv under the shared-acyclic convention, and 5,000 for the singleton regression sensitivity. The shared-acyclic regression search had not converged by its frozen 20,000-draw cap and is not described as converged.
+
+All models used radius-2, 2048-bit Morgan fingerprints \citep{rogers2010extended}. Classification used logistic regression, random forest, and XGBoost; regression used ridge regression, random forest, and XGBoost \citep{pedregosa2011scikit,breiman2001random,chen2016xgboost}. Fixed configurations and production seed 17 were used. ROC--AUC was the primary classification metric and RMSE the primary regression metric.
+
+The inferential unit was the unique paired partition, not a model seed. Each of 18 primary dataset--model cells contained 20 partition-pair effects, a 10,000-replicate paired-bootstrap interval for the mean, and a two-sided Wilcoxon signed-rank test. Holm correction was applied across all 18 cells. A response-aware advantage required both adjusted $P<0.05$ and a bootstrap interval wholly above zero. RF/XGBoost model-seed repeats were robustness checks and did not increase inferential $n$.
+
+For regression, the mean-only predictor assigned every test molecule the training-set endpoint mean. Its paired RMSE effect linked the observed empirical partition geometry to Equations~\ref{eq:mse-decomposition} and \ref{eq:mse-effect-decomposition}. Collateral diagnostics measured endpoint-distribution shape and scaffold composition but were not treated as controlled covariates.
+
+\subsection{Molecular endpoint-permutation experiment}
+
+The endpoint-permutation protocol was frozen before null outcomes were generated. For each dataset, \NullPermutationN{} independent permutations reassigned endpoint values across molecular rows. Molecular records, endpoint marginals, scaffold identities, group-size distributions, candidate-generation algorithm, nested search budgets, and the same \PartitionSeedN{} partition seeds remained fixed. The same endpoint permutation was reused across partition seeds, and the same regression permutation was reused across shared-acyclic and singleton modes.
+
+For each permutation, size-matched and response-aware partitions were selected independently at every requested budget. Regression used the training mean as a constant test prediction and reported MSE, RMSE, MAE, and $R^2$, together with the exact decomposition in Equation~\ref{eq:mse-effect-decomposition}. Classification used the training prevalence as a constant probability and reported ROC--AUC, average precision, Brier score, and log loss. ROC--AUC was marked undefined rather than imputed when a test partition contained one class.
+
+Seed-level effects were averaged within each endpoint permutation. The \NullPermutationN{} permutation-level means formed the null reference distribution. Partition seeds were not treated as independent replicates. We report the null mean, standard deviation, median, and central 2.5th--97.5th percentile interval. These percentile intervals describe the randomized reference distribution and are not confidence intervals for a superpopulation parameter. The null experiment was kept outside the empirical 18-cell multiplicity family.
+
+\subsection{Exploratory empirical--null bridge}
+
+After the pre-specified null experiment was completed, we added an explicitly exploratory bridge analysis. For each regression dataset and scaffold convention, the statistic was the mean mean-only RMSE effect across the 20 partition seeds. The empirical statistic was compared with the matching null distribution at the empirical search budget: 20,000 draws for shared-acyclic primary analyses and 5,000 for singleton sensitivities. One-sided Monte Carlo upper-tail probabilities used the plus-one correction, $(b+1)/(m+1)$, where $b$ is the number of randomized statistics at least as large as the empirical statistic and $m=200$ \citep{phipson2010permutation}. Because this bridge was formulated after the null results were available, it is labeled exploratory and is not used to redefine the primary empirical hypothesis family.
+
+\subsection{Quality gates and reproducibility}
+
+Hard gates required complete dataset--mode--seed--budget--permutation cells, exact paired test size, a response-aware target gap no larger than its baseline, regression MSE decomposition residual below $10^{-9}$, constant-score AUC invariance, and matching protocol, configuration, and clean-data hashes. The final run contained \RawSeedRows{} partition-seed rows and \PermutationRows{} permutation-level rows; the maximum absolute MSE decomposition residual was \MaxMSEResidual{}. Candidate caches and seed-level checkpoints were immutable under matching hashes and allowed interrupted runs to resume.
