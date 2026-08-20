@@ -35,13 +35,23 @@ jobs:
           paper1_leakage_benchmark/scripts/42_run_paper1_sarqsar_overnight_hardened_v1.py
           paper1_leakage_benchmark/scripts/43_run_paper1_sarqsar_overnight_windows_hardened_v1.py
 
-      - name: Verify repair manifest
+      - name: Verify repair manifest and generated root
         shell: python
         run: |
           import json
           from pathlib import Path
-          path = Path("paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.json")
-          manifest = json.loads(path.read_text(encoding="utf-8"))
+
+          manifest_path = Path("paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.json")
+          generated_path = Path("paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.py")
+          manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+          generated = generated_path.read_text(encoding="utf-8")
+
           assert manifest["status"] == "syntax_pass", manifest
-          assert manifest["repairs"] == {"table_header": 1, "table_row": 1}, manifest
-          print("REPAIR CONTRACT: PASS")
+          assert manifest["repairs"] == {
+              "root_depth": 1,
+              "table_header": 1,
+              "table_row": 1,
+          }, manifest
+          assert manifest["generated_repository_root_depth"] == 3, manifest
+          assert "ROOT = Path(__file__).resolve().parents[3]" in generated
+          print("REPAIR CONTRACT AND GENERATED ROOT: PASS")
