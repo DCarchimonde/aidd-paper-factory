@@ -1,0 +1,65 @@
+\section{Results}
+
+\subsection{The null experiment isolated deterministic component coupling from contingent total effects}
+
+All \PermutationRows{} permutation-level cells were present, and the numerical and integrity gates passed. At the maximum regression budget, the squared mean-gap contribution favored response-aware selection in 100\% of endpoint permutations for ESOL and FreeSolv under both scaffold conventions. Under the shared-acyclic convention, the mean squared-gap contributions to MSE were \ESGapSqMean{} for ESOL and \FSGapSqMean{} for FreeSolv. The corresponding mean test-variance contributions were \ESVarianceMean{} and \FSVarianceMean{}. Consequently, total RMSE effects were much less stable: \ESNullRMSEMean{} with central 95\% null interval [\ESNullRMSELow{}, \ESNullRMSEHigh{}] for ESOL and \FSNullRMSEMean{} [\FSNullRMSELow{}, \FSNullRMSEHigh{}] for FreeSolv. Both total-effect intervals spanned zero.
+
+The budget trajectories in Figures~\ref{fig:null-rmse} and \ref{fig:null-anatomy} show why the distinction matters. The objective-aligned squared-gap component was consistently positive, but collateral test-variance changes sometimes reinforced and sometimes offset it. A larger candidate pool increased the opportunity to find endpoint-aligned partitions, yet mean total RMSE effects did not follow a universal monotone trajectory. The null experiment therefore supports a component-level mechanism rather than a blanket claim that response-aware selection must reduce headline RMSE.
+
+For classification at 300 draws, mean Brier effects ranged from \ClassBrierMin{} to \ClassBrierMax{} and mean log-loss effects from \ClassLogLossMin{} to \ClassLogLossMax{} across datasets. Constant-score ROC--AUC effects were exactly zero wherever defined. The squared prevalence-gap component was nonnegative by construction, but changes in Bernoulli test variance, test prevalence, and entropy produced small dataset-dependent total effects. ClinTox, for example, had negative mean Brier and log-loss effects despite a reduced prevalence gap. Full classification budget curves and decomposition tables are in Supporting Information.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure_1.pdf}
+\caption{Endpoint-permutation null RMSE effects across nested requested-draw budgets for ESOL and FreeSolv under shared-acyclic and singleton conventions. Lines show null means and shaded bands show central 2.5th--97.5th percentiles across 200 permutation-level statistics.}
+\label{fig:null-rmse}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure_2.pdf}
+\caption{Decomposition of the null MSE effect into the squared train--test mean-gap component and collateral test-variance component across nested search budgets.}
+\label{fig:null-anatomy}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.98\textwidth]{figures/Figure_3.pdf}
+\caption{Classification null effects across nested requested-draw budgets. Constant-score ROC--AUC is invariant when both classes are represented, whereas Brier score, log loss, and average precision respond to prevalence and composition through different mechanisms.}
+\label{fig:null-classification}
+\end{figure}
+
+\subsection{Real endpoint--scaffold organization amplified the mean-only effect in three of four matched analyses}
+
+The exploratory bridge produced a strong separation between empirical and permuted endpoint effects for the primary scaffold convention (Table~\ref{tab:bridge}). ESOL's empirical mean-only RMSE effect was \ESPrimaryObserved{}, compared with null mean \ESPrimaryNullMean{} and central null interval [\ESPrimaryNullLow{}, \ESPrimaryNullHigh{}]. FreeSolv's empirical effect was \FSPrimaryObserved{}, compared with \FSPrimaryNullMean{} [\FSPrimaryNullLow{}, \FSPrimaryNullHigh{}]. Both empirical values exceeded all 200 randomized values, giving the smallest attainable plus-one upper-tail probability, \BridgeMinP{}.
+
+At the matched 5,000-draw singleton budget, ESOL's empirical effect, \ESSingletonObserved{}, also exceeded all randomized values. In contrast, singleton FreeSolv's empirical effect, \FSSingletonObserved{}, lay within its null distribution (null mean \FSSingletonNullMean{}; percentile \FSSingletonPercentile{}\%). This pattern mirrors the empirical scaffold-semantic sensitivity: real-data amplification remained for ESOL but disappeared for FreeSolv when acyclic molecules no longer formed one shared scaffold group.
+
+Because the bridge was added after null completion, it is evidence-generating rather than confirmatory. Nevertheless, it sharpens the mechanism: endpoint-aware selection always reduces an aligned squared-gap component, while strong observed headline effects require the actual response to be organized across the available scaffold candidate space in a way that exceeds random reassignment.
+
+\begin{table}[!htbp]
+\centering
+\caption{Exploratory empirical--null bridge for the mean-only RMSE effect. Null intervals are central 2.5th--97.5th percentiles across 200 endpoint permutations after averaging 20 partition seeds within each permutation.}
+\label{tab:bridge}
+\input{generated/bridge_table.tex}
+\end{table}
+
+\subsection{Empirical learned-model effects remained protocol-dependent}
+
+The learned-model results independently confirmed that benchmark choices can alter apparent performance. None of 12 classification dataset--model cells met the corrected response-aware advantage criterion. All six shared-acyclic regression cells did so, but the regression pattern attenuated strongly under singleton acyclic semantics. The empirical mean-only effect exceeded the corresponding learned-model mean effect in all six primary regression cells.
+
+The statistical interpretation remains conservative. No corrected classification advantage does not imply equivalence, and the primary regression advantages do not imply that response-aware selection is a preferred deployment split. They show that a searched benchmark can change the difficulty and composition of the held-out population.
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.96\textwidth]{figures/Figure_4.pdf}
+\caption{Empirical learned-model paired effects. Panel A shows the 12 classification AUC effects. Panel B shows the six regression RMSE effects. Points are means over 20 unique partition pairs; bars are paired-bootstrap 95\% intervals. Positive values favor response-aware selection. Corrected decisions were 0/12 classification and 6/6 shared-acyclic regression advantages.}
+\label{fig:empirical-primary}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.96\textwidth]{figures/Figure_5.pdf}
+\caption{Acyclic-scaffold semantic sensitivity. The shared-acyclic primary and singleton sensitivity kept endpoints, models, partition seeds, and exact-size pairing logic but imposed different structural meanings for acyclic molecules. Shared-acyclic effects attenuated for ESOL and reversed for FreeSolv under singleton semantics.}
+\label{fig:acyclic-primary}
+\end{figure}
