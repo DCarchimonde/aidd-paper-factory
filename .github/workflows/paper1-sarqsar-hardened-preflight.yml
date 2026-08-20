@@ -1,0 +1,46 @@
+name: Paper 1 SARQSAR hardened preflight
+
+on:
+  push:
+    branches:
+      - paper1-sarqsar-metric-coupling-2026
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  syntax-and-materialization:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Materialize audited simulation source
+        run: python -u paper1_leakage_benchmark/scripts/33_materialize_metric_coupling_null_v1.py
+
+      - name: Compile all executable entrypoints
+        run: >-
+          python -m py_compile
+          paper1_leakage_benchmark/scripts/33_materialize_metric_coupling_null_v1.py
+          paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.py
+          paper1_leakage_benchmark/scripts/35_build_sarqsar_draft_v1.py
+          paper1_leakage_benchmark/scripts/40_run_paper1_sarqsar_overnight_v1.py
+          paper1_leakage_benchmark/scripts/42_run_paper1_sarqsar_overnight_hardened_v1.py
+          paper1_leakage_benchmark/scripts/43_run_paper1_sarqsar_overnight_windows_hardened_v1.py
+
+      - name: Verify repair manifest
+        shell: python
+        run: |
+          import json
+          from pathlib import Path
+          path = Path("paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.json")
+          manifest = json.loads(path.read_text(encoding="utf-8"))
+          assert manifest["status"] == "syntax_pass", manifest
+          assert manifest["repairs"] == {"table_header": 1, "table_row": 1}, manifest
+          print("REPAIR CONTRACT: PASS")
