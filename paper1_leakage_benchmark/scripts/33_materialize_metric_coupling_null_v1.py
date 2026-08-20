@@ -20,11 +20,21 @@ def sha256_bytes(data: bytes) -> str:
 
 def repair_source(source: str) -> tuple[str, dict[str, int]]:
     repaired: list[str] = []
-    counts = {"table_header": 0, "table_row": 0}
+    counts = {"root_depth": 0, "table_header": 0, "table_row": 0}
 
     for line in source.splitlines():
         stripped = line.strip()
         indent = line[: len(line) - len(line.lstrip())]
+
+        # The audited template was originally located directly in scripts/, where
+        # parents[2] is the repository root. The materialized executable lives one
+        # directory deeper in scripts/_generated/, so its repository root is
+        # parents[3]. Failing to adjust this makes imports and every output path
+        # resolve under paper1_leakage_benchmark/paper1_leakage_benchmark.
+        if stripped == "ROOT = Path(__file__).resolve().parents[2]":
+            repaired.append(indent + "ROOT = Path(__file__).resolve().parents[3]")
+            counts["root_depth"] += 1
+            continue
 
         if stripped.startswith('r"Audit item & Minimum report & Risk if omitted'):
             repaired.append(
@@ -44,13 +54,16 @@ def repair_source(source: str) -> tuple[str, dict[str, int]]:
 
         repaired.append(line)
 
-    if counts != {"table_header": 1, "table_row": 1}:
+    expected = {"root_depth": 1, "table_header": 1, "table_row": 1}
+    if counts != expected:
         raise AssertionError(
             "The source template no longer matches the audited repair contract: "
-            f"{counts}. Refuse to guess."
+            f"found={counts}, expected={expected}. Refuse to guess."
         )
 
     text = "\n".join(repaired) + "\n"
+    if "ROOT = Path(__file__).resolve().parents[3]" not in text:
+        raise AssertionError("Generated simulation did not receive the required repository-root repair")
     ast.parse(text, filename=str(OUTPUT))
     return text, counts
 
@@ -75,6 +88,7 @@ def main() -> None:
         "output": str(OUTPUT.relative_to(ROOT)),
         "output_sha256": sha256_bytes(OUTPUT.read_bytes()),
         "repairs": counts,
+        "generated_repository_root_depth": 3,
         "status": "syntax_pass",
     }
     MANIFEST.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
