@@ -28,6 +28,7 @@ jobs:
         run: >-
           python -m py_compile
           paper1_leakage_benchmark/scripts/33_materialize_metric_coupling_null_v1.py
+          paper1_leakage_benchmark/scripts/34_run_metric_coupling_null_v1.py
           paper1_leakage_benchmark/scripts/_generated/34_run_metric_coupling_null_v1_materialized.py
           paper1_leakage_benchmark/scripts/35_build_sarqsar_draft_v1.py
           paper1_leakage_benchmark/scripts/40_run_paper1_sarqsar_overnight_v1.py
