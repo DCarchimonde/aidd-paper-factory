@@ -18,21 +18,33 @@ def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def replace_exact(text: str, old: str, new: str, *, label: str, counts: dict[str, int]) -> str:
+    occurrences = text.count(old)
+    if occurrences != 1:
+        raise AssertionError(
+            f"The source template no longer matches the audited repair contract for {label}: "
+            f"expected exactly 1 occurrence, found {occurrences}. Refuse to guess."
+        )
+    counts[label] = 1
+    return text.replace(old, new, 1)
+
+
 def repair_source(source: str) -> tuple[str, dict[str, int]]:
     repaired: list[str] = []
-    counts = {"root_depth": 0, "table_header": 0, "table_row": 0}
+    counts = {
+        "root_depth": 0,
+        "table_header": 0,
+        "table_row": 0,
+        "subset_aggregation_guard": 0,
+        "residual_summary": 0,
+    }
 
     for line in source.splitlines():
         stripped = line.strip()
         indent = line[: len(line) - len(line.lstrip())]
 
-        # The audited template was originally located directly in scripts/, where
-        # parents[2] is the repository root. The materialized executable lives one
-        # directory deeper in scripts/_generated/, so its repository root is
-        # parents[3]. Failing to adjust this makes imports and every output path
-        # resolve under paper1_leakage_benchmark/paper1_leakage_benchmark.
-        if stripped == "ROOT = Path(__file__).resolve().parents[2]":
-            repaired.append(indent + "ROOT = Path(__file__).resolve().parents[3]")
+        if stripped == 'ROOT = Path(__file__).resolve().parents[2]':
+            repaired.append(indent + 'ROOT = Path(__file__).resolve().parents[3]')
             counts["root_depth"] += 1
             continue
 
@@ -54,14 +66,70 @@ def repair_source(source: str) -> tuple[str, dict[str, int]]:
 
         repaired.append(line)
 
-    expected = {"root_depth": 1, "table_header": 1, "table_row": 1}
-    if counts != expected:
+    expected_line_repairs = {"root_depth": 1, "table_header": 1, "table_row": 1}
+    actual_line_repairs = {key: counts[key] for key in expected_line_repairs}
+    if actual_line_repairs != expected_line_repairs:
         raise AssertionError(
-            "The source template no longer matches the audited repair contract: "
-            f"found={counts}, expected={expected}. Refuse to guess."
+            "The source template no longer matches the audited line-repair contract: "
+            f"{actual_line_repairs}. Refuse to guess."
         )
 
     text = "\n".join(repaired) + "\n"
+
+    old_subset_block = '''    regression = seed_aggregate[seed_aggregate["task_type"].eq("regression")].copy()
+    residual = (
+        regression["effect_mse"]
+        - regression["effect_test_variance"]
+        - regression["effect_squared_mean_gap"]
+    ).abs()
+    if not residual.empty and float(residual.max()) > 1e-9:
+        raise AssertionError(f"Aggregate MSE decomposition residual {residual.max()}")
+'''
+    new_subset_block = '''    regression = seed_aggregate[seed_aggregate["task_type"].eq("regression")].copy()
+    required_regression_columns = {
+        "effect_mse",
+        "effect_test_variance",
+        "effect_squared_mean_gap",
+    }
+    if regression.empty:
+        max_residual = 0.0
+    else:
+        missing_regression_columns = required_regression_columns.difference(regression.columns)
+        if missing_regression_columns:
+            raise KeyError(
+                "Regression rows are present but required decomposition columns are missing: "
+                f"{sorted(missing_regression_columns)}"
+            )
+        residual = (
+            regression["effect_mse"]
+            - regression["effect_test_variance"]
+            - regression["effect_squared_mean_gap"]
+        ).abs()
+        max_residual = float(residual.max()) if not residual.empty else 0.0
+        if max_residual > 1e-9:
+            raise AssertionError(f"Aggregate MSE decomposition residual {max_residual}")
+'''
+    text = replace_exact(
+        text,
+        old_subset_block,
+        new_subset_block,
+        label="subset_aggregation_guard",
+        counts=counts,
+    )
+
+    old_summary = (
+        '"max_abs_mse_decomposition_residual": '
+        '[float(residual.max()) if not residual.empty else 0.0],'
+    )
+    new_summary = '"max_abs_mse_decomposition_residual": [max_residual],'
+    text = replace_exact(
+        text,
+        old_summary,
+        new_summary,
+        label="residual_summary",
+        counts=counts,
+    )
+
     if "ROOT = Path(__file__).resolve().parents[3]" not in text:
         raise AssertionError("Generated simulation did not receive the required repository-root repair")
     ast.parse(text, filename=str(OUTPUT))
