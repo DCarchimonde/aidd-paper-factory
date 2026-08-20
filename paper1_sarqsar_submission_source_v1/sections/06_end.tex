@@ -1,0 +1,37 @@
+\section{Limitations}
+
+Only ESOL and FreeSolv were regression endpoints, so the observed empirical amplification should not be generalized to all continuous QSAR tasks. The endpoint-permutation experiment removes all structure--endpoint association and therefore represents a molecular null, not a continuum of realistic signal strengths. The empirical--null bridge was specified after null completion and is exploratory. With 200 permutations, the smallest attainable plus-one upper-tail probability is approximately 0.005; the study emphasizes effect distributions and mechanisms rather than fine-grained significance levels.
+
+The predictive models were classical Morgan-fingerprint baselines chosen to limit architecture-related degrees of freedom. Candidate generation used a random scaffold-prefix heuristic rather than exhaustive subset enumeration, and the empirical shared-acyclic regression search had not converged by 20,000 requested draws. The acyclic conventions are operational extremes, and dominant-fragment mapping is not guaranteed to identify a chemically authoritative parent. Exact-size pairing controls cardinality but not chemical composition. Finally, no chronological, prospective, or external industrial test set was available; the study diagnoses internal benchmark construction rather than identifying the split that best predicts a particular future deployment.
+
+\section{Conclusion}
+
+Split-objective--metric coupling is deterministic at the aligned component level and contingent at the headline-metric level. Molecular endpoint permutations showed that response-aware same-size scaffold selection always reduced squared mean or prevalence-gap components, while total RMSE, Brier, and log-loss effects depended on collateral changes in the selected test population and constant-score AUC remained invariant. Real endpoints produced mean-only effects far beyond matched molecular-null distributions for primary ESOL and FreeSolv and for singleton ESOL, but not singleton FreeSolv. The learned-model audit independently showed no corrected classification advantage, protocol-dependent regression effects, and representation-sensitive point estimates.
+
+QSAR benchmark construction should therefore be treated as part of the measurement model. Endpoint use, search effort, scaffold and molecular-record semantics, trivial metric controls, inferential units, and immutable partition provenance should be frozen and reported. The practical goal is not one universally superior split, but claims whose dependence on defensible benchmark choices is visible and auditable.
+
+\section*{Data availability statement}
+\ifanonymous
+The public molecular-property datasets are cited in the manuscript. An anonymized code and reproducibility archive containing frozen protocols, partition manifests, simulation outputs, tables, figures, and build scripts will be supplied for double-anonymous peer review and made openly available with the final publication record.
+\else
+The public molecular-property datasets are cited in the manuscript. Code, frozen protocols, partition manifests, simulation outputs, tables, figures, and build scripts are maintained in the project repository. The empirical submission state and molecular-null run are identified by immutable tags, protocol and configuration hashes, and machine-readable run manifests. A dedicated archival release will be created upon acceptance.
+\fi
+
+\section*{Disclosure statement}
+The authors report no competing interests.
+
+\section*{Funding}
+The authors received no specific funding for this work.
+
+\ifanonymous\else
+\section*{Author contributions}
+S.T. conceptualized the study, designed the benchmark audit and null experiment, implemented the workflow, analyzed the results, and drafted the manuscript. Y.W. reviewed the methodology and experimental design, checked manuscript consistency, provided technical feedback, and contributed to revision. Both authors approved the submitted version.
+
+\section*{Acknowledgements}
+The authors thank the maintainers of the public molecular datasets and open-source cheminformatics and machine-learning libraries used in this work.
+\fi
+
+\section*{AI-assisted tools}
+OpenAI ChatGPT was used for language editing, manuscript organization, code debugging, LaTeX formatting, figure-layout assistance, and preparation of reproducibility materials. It was not used to generate or alter molecular data, endpoint values or permutations, partition assignments, predictive outputs, statistical results, or scientific conclusions. All analyses were executed in the authors' controlled computational environment, and all code, references, numerical outputs, and figures were reviewed and verified by the authors.
+
+\input{references.tex}
