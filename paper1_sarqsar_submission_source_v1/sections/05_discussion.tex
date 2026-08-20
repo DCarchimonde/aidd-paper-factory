@@ -1,0 +1,57 @@
+\section{Discussion}
+
+\subsection{Component coupling is deterministic; headline-metric change is contingent}
+
+The molecular null distinguishes two claims that are easily conflated. First, the objective-aligned squared-gap component is deterministically non-increasing because the selection rule directly minimizes the underlying gap. Second, the total RMSE or Brier effect is contingent because the selected test population has a different variance, prevalence, entropy, and molecular composition. The selection objective therefore implies a mathematical coupling but does not guarantee a better headline score.
+
+This distinction helps resolve the apparent asymmetry between the null and empirical regression results. Under randomized endpoints, total RMSE distributions spanned zero despite a strictly positive squared-gap component. Under the real shared-acyclic endpoints, mean-only effects were much larger and exceeded the matched null reference distributions. Learned-model effects shared the same direction but were smaller than the mean-only control. The benchmark definition determines which conclusion is supported.
+
+A classification benchmark illustrates the metric specificity of the mechanism. Binary prevalence alignment directly reduces a squared-gap component of Brier score, but constant-score ROC--AUC remains 0.5 and average precision remains prevalence-dependent. Classification splits should not therefore be called generally ``easier'' or ``harder'' without naming the metric and the composition changes that accompany the split.
+
+\begin{table}[!htbp]
+\centering
+\caption{Compact reporting checklist for response-aware QSAR benchmarks.}
+\label{tab:checklist}
+\begin{adjustbox}{width=\textwidth}
+\begin{tabular}{p{0.24\textwidth}p{0.68\textwidth}}
+\toprule
+Domain & Minimum disclosure \\
+\midrule
+Molecular identity & Canonicalization, stereochemistry, duplicate aggregation, conflicting-label policy, and disconnected-component rule. \\
+Structural grouping & Scaffold algorithm, chirality, acyclic handling, and train--test overlap checks. \\
+Endpoint use & Whether endpoints enter candidate generation, filtering, selection, stopping, or post hoc choice. \\
+Search and cardinality & Requested draws, unique candidates, stopping rule, requested test size, and realized paired test size. \\
+Trivial metric control & Training-mean or training-prevalence predictor matched to the primary metric. \\
+Collateral diagnostics & Endpoint variance and tails, prevalence, scaffold concentration, acyclic fraction, and selected chemical composition. \\
+Inference & Unique partition count, inferential unit, uncertainty method, multiplicity family, and model-seed role. \\
+Provenance & Molecule-level manifests, hashes, data and code versions, environment, and immutable release. \\
+\bottomrule
+\end{tabular}
+\end{adjustbox}
+\end{table}
+
+\subsection{Scaffold--response organization amplifies coupling in real data}
+
+The empirical--null bridge suggests why the original primary regression effects were much larger than the randomized total effects. When endpoint values are randomly reassigned across real scaffold groups, candidate-level mean differences are attenuated by within-group averaging and no longer align systematically with chemical series. The observed ESOL and FreeSolv endpoints produced mean-only effects beyond all 200 matched null permutations under shared-acyclic semantics. This is consistent with response structure being organized across the available scaffold candidate space, allowing response-aware search to select unusually aligned partitions.
+
+The singleton sensitivity is especially informative. ESOL remained beyond its matched null distribution, whereas FreeSolv did not. The same change in acyclic semantics also attenuated or reversed learned-model effects. Thus, the magnitude of coupling is not determined only by an endpoint's marginal distribution; it depends on how endpoint values are arranged over the grouping rule that defines candidate partitions.
+
+The bridge is exploratory and should not be treated as a newly pre-specified confirmatory test. Its role is mechanistic: it connects the null experiment to a pattern already visible in the mean-only and scaffold-semantic empirical controls. A future prospective study should freeze this comparison and increase the number of regression endpoints before it is used confirmatorily.
+
+\subsection{Search budget is a benchmark hyperparameter}
+
+A searched split is defined by both its objective and how hard the algorithm searches. As requested draws increase, the pool is more likely to contain a candidate with an extreme target gap, another metric, or a particular chemical composition. This is a benchmark-specific researcher degree of freedom. Search budget, duplicate-draw semantics, stopping criterion, and pre-outcome freeze should be treated analogously to model hyperparameters.
+
+The appropriate response is not to prohibit every endpoint-aware audit. Such perturbations can reveal how a benchmark claim depends on endpoint distribution. The requirement is transparency: candidate generation must remain distinct from endpoint-based selection, exact paired cardinality should be enforced when sample-size confounding is under study, and the selected partition should not be presented as an unbiased prospective estimate.
+
+\subsection{Scaffold and molecular-record semantics define the validation population}
+
+``Unseen scaffold'' depends on the scaffold ontology. Placing all acyclic molecules into one group withholds or retains them collectively, whereas singleton treatment distributes them independently. Both are operational conventions, and neither is universally correct. Their disagreement is evidence about the benchmark's structural definition.
+
+Disconnected-component policy creates a parallel issue at the molecular-record level. Selecting a dominant fragment can change fingerprints, scaffolds, duplicate mappings, and conflicting labels. In the present data, corrected conclusions remained inconclusive but most directional AUC effects reversed. Reporting only the sign of a small difference would therefore have produced a representation-dependent narrative. Molecular identity and component policy belong in the benchmark contract, not in undocumented preprocessing.
+
+\subsection{Implications for QSAR validation practice}
+
+The findings complement established QSAR validation principles rather than replacing them. External validation, applicability-domain assessment, cross-validation design, and $y$-randomization remain essential \citep{tropsha2003earnest,gramatica2007principles,heberger2023validation,rucker2007yrandomization}. The additional requirement is to audit the benchmark-construction algorithm itself when it searches over possible test sets.
+
+At minimum, authors should state whether endpoint values enter split construction, report requested and unique search budgets, preserve exact partition manifests, evaluate trivial response-only predictors for aligned metrics, and distinguish partition replicates from repeated model fits. When reasonable scaffold or representation policies disagree, the disagreement should be reported rather than resolved by selecting the preferred outcome post hoc. These practices make negative and conditional results scientifically useful and reduce false confidence in small model comparisons.
