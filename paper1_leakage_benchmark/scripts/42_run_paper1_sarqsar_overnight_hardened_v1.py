@@ -27,8 +27,6 @@ def load_module(path: Path, name: str):
     if spec is None or spec.loader is None:
         raise ImportError(path)
     module = importlib.util.module_from_spec(spec)
-    # Dataclasses and some import-time utilities expect the module to be
-    # registered while it is executed.
     sys.modules[name] = module
     try:
         spec.loader.exec_module(module)
@@ -112,6 +110,51 @@ def build_synthetic_summary(sim):
     return sim.pd.DataFrame(rows)
 
 
+def run_smoke_condition(
+    sim,
+    smoke_config: dict,
+    *,
+    dataset: str,
+    task_type: str,
+    mode: str,
+    budget: int,
+) -> Path:
+    frame, _, clean_sha256 = sim.validate_clean_frame(dataset, task_type)
+    permutations, permutation_seeds = sim.generate_permutations(
+        frame["target"].to_numpy(dtype=float), dataset, smoke_config
+    )
+    fingerprint = sim.protocol_fingerprint(smoke_config)
+    checkpoint = sim.run_seed(
+        frame=frame,
+        permutations=permutations,
+        permutation_seeds=permutation_seeds,
+        dataset=dataset,
+        task_type=task_type,
+        mode=mode,
+        partition_seed=42,
+        budgets=[budget],
+        clean_sha256=clean_sha256,
+        fingerprint=fingerprint,
+        force=True,
+        force_cache=True,
+    )
+    checkpoint_frame = sim.pd.read_csv(checkpoint)
+    if len(checkpoint_frame) != 2:
+        raise AssertionError(
+            f"{dataset} smoke checkpoint row count is {len(checkpoint_frame)}, expected 2"
+        )
+    return checkpoint
+
+
+def assert_summary_metric(summary, metric: str, task_type: str) -> None:
+    if summary.empty:
+        raise AssertionError(f"{task_type} smoke aggregation returned an empty summary")
+    if metric not in set(summary["metric"].astype(str)):
+        raise AssertionError(
+            f"{task_type} smoke aggregation did not produce required metric {metric}"
+        )
+
+
 def functional_smoke(config: dict) -> None:
     sim = load_module(GENERATED_SIM, "paper1_metric_coupling_materialized_smoke")
     if Path(sim.ROOT).resolve() != ROOT.resolve():
@@ -155,31 +198,43 @@ def functional_smoke(config: dict) -> None:
 
         smoke_config = json.loads(json.dumps(config))
         smoke_config["n_permutations"] = 2
-        frame, _, clean_sha256 = sim.validate_clean_frame("BACE", "classification")
-        permutations, permutation_seeds = sim.generate_permutations(
-            frame["target"].to_numpy(dtype=float), "BACE", smoke_config
-        )
-        fingerprint = sim.protocol_fingerprint(smoke_config)
-        checkpoint = sim.run_seed(
-            frame=frame,
-            permutations=permutations,
-            permutation_seeds=permutation_seeds,
+
+        classification_checkpoint = run_smoke_condition(
+            sim,
+            smoke_config,
             dataset="BACE",
             task_type="classification",
             mode="single_group",
-            partition_seed=42,
-            budgets=[10],
-            clean_sha256=clean_sha256,
-            fingerprint=fingerprint,
-            force=True,
-            force_cache=True,
+            budget=10,
         )
-        checkpoint_frame = sim.pd.read_csv(checkpoint)
-        if len(checkpoint_frame) != 2:
-            raise AssertionError(f"Real-data smoke checkpoint row count is {len(checkpoint_frame)}, expected 2")
-        _, smoke_summary = sim.aggregate_results(smoke_config, [checkpoint])
-        if smoke_summary.empty or "effect_roc_auc" not in set(smoke_summary["metric"]):
-            raise AssertionError("Real-data smoke aggregation did not produce classification effects")
+        regression_checkpoint = run_smoke_condition(
+            sim,
+            smoke_config,
+            dataset="ESOL",
+            task_type="regression",
+            mode="single_group",
+            budget=100,
+        )
+
+        _, classification_summary = sim.aggregate_results(
+            smoke_config, [classification_checkpoint]
+        )
+        assert_summary_metric(classification_summary, "effect_roc_auc", "classification-only")
+
+        _, regression_summary = sim.aggregate_results(smoke_config, [regression_checkpoint])
+        assert_summary_metric(regression_summary, "effect_mse", "regression-only")
+        quality = sim.pd.read_csv(sim.TABLES / "null_simulation_quality_gate_summary.csv")
+        maximum_residual = float(quality["max_abs_mse_decomposition_residual"].iloc[0])
+        if maximum_residual > 1e-9:
+            raise AssertionError(
+                f"Regression-only aggregate MSE residual exceeded tolerance: {maximum_residual}"
+            )
+
+        _, combined_summary = sim.aggregate_results(
+            smoke_config, [classification_checkpoint, regression_checkpoint]
+        )
+        assert_summary_metric(combined_summary, "effect_roc_auc", "combined")
+        assert_summary_metric(combined_summary, "effect_mse", "combined")
 
         sim.build_checklist()
         require(sim.TABLES / "qsar_benchmark_minimum_reporting_checklist.csv")
@@ -197,7 +252,11 @@ def functional_smoke(config: dict) -> None:
             for extension in ["pdf", "png", "tiff"]:
                 require(sim.FIGURES / f"{stem}.{extension}")
 
-    print("  REAL-DATA/FUNCTIONAL SMOKE OK (BACE, 2 permutations, 1 seed, 10 draws)")
+    print(
+        "  REAL-DATA/FUNCTIONAL SMOKE OK "
+        "(BACE classification + ESOL regression; 2 permutations; 1 seed each)"
+    )
+    print("  SUBSET/COMBINED AGGREGATION SMOKE OK")
     print("  FIGURE/CHECKLIST SMOKE OK")
 
 
@@ -264,9 +323,11 @@ def hardened_preflight(base) -> None:
 
 
 def main() -> None:
-    run_materializer()
     base = load_base_runner()
     base.SIM_SCRIPT = GENERATED_SIM
+    if sys.argv[1:] == ["--preflight-only"]:
+        hardened_preflight(base)
+        return
     base.preflight = lambda: hardened_preflight(base)
     base.main()
 
