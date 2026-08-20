@@ -1,0 +1,74 @@
+name: Paper 1 SAR-QSAR finalizer gate
+
+on:
+  push:
+    branches:
+      - paper1-sarqsar-metric-coupling-2026
+    paths:
+      - 'paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py'
+      - 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py'
+      - 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py'
+      - 'paper1_sarqsar_submission_source_v1/**'
+      - '.github/workflows/paper1-sarqsar-finalizer-gate.yml'
+  workflow_dispatch:
+
+jobs:
+  finalizer-source-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Compile every executable Python source
+        run: |
+          python -m py_compile \
+            paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py \
+            paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py \
+            paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py
+      - name: Reject corrupted or malformed manuscript source
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          python_files = [
+              root / 'paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py',
+              root / 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py',
+              root / 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py',
+          ]
+          source_root = root / 'paper1_sarqsar_submission_source_v1'
+          tex_files = [source_root / 'main_body.tex', source_root / 'references.tex'] + sorted((source_root / 'sections').glob('*.tex'))
+          all_files = python_files + tex_files
+          for path in all_files:
+              if not path.exists() or path.stat().st_size == 0:
+                  raise SystemExit(f'missing or empty: {path}')
+              path.read_text(encoding='utf-8', errors='strict')
+
+          joined = '\n'.join(path.read_text(encoding='utf-8') for path in all_files)
+          banned = ['1u-12', '\ufffd', 'Â', '\\begin{table}!', '\\begin{figure}!', '\\Delu', '\\spacing']
+          hits = [token for token in banned if token in joined]
+          if hits:
+              raise SystemExit(f'corruption tokens found: {hits}')
+
+          expected_sections = {
+              '00_front.tex', '01_theory.tex', '02_methods.tex', '03_results_a.tex',
+              '04_results_b.tex', '05_discussion.tex', '06_end.tex'
+          }
+          actual_sections = {path.name for path in (source_root / 'sections').glob('*.tex')}
+          if actual_sections != expected_sections:
+              raise SystemExit(f'section set mismatch: {actual_sections}')
+
+          body = '\n'.join(path.read_text(encoding='utf-8') for path in sorted((source_root / 'sections').glob('*.tex')))
+          refs = (source_root / 'references.tex').read_text(encoding='utf-8')
+          cited = set()
+          for match in re.finditer(r'\\cite[pt]?\{([^}]+)\}', body):
+              cited.update(part.strip() for part in match.group(1).split(','))
+          keys = set(re.findall(r'\\bibitem\{([^}]+)\}', refs))
+          missing = cited - keys
+          if missing:
+              raise SystemExit(f'unresolved citation keys: {sorted(missing)}')
+          if len(keys) < 20:
+              raise SystemExit(f'too few reference entries: {len(keys)}')
+          print('FINALIZER SOURCE GATE: PASS')
