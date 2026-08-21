@@ -7,6 +7,7 @@ on:
     paths:
       - 'paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py'
       - 'paper1_leakage_benchmark/scripts/46_test_paper1_sarqsar_empirical_compat_v1.py'
+      - 'paper1_leakage_benchmark/scripts/47_rebuild_sarqsar_ai_disclosure_uploads_v1.py'
       - 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py'
       - 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py'
       - 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_empirical_compat_v1.py'
@@ -29,6 +30,7 @@ jobs:
           python -m py_compile \
             paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py \
             paper1_leakage_benchmark/scripts/46_test_paper1_sarqsar_empirical_compat_v1.py \
+            paper1_leakage_benchmark/scripts/47_rebuild_sarqsar_ai_disclosure_uploads_v1.py \
             paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py \
             paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py \
             paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_empirical_compat_v1.py
@@ -44,6 +46,7 @@ jobs:
           python_files = [
               root / 'paper1_leakage_benchmark/scripts/44_build_paper1_sarqsar_submission_v1.py',
               root / 'paper1_leakage_benchmark/scripts/46_test_paper1_sarqsar_empirical_compat_v1.py',
+              root / 'paper1_leakage_benchmark/scripts/47_rebuild_sarqsar_ai_disclosure_uploads_v1.py',
               root / 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_core_v1.py',
               root / 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_build_v1.py',
               root / 'paper1_leakage_benchmark/scripts/paper1_sarqsar_finalizer_empirical_compat_v1.py',
@@ -69,6 +72,13 @@ jobs:
           actual_sections = {path.name for path in (source_root / 'sections').glob('*.tex')}
           if actual_sections != expected_sections:
               raise SystemExit(f'section set mismatch: {actual_sections}')
+
+          ai_marker = 'OpenAI ChatGPT (GPT-5.6 Pro, web application; accessed 22 August 2026)'
+          end_text = (source_root / 'sections' / '06_end.tex').read_text(encoding='utf-8')
+          if end_text.count(ai_marker) != 1:
+              raise SystemExit('versioned AI disclosure marker is absent or duplicated')
+          if 'OpenAI ChatGPT was used' in end_text:
+              raise SystemExit('superseded unversioned AI disclosure remains')
 
           body = '\n'.join(path.read_text(encoding='utf-8') for path in sorted((source_root / 'sections').glob('*.tex')))
           refs = (source_root / 'references.tex').read_text(encoding='utf-8')
