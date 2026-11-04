@@ -1,0 +1,193 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage[margin=2.7cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,array}
+\usepackage{setspace}
+\usepackage{microtype}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
+\hypersetup{pdftitle={Class-Specific Errors and Deferral under Molecular Distribution Shift},pdfauthor={Siyuan Tong and Yuechen Wang}}
+\doublespacing
+\raggedbottom
+\newcommand{\ind}{\mathbb{1}}
+\newcommand{\pending}[1]{\par\noindent\textbf{Experiment pending:} #1\par}
+\title{Class-Specific Errors and Deferral under Molecular Distribution Shift: A Budget-Controlled Comparison of Conformal and Abstention Rules}
+\author{\begin{minipage}{0.94\textwidth}\centering
+Siyuan Tong$^{1,*}$ and Yuechen Wang$^2$\\[0.3em]
+\small $^1$Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia\\
+\small $^2$Faculty of Data Science, City University of Macau, Macau SAR, China\\
+\small $^*$Corresponding author: \texttt{25064241@siswa.um.edu.my}
+\end{minipage}}
+\date{Revision working draft, 4 November 2026}
+\begin{document}
+\maketitle
+\begin{center}
+\fbox{\parbox{0.91\textwidth}{\small This is a pre-experiment revision draft of CHEMOLAB-D-26-01118. Historical results are identified explicitly. The revised experiments and their interpretation are pending; this file is not ready for journal submission.}}
+\end{center}
+
+\begin{abstract}
+Prediction sets for shifted molecular assays can become more accurate by deferring more compounds. Evaluating a method only by its coverage gain therefore leaves an important question unanswered: does it identify erroneous decisions more effectively than a simpler rule with the same deferral budget? We formulate this question for binary assay activity, distinguishing false-inactive decisions, false-active decisions, and requests for further evidence. The revised study compares marginal and class-conditional conformal prediction, estimated density-ratio weighting, and decision-specific probability, uncertainty, similarity, and random deferral using common molecular predictions and matched output budgets. The previously proposed transport-audited multi-view envelope (TAME) is evaluated as an empirical set-expansion rule, alongside its single-view, ungated, and protected-label variants. Calibration uses the finite-sample order statistic with an infinite threshold when the requested rank is unavailable. The analysis separates historical Tox21 development and EPA findings from the new retrospective comparisons, preserves repeated predictions for each molecule in paired inference, and reports assay-specific error--deferral trade-offs. A historical comparison with ordinary stacked Mondrian prediction found a 1.36-percentage-point improvement in mean minimum-class coverage at a 1.61-point loss in macro correct-singleton yield; a simple equal-logit comparator had slightly better values on both quantities in the descriptive twelve-assay summary. These observations motivate the revised comparisons rather than establish TAME superiority. The revised experimental results remain pending and will determine whether transport information improves error targeting beyond matched deferral.
+\end{abstract}
+\noindent\textbf{Keywords:} molecular assay prediction; conformal prediction; class-specific error; selective prediction; covariate shift; deferral
+
+\section{Introduction}
+Molecular prediction systems often supply a probability of assay activity for compounds that differ from their training collection. A screening workflow may use that probability to designate a compound as inactive, flag it as active, or request additional evidence. These actions have different consequences. Incorrectly clearing an active compound and incorrectly discarding an inactive compound should therefore be counted separately, alongside the number of compounds deferred. A method that produces fewer errors by making almost no decisions may have little practical value.
+
+Conformal prediction provides a principled way to construct prediction sets under specified sampling assumptions. Its standard marginal guarantee does not imply equal coverage within every outcome class. Class-conditional Mondrian calibration addresses the outcome-class distinction under exchangeability within the corresponding classes \citep{vovk2012}. Neither construction automatically transfers that guarantee to arbitrary molecular distribution shift. These are established properties, rather than new principles derived from the present molecular examples.
+
+Under covariate shift, likelihood-ratio weighting relates source and target calibration distributions \citep{tibshirani2019}. Molecular implementations must estimate those ratios. CoDrug combines a trained prediction model with density estimation for molecular conformal prediction \citep{codrug2023}; KMM-CP uses selective kernel mean matching for covariate-shift correction \citep{kmm2026}. Such methods are directly relevant comparators. Their representation learning, ratio estimation, support selection, and prediction-set construction should be distinguished from a generic domain-classifier weighting baseline.
+
+An alternative intervention is to expand an existing prediction set. In binary classification, adding a missing label to a singleton converts a decision into a deferral. Coverage cannot decrease on the same labeled observations, but this is a consequence of set inclusion. It does not establish that the selected compounds were better targets for deferral than those chosen by probability uncertainty, chemical novelty, or random selection. Nor does it establish a portable rule for selecting a protected class.
+
+Our previous submission introduced a two-view expansion rule, TAME, and evaluated it against ordinary Mondrian prediction in a locked Tox21 comparison. The principal response to peer review is to make the unresolved comparison explicit. The revised study asks whether transport-based selection reduces class-specific decision errors more effectively at the same deferral budget. It also examines whether the answer changes with the base predictor, score, selected class, and transport thresholds. The contribution sought is an empirical characterization of when these additional components help, rather than a new conformal-validity theorem.
+
+The revised main analysis focuses on Tox21 activity classification. The earlier BBBP, ClinTox, ESOL, and Lipophilicity audit is retained as historical context and an implementation audit in the supplement. This avoids treating different endpoint meanings, regression outputs, and classifier families as one performance claim. In particular, Tox21 activity denotes a nuclear-receptor or stress-response assay measurement; it is not interchangeable with clinical toxicity \citep{huang2016}.
+
+\section{Methods}
+\subsection{Data roles and scope of inference}
+The Tox21 10K collection supplies labeled training data. The public leaderboard collection contains 296 structures, and the released final EPA collection contains 647 structures before standardization and overlap exclusions. All twelve official assays are retained. The six assays used in the original primary panel---NR-AhR, NR-ER, SR-ARE, SR-ATAD5, SR-MMP, and SR-p53---remain an explicitly historical panel selected by at least twenty active labels in the public development collection. Results for this panel and all twelve assays are reported separately.
+
+The EPA labels were accessed during the original study. Every comparison newly designed after peer review is therefore retrospective, including reruns with different random seeds. The revision will not describe these analyses as a new sealed or prospective test. They can measure the performance of a fixed revised comparison on the observed collection, but cannot undo its prior use in method development. A genuinely unexamined collection would be needed for a subsequent independent confirmation.
+
+The original source files, standardization rules, and exclusions remain versioned. Reconstruction uses the original cleaning environment's RDKit version, 2026.03.4. Invalid structures receive a reason code; missing assay outcomes are excluded only from that assay's labeled evaluation. Canonical structure identity determines overlap checks and connects repeated observations for statistical analysis. Each method uses the same eligible rows within an assay, model, and seed. Counts before and after every exclusion must accompany the results.
+
+\subsection{Common predictions and calibration roles}
+The controlled comparison uses 2048-bit radius-two Morgan fingerprints. The historical 60/20/20 allocation separates model fitting, stack fitting, and conformal calibration. A logistic predictor and the original four-component stack provide planned base-predictor comparisons. The stack consists of logistic regression, random forest, extra trees, and Bernoulli naive Bayes; its second-stage logistic model is trained only on the stack-fitting role. The equal-logit combination is retained because the archived results identify it as a relevant simple comparator. A method comparison never changes the underlying probability estimates unless it is explicitly labeled an end-to-end model comparison.
+
+Models, data roles, calibration rows, and target rows are identical across the uncertainty layers being compared. Least-ambiguous-classification (LAC) scores are the primary scoring rule. A deterministic adaptive-prediction-set (APS) score provides a scoring sensitivity analysis \citep{romano2020}. Predictor and score effects are reported separately, rather than allowing either to be confused with a gain from transport weighting.
+
+\subsection{Conformal sets and the finite-sample rank}
+Let $p_y(x)$ denote the fitted probability for $y\in\{0,1\}$. The candidate-label LAC score is
+\begin{equation}
+ s(x,y)=1-p_y(x).
+\end{equation}
+For $n$ calibration scores, define $k=\lceil(n+1)(1-\alpha)\rceil$. The threshold is the $k$th smallest score when $k\leq n$ and $+\infty$ otherwise. Empty calibration groups also receive $+\infty$. In particular, the rank is never truncated to $n$. Marginal calibration uses all observed calibration scores. Mondrian calibration uses only the scores whose observed outcome equals the candidate label, giving thresholds $q_0$ and $q_1$ and set
+\begin{equation}
+ S_M(x)=\{y:s(x,y)\leq q_y\}.
+\end{equation}
+The candidate label, rather than the point-predicted class, selects its Mondrian threshold.
+
+For deterministic APS, labels are ordered by decreasing fitted probability, with a fixed class-index tie order. The score for a candidate label is the cumulative probability through that label in this ordering. The same scoring rule is used on calibration and target rows. This deterministic version is compared as a component sensitivity analysis; it is not presented as a new score or as an exact reproduction of every randomized APS variant.
+
+The original Stage I implementation truncated an unavailable rank to the largest observed score. The revision corrects that implementation and records the affected calibration groups and metric changes. The original Stage II implementation already used the infinite-threshold rule. Archived results are preserved; corrected results receive a separate analysis identifier.
+
+\subsection{Estimated weighting and transport diagnostics}
+The domain-classifier baseline estimates a target-to-source density ratio from unlabeled source and target covariates. Posterior odds from logistic domain classification are multiplied by the source-to-target sample-size ratio and clipped at the specified bounds. The historical views comprise nine physicochemical descriptors, component and stack logits, and diagnostic ECFP bits. Source and target counts, domain AUC, class-specific and overall effective sample sizes, clipping frequencies, and weighted mean discrepancy are retained as diagnostics.
+
+For calibration weights $w_i$ and a target weight $w(x)$, the weighted calibration distribution for candidate class $y$ is
+\begin{equation}
+ F_{x,y}=\frac{\sum_{i:Y_i=y} w_i\delta_{s(X_i,Y_i)}+w(x)\delta_{+\infty}}
+ {\sum_{i:Y_i=y}w_i+w(x)}.
+\end{equation}
+The $(1-\alpha_y)$ quantile gives the corresponding threshold. The target mass at infinity is retained. With no class-$y$ calibration observation, that candidate has an infinite threshold.
+
+Likelihood-ratio conformal theory requires the relevant distributional assumptions and weights \citep{tibshirani2019}. Here, ratios are estimated, clipped, and constructed in selected molecular views. A high effective sample size or a low domain AUC does not establish the correctness of those assumptions. Passing the historical gates permits the empirical correction to be used; it does not certify conditional coverage. An ungated weighting comparator and gate sensitivities are therefore necessary to evaluate the gates' empirical contribution.
+
+\subsection{Protected classes and screening actions}
+For each assay, label 1 means assay-active and label 0 means assay-inactive according to the released outcome encoding. We map $\{0\}$ to an inactive decision, $\{1\}$ to an active decision, and the full set to deferral. Raw empty sets are reported separately. For operational expansion comparisons, an empty baseline is repaired to the full set for every method before additional deferral is counted.
+
+The historical TAME protects label 0, chosen after observing a development coverage deficit. It can turn an erroneous active decision for an inactive compound into deferral, but cannot repair the active class by adding label 1. The revised active-protection question instead fixes label 1 from the stated action: avoiding an inactive decision for an assay-active compound. These are different objectives. Both variants, along with protection of both labels, are reported; a new active-protection result cannot be retroactively attributed to the original method.
+
+Let $S_0$ be the repaired Mondrian baseline and $W_v$ a weighted set from view $v$. Under the historical two-view consensus rule, a protected label is added when both eligible views contain it. If the required views are unavailable, the output remains $S_0$. Single-view, union, ungated, and protected-class variants isolate the role of each component. For every expansion variant $S$, the invariant $S_0(x)\subseteq S(x)$ is checked. It establishes nondecreasing empirical coverage on the same observations and nonincreasing singleton yield; it does not establish useful error targeting.
+
+\subsection{Matched deferral budgets}
+For a reference expansion rule, define the additional number of deferred baseline singletons of each predicted class as
+\begin{equation}
+ m_c=\sum_i\ind\{S_0(x_i)=\{c\},\ |S(x_i)|=2\},\qquad c\in\{0,1\}.
+\end{equation}
+Each matched comparator expands exactly $m_0$ baseline class-0 singletons and $m_1$ baseline class-1 singletons. This matches both the total budget and the composition of the original decisions. It prevents an apparent benefit from arising simply because one rule defers more inactive decisions in an imbalanced assay.
+
+The primary simple comparator ranks the probability assigned to the omitted label: among baseline $\{0\}$ decisions, it defers larger $p_1(x)$ first; among baseline $\{1\}$ decisions, it defers larger $1-p_1(x)$ first. A Mondrian singleton need not equal the probability argmax, so this decision-specific ranking need not agree with generic entropy or maximum-probability uncertainty. It directly targets the candidate label whose addition could repair the decision. The implementation identifies the active-protection matched comparator as \nolinkurl{matched_label1_active_omitted_label_probability}.
+
+Secondary rankings use lower maximum predicted probability, lower maximum training-set Tanimoto similarity, or fixed seeded random priorities. Stable molecule identifiers resolve ties. All rankings use predictions, structures, and fixed seeds only; target outcomes never rank compounds or select a budget. The reference TAME budget is itself computed from label-free outputs on the target batch; this is an explanatory same-budget comparison, not a claim that every rule achieves a prespecified clinical workload. Fixed deferral-rate curves provide a complementary view, including the zero-additional-deferral and always-defer limits.
+
+\subsection{Comparators and sensitivity analyses}
+The controlled suite includes marginal LAC, Mondrian LAC, Mondrian APS, ordinary Mondrian with empty-set repair, domain-ratio-weighted Mondrian for each view, the historical TAME, the active-label and both-label variants, and matched omitted-label-probability, uncertainty, applicability-domain, and random deferral. The ordinary equal-logit predictor is retained in the base-model comparison. Alpha and deferral-budget curves are reported rather than selecting an operating point after inspecting EPA outcomes.
+
+Complete CoDrug and KMM-CP reproductions are required external comparisons for the intended revised paper. Their full methods include choices beyond the available domain-logistic component. Results from a simplified density estimator or a partial kernel-weighting implementation will be named as components, not labeled CoDrug or KMM-CP. Official implementations or documented faithful reproductions must be checked on their own examples before evaluation on the common molecular panel. End-to-end comparisons, in which representation learning differs, are reported separately from the fixed-predictor component analysis. If a required reproduction cannot be completed, that fact remains visible and the claim of comparison with that method is withheld.
+
+Optional Gaussian-KDE ratio and fixed-kernel mean-matching components provide additional estimator diagnostics. The KDE component uses the target mass at infinity in the weighted quantile above. The kernel-mean-matching component uses a weighted empirical quantile without a target mass; this distinction is recorded explicitly, and no finite-sample weighted-conformal guarantee is assigned to that component. Neither diagnostic includes all training, bandwidth-selection, and support-selection choices of the corresponding published end-to-end method.
+
+Sensitivity analyses vary one historical gate at a time, remove all gates, evaluate each view alone, change the view quorum, and change the protected-label set. The original numerical thresholds are treated as study-specific settings. Their effect is assessed by activation frequency, error targeting, and deferral cost across assays; no threshold is called transferable solely because it passes on this collection. The public leaderboard can support exploratory configuration work, while the retrospective EPA comparison uses the recorded configuration without further outcome-driven retuning.
+
+\subsection{Outcomes and paired inference}
+For each true class $y$, coverage and correct-singleton yield are
+\begin{align}
+ C_y&=\Pr\{y\in S(X)\mid Y=y\},\\
+ \mathrm{CSY}_y&=\Pr\{S(X)=\{y\}\mid Y=y\}.
+\end{align}
+We report both classes, $\min(C_0,C_1)$, and $\mathrm{MacroCSY}=(\mathrm{CSY}_0+\mathrm{CSY}_1)/2$. Decision-specific outcomes are false-inactive exposure $\Pr\{S(X)=\{0\}\mid Y=1\}$, false-active exposure $\Pr\{S(X)=\{1\}\mid Y=0\}$, the active fraction among inactive decisions $\Pr\{Y=1\mid S(X)=\{0\}\}$, inactive-decision yield, total singleton rate, deferral rate, and raw empty-set rate. A missing class or an empty decision denominator produces an undefined value with its count; it is not silently treated as zero.
+
+The primary contrast uses the original stack, LAC scores, $\alpha_0=\alpha_1=0.10$, and the historical six-assay panel. It compares active-protection TAME against the class-matched omitted-label-probability rule on false-inactive exposure, with identical eligible rows and additional deferral budgets. A negative TAME-minus-comparator difference favors TAME. Uncertainty, applicability-domain, and random matching are secondary comparisons; the all-twelve-assay panel and alternative predictors are sensitivity analyses.
+
+Each metric is computed separately for each assay--seed cell, and the cell metrics are averaged with equal weight across the declared assays and seeds. Probabilities or set memberships are not averaged across seeds before thresholding. Repeated seeds do not multiply the number of independent compounds. Paired bootstrap resampling uses molecule or standardized-structure identity as a shared resampling unit across assays and methods, retaining all seed predictions for each selected unit and recomputing the same cell metrics and equal-weight summary. This preserves cross-assay dependence induced by repeated compounds. Intervals describe sampling variation for the evaluated collection and fixed assay panel, rather than generalization to all molecular assays.
+
+No five-percentage-point efficiency tolerance is interpreted as a clinically validated utility threshold. Error--deferral curves and their paired contrasts replace a binary promotion claim. An advantage in coverage against a less-deferred baseline alone is insufficient evidence of a useful expansion rule. Whether the revised study supports TAME, a simpler comparator, or no stable winner will be determined from the complete comparisons, including unfavorable findings.
+
+\section{Results}
+\subsection{Archived findings that motivate the revision}
+The original six-assay comparison contained thirty assay--seed cells. Relative to ordinary stacked Mondrian prediction, historical TAME increased mean minimum-class coverage by 1.3649 percentage points and decreased MacroCSY by 1.6067 points. Its archived hierarchical-bootstrap interval for the coverage contrast was 0.5827 to 2.0051 points. This is the original analysis, not a newly estimated interval under the revised cross-assay molecule-resampling procedure. The class-1 coverage change was zero in every reported primary assay because the intervention protected label 0.
+
+The archived twelve-assay summary provides an additional comparison that must not be omitted (Table~\ref{tab:historical}). Equal-logit ordinary Mondrian had slightly higher mean minimum-class coverage and MacroCSY, and a lower ambiguous-set rate, than TAME. These descriptive averages do not establish statistical superiority, and they are not substitutes for a paired six-assay analysis. They do establish why the old TAME-versus-stacked-Mondrian contrast cannot support a general superiority claim.
+
+\begin{table}[htbp]
+\centering
+\caption{Archived descriptive means across twelve assays and five seeds. All values are percentages. These are historical results, not outputs from the revised experiment suite.}
+\label{tab:historical}
+\small
+\begin{tabular}{p{0.43\textwidth}rrr}
+\toprule
+Method & Minimum coverage & MacroCSY & Ambiguous\\
+\midrule
+Ordinary Mondrian, stacked & 83.35 & 42.38 & 49.05\\
+Ordinary Mondrian, equal-logit & 84.41 & 41.44 & 49.57\\
+Historical TAME, label 0 & 84.30 & 41.33 & 50.40\\
+Weighted Mondrian, physicochemical & 83.60 & 43.09 & 46.98\\
+Weighted Mondrian, score view & 82.48 & 42.52 & 45.95\\
+Weighted Mondrian, ECFP & 99.80 & 0.22 & 99.65\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Finite-sample calibration correction}
+\pending{Count Stage I calibration groups with unavailable finite-sample ranks, regenerate affected predictions with infinite thresholds, and report the changes relative to the archived outputs. The current draft does not assume that the correction leaves the historical ClinTox summaries unchanged.}
+
+\subsection{Class-specific error at matched deferral}
+\pending{Report the primary active-protection comparison against matched omitted-label-probability deferral under the stacked predictor at alpha 0.10 in the six-assay panel. Then report inactive-protection, both-label, uncertainty, similarity, and random comparisons as declared secondary analyses. Include exact per-class expansion counts, point effects, paired intervals, and assay-level results. Do not infer error-targeting value from set inclusion alone.}
+
+\subsection{Strong conformal comparators and model sensitivity}
+\pending{Complete fixed-predictor LAC/APS and weighting comparisons, the equal-logit and logistic predictor analyses, and externally verified CoDrug and KMM-CP comparisons. Distinguish component implementations from full methods and show all declared operating-point curves.}
+
+\subsection{Contribution of transport views and gates}
+\pending{Quantify single-view, quorum, gate-removal, gate-threshold, and protected-class effects. Report how often a method falls back or defers nearly every compound. Include configurations whose coverage gain is explained entirely by deferral volume.}
+
+\section{Discussion}
+The central question in the revision is whether an uncertainty rule chooses the right compounds for deferral at a specified workload. This differs from asking whether adding labels improves empirical coverage: any set expansion satisfies the latter weak inequality. The matched-budget design tests the information contributed by transport views after controlling that mechanical effect and the original predicted-class composition.
+
+The distinction between active and inactive decisions also changes the interpretation of the historical method. Adding label 0 protects inactive compounds from an erroneous active singleton. Adding label 1 protects active compounds from an erroneous inactive singleton. Neither is a universal definition of the costly error. A screening study must state its action and assay meaning first; a development-selected coverage deficit cannot substitute for that statement. The present revision treats assay activity as the measured outcome and does not translate it into patient safety or clinical toxicity.
+
+The archived equal-logit result is a useful check on methodological complexity. It shows that an apparently favorable contrast against one stacked predictor does not establish that a more elaborate wrapper improves the attainable coverage--informativeness trade-off. The revised design accordingly retains simple predictors and simple deferral rules alongside shift-aware conformal methods. If a simpler rule matches or improves upon TAME at the same budget, that is an informative result and should change the conclusion.
+
+Transport diagnostics may still be useful even when they do not yield a new validity result. They reveal weight concentration, poor overlap, and sensitivity to the representation used to estimate shift. Their decision value, however, requires an empirical comparison with ungated and alternative rules. A failed gate disables an operation; a passed gate does not prove that the operation is statistically justified. Threshold sensitivity and external assay evaluation are needed before adopting the same numerical settings elsewhere.
+
+The current evidence remains restricted to the observed Tox21 cohorts and the earlier molecular audit. Multiple assays share compounds and are not independent replications of a universal molecular prediction task. Repeated seeds describe variability from training partitions, not additional biological samples. The revised inference retains this dependence and reports sparse denominators explicitly. Because the EPA outcomes are already known, this revision can supply a transparent retrospective comparison but cannot claim a second independent validation on that collection.
+
+\pending{Replace this paragraph with a result-specific conclusion only after the declared comparison matrix and sensitivity analyses are complete. A positive conclusion requires evidence of useful class-specific error targeting beyond matched simple rules; otherwise the paper should conclude that the evaluated transport expansion does not show that advantage and present the resulting chemometric comparison without an algorithm-superiority claim.}
+
+\section*{Data and code availability}
+The historical source and revised experiment suite are maintained in the \href{https://github.com/DCarchimonde/aidd-paper-factory}{project repository}. The revision keeps the submitted analysis separate from new outputs. Source acquisition, shared-row comparisons, row-level prediction export, tests, and execution instructions are provided with the code. Completion status and experiment provenance must accompany every new result table.
+
+\section*{Author declarations: revision status}
+The original affiliations and author order are retained in this working draft. Both authors must review the completed analyses, update their actual contributions, and approve the final manuscript before submission. Funding, competing-interest, and AI-assistance declarations must be checked at that time. This draft does not certify author approval or numerical verification that has not yet occurred.
+
+\begin{thebibliography}{9}
+\bibitem{vovk2012} V. Vovk, Conditional validity of inductive conformal predictors, Proceedings of Machine Learning Research 25 (2012) 475--490. \url{https://proceedings.mlr.press/v25/vovk12.html}.
+\bibitem{tibshirani2019} R. J. Tibshirani, R. F. Barber, E. J. Cand\`es, A. Ramdas, Conformal prediction under covariate shift, Advances in Neural Information Processing Systems 32 (2019). \url{https://proceedings.neurips.cc/paper/2019/hash/8fb21ee7a2207526da55a679f0332de2-Abstract.html}.
+\bibitem{codrug2023} S. Laghuvarapu, Z. Lin, J. Sun, CoDrug: Conformal drug property prediction with density estimation under covariate shift, Advances in Neural Information Processing Systems 36 (2023). \url{https://proceedings.neurips.cc/paper_files/paper/2023/hash/7691484a7a35d5e2742279c1d926b778-Abstract-Conference.html}.
+\bibitem{kmm2026} S. Laghuvarapu, R. Deb, J. Sun, KMM-CP: Practical conformal prediction under covariate shift via selective kernel mean matching, Proceedings of Machine Learning Research 337 (2026) 3237--3261. \url{https://proceedings.mlr.press/v337/laghuvarapu26a.html}.
+\bibitem{romano2020} Y. Romano, M. Sesia, E. Cand\`es, Classification with valid and adaptive coverage, Advances in Neural Information Processing Systems 33 (2020). \url{https://proceedings.neurips.cc/paper_files/paper/2020/hash/244edd7e85dc81602b7615cd705545f5-Abstract.html}.
+\bibitem{huang2016} R. Huang, M. Xia, D.-T. Nguyen, T. Zhao, S. Sakamuru, J. Zhao, S. A. Shahane, A. Rossoshek, A. Simeonov, Tox21Challenge to build predictive models of nuclear receptor and stress response pathways as mediated by exposure to environmental chemicals and drugs, Frontiers in Environmental Science 3 (2016) 85. \url{https://doi.org/10.3389/fenvs.2015.00085}.
+\end{thebibliography}
+\end{document}

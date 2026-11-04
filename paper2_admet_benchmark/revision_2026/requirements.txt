@@ -1,0 +1,8 @@
+# Isolated Python 3.12 CPU environment; historical RDKit identity contract.
+numpy==2.3.5
+scipy==1.17.0
+scikit-learn==1.8.0
+rdkit==2026.3.4
+PyYAML==6.0.3
+threadpoolctl==3.6.0
+pandas==2.2.3

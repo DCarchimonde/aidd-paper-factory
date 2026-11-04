@@ -1,0 +1,144 @@
+{
+  "version": "chemolab-revision-2026-11-04-v1",
+  "study_status": "revision_experiment_plan_not_completed",
+  "historical_commit": "d2e05ad1b948ea8c19b8d67783a659a385c54240",
+  "data_interpretation": {
+    "development": "previously observed public leaderboard; development and diagnostic use",
+    "retrospective_epa": "previously evaluated EPA batch; retrospective reanalysis, never a new blinded validation"
+  },
+  "labels": {
+    "0": "inactive assay call; not proof of chemical or clinical safety",
+    "1": "active assay call; not a general toxicity diagnosis"
+  },
+  "primary_protected_labels": [
+    1
+  ],
+  "primary_target": "false_clearance among assay-active compounds at matched class-specific deferral budget",
+  "secondary_targets": [
+    "false_discard",
+    "minimum_class_coverage",
+    "macro_csy",
+    "clearance_contamination",
+    "singleton_rate",
+    "matched uncertainty, AD, random and full-method comparisons"
+  ],
+  "models": [
+    "logistic",
+    "stack",
+    "equal_logit"
+  ],
+  "alpha_grid": [
+    0.05,
+    0.1,
+    0.2
+  ],
+  "primary_alpha": 0.1,
+  "development_seeds": [
+    101,
+    102,
+    103,
+    104,
+    105
+  ],
+  "retrospective_epa_seeds": [
+    211,
+    212,
+    213,
+    214,
+    215
+  ],
+  "endpoint_scope": "all_12_official_tox21_endpoints_without_performance_based_selection",
+  "fixed_deferral_fractions": [
+    0.0,
+    0.1,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "density_components": {
+    "status": "optional_diagnostic_components_not_full_CoDrug_or_KMM_CP",
+    "feature_view": "nine_source_standardized_physchem_descriptors",
+    "kde": {
+      "bandwidth": 1.0,
+      "weight_clip": [
+        0.05,
+        20.0
+      ]
+    },
+    "kmm": {
+      "bandwidth": 1.0,
+      "weight_bound": 30.0,
+      "epsilon": 0.0,
+      "max_source": 2500,
+      "max_target": 2500,
+      "maxiter": 1000
+    }
+  },
+  "budget_matching": "same numbers of baseline label-0 and label-1 singleton expansions; labels never used in selection",
+  "primary_simple_comparator": "matched_label1_active_omitted_label_probability",
+  "audit_sensitivity": {
+    "minimum_source_n": [
+      50,
+      200
+    ],
+    "minimum_target_n": [
+      50,
+      200
+    ],
+    "minimum_class_n": [
+      10,
+      40
+    ],
+    "minimum_ess_fraction": [
+      0.1,
+      0.5
+    ],
+    "maximum_clip_fraction": [
+      0.1,
+      0.5
+    ],
+    "maximum_domain_auc": [
+      0.95,
+      1.0
+    ],
+    "maximum_gap_ratio": [
+      1.0,
+      1.2
+    ]
+  },
+  "threshold_status": "legacy heuristic operational thresholds; sensitivity settings are not guarantees or transferable validity certificates",
+  "full_reference_baselines_required": [
+    "CoDrug_official_or_verified_reproduction",
+    "KMM-CP_official_or_verified_reproduction"
+  ],
+  "reference_baseline_status": "external_reproduction_required_before_manuscript_superiority_claim",
+  "inference": "shared-structure paired bootstrap across endpoints; seeds are repeated fits, not independent samples; no tuning on retrospective EPA outcomes",
+  "execution": "CPU; model jobs explicitly limited; no full experiments completed by this code delivery",
+  "primary_comparison": {
+    "predictor": "stack",
+    "alpha": 0.1,
+    "method": "tame_label1_active",
+    "reference": "matched_label1_active_omitted_label_probability",
+    "metric": "active_false_clearance",
+    "direction": "lower_is_better",
+    "status": "predeclared_retrospective_comparison_not_prospective_confirmation",
+    "endpoint_panel": [
+      "Tox21_NR_AhR",
+      "Tox21_NR_ER",
+      "Tox21_SR_ARE",
+      "Tox21_SR_ATAD5",
+      "Tox21_SR_MMP",
+      "Tox21_SR_p53"
+    ]
+  },
+  "statistical_analysis": {
+    "bootstrap_replicates": 2000,
+    "bootstrap_seed": 44021,
+    "unit": "standardized_structure_cluster_shared_across_assays_methods_seeds",
+    "endpoint_estimand": "fixed_panel_equal_endpoint_and_seed_mean",
+    "intervals": "pointwise_exploratory",
+    "minimum_valid_bootstrap_fraction": 0.95,
+    "seed_replicates_independent": false
+  }
+}
