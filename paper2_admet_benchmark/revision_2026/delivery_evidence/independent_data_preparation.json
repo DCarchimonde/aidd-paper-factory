@@ -1,0 +1,332 @@
+{
+  "AMES": {
+    "counts": {
+      "clean_label_counts": {
+        "0": 3304,
+        "1": 3951
+      },
+      "clean_structures": 7255,
+      "conflicting_structure_groups": 0,
+      "excluded_rows": 23,
+      "exclusion_reasons": {
+        "same_label_structure_duplicate": 23
+      },
+      "raw_label_counts": {
+        "0": 3304,
+        "1": 3974
+      },
+      "raw_rows": 7278
+    },
+    "splits": {
+      "random": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 5804,
+        "n_source_calibration_expected": 1161,
+        "n_target": 1451,
+        "outer_seed": 43021,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 334,
+        "source_calibration_n_below_historical_100_gate": false,
+        "source_label_counts": {
+          "0": 2642,
+          "1": 3162
+        },
+        "split": "random",
+        "structure_overlap": 0,
+        "target_fraction": 0.2,
+        "target_id_sha256": "f2ad3f1c3bc49828ac37fc05d0dca649cf28aa8a0e8ba7f123d5dbe37183291c",
+        "target_label_counts": {
+          "0": 662,
+          "1": 789
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      },
+      "scaffold": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 5804,
+        "n_source_calibration_expected": 1161,
+        "n_target": 1451,
+        "outer_seed": 43022,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 0,
+        "source_calibration_n_below_historical_100_gate": false,
+        "source_label_counts": {
+          "0": 2686,
+          "1": 3118
+        },
+        "split": "scaffold",
+        "structure_overlap": 0,
+        "target_fraction": 0.2,
+        "target_id_sha256": "914b97b61875d49ac3f669c1e8b8d7744ac0892161b6eadc50595574f49cb58b",
+        "target_label_counts": {
+          "0": 618,
+          "1": 833
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      }
+    },
+    "preparation_sha256": "55cf1bf7b774084cb4969e8bf8b37eabbda55ccd439c52c2d11e83d4deb4b135"
+  },
+  "hERG": {
+    "counts": {
+      "clean_label_counts": {
+        "0": 193,
+        "1": 414
+      },
+      "clean_structures": 607,
+      "conflicting_structure_groups": 9,
+      "excluded_rows": 48,
+      "exclusion_reasons": {
+        "conflicting_structure_labels": 18,
+        "same_label_structure_duplicate": 30
+      },
+      "raw_label_counts": {
+        "0": 204,
+        "1": 451
+      },
+      "raw_rows": 655
+    },
+    "splits": {
+      "random": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 485,
+        "n_source_calibration_expected": 97,
+        "n_target": 122,
+        "outer_seed": 43021,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 47,
+        "source_calibration_n_below_historical_100_gate": true,
+        "source_label_counts": {
+          "0": 151,
+          "1": 334
+        },
+        "split": "random",
+        "structure_overlap": 0,
+        "target_fraction": 0.20098846787479407,
+        "target_id_sha256": "8364cee251c395c8267635d02fe4c5fb064fd063efa7606f3ce120f3ca3e1b93",
+        "target_label_counts": {
+          "0": 42,
+          "1": 80
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      },
+      "scaffold": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 485,
+        "n_source_calibration_expected": 97,
+        "n_target": 122,
+        "outer_seed": 43022,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 0,
+        "source_calibration_n_below_historical_100_gate": true,
+        "source_label_counts": {
+          "0": 155,
+          "1": 330
+        },
+        "split": "scaffold",
+        "structure_overlap": 0,
+        "target_fraction": 0.20098846787479407,
+        "target_id_sha256": "ea4e365664796bc5bf281e8a15365089962a24c8e72835964f3390fd11e8553a",
+        "target_label_counts": {
+          "0": 38,
+          "1": 84
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      }
+    },
+    "preparation_sha256": "3806224ef7b56c341181591aa4a80edfcdcbf14ddabab59e31c48b739d69fc9f"
+  },
+  "DILI": {
+    "counts": {
+      "clean_label_counts": {
+        "0": 238,
+        "1": 236
+      },
+      "clean_structures": 474,
+      "conflicting_structure_groups": 0,
+      "excluded_rows": 1,
+      "exclusion_reasons": {
+        "same_label_structure_duplicate": 1
+      },
+      "raw_label_counts": {
+        "0": 239,
+        "1": 236
+      },
+      "raw_rows": 475
+    },
+    "splits": {
+      "random": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 379,
+        "n_source_calibration_expected": 76,
+        "n_target": 95,
+        "outer_seed": 43021,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 23,
+        "source_calibration_n_below_historical_100_gate": true,
+        "source_label_counts": {
+          "0": 191,
+          "1": 188
+        },
+        "split": "random",
+        "structure_overlap": 0,
+        "target_fraction": 0.20042194092827004,
+        "target_id_sha256": "1893dd6dcb2073463cb1b28d9bcc1856c8f10a1f9318af14dd9629a8cd5a05d4",
+        "target_label_counts": {
+          "0": 47,
+          "1": 48
+        },
+        "target_n_below_historical_100_gate": true,
+        "target_selection_uses_labels": false
+      },
+      "scaffold": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 379,
+        "n_source_calibration_expected": 76,
+        "n_target": 95,
+        "outer_seed": 43022,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 0,
+        "source_calibration_n_below_historical_100_gate": true,
+        "source_label_counts": {
+          "0": 202,
+          "1": 177
+        },
+        "split": "scaffold",
+        "structure_overlap": 0,
+        "target_fraction": 0.20042194092827004,
+        "target_id_sha256": "96119a0da921b45157e968965128e2f52899fbf2174af17c189bea2f871d7105",
+        "target_label_counts": {
+          "0": 36,
+          "1": 59
+        },
+        "target_n_below_historical_100_gate": true,
+        "target_selection_uses_labels": false
+      }
+    },
+    "preparation_sha256": "208fc105918054f2307302bb1003bf47cf9769caeef84099d701f7cf81ffa3a8"
+  },
+  "CYP2D6_Veith": {
+    "counts": {
+      "clean_label_counts": {
+        "0": 10583,
+        "1": 2500
+      },
+      "clean_structures": 13083,
+      "conflicting_structure_groups": 6,
+      "excluded_rows": 47,
+      "exclusion_reasons": {
+        "conflicting_structure_labels": 13,
+        "same_label_structure_duplicate": 34
+      },
+      "raw_label_counts": {
+        "0": 10616,
+        "1": 2514
+      },
+      "raw_rows": 13130
+    },
+    "splits": {
+      "random": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 10466,
+        "n_source_calibration_expected": 2094,
+        "n_target": 2617,
+        "outer_seed": 43021,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 752,
+        "source_calibration_n_below_historical_100_gate": false,
+        "source_label_counts": {
+          "0": 8444,
+          "1": 2022
+        },
+        "split": "random",
+        "structure_overlap": 0,
+        "target_fraction": 0.20003057402736377,
+        "target_id_sha256": "d307e1658c907a74178269232c8f4261d1a24ef01488b42de511e245efeb598b",
+        "target_label_counts": {
+          "0": 2139,
+          "1": 478
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      },
+      "scaffold": {
+        "fixed_across_fit_seeds": [
+          311,
+          312,
+          313,
+          314,
+          315
+        ],
+        "n_source": 10466,
+        "n_source_calibration_expected": 2094,
+        "n_target": 2617,
+        "outer_seed": 43022,
+        "requested_target_fraction": 0.2,
+        "scaffold_overlap": 0,
+        "source_calibration_n_below_historical_100_gate": false,
+        "source_label_counts": {
+          "0": 8454,
+          "1": 2012
+        },
+        "split": "scaffold",
+        "structure_overlap": 0,
+        "target_fraction": 0.20003057402736377,
+        "target_id_sha256": "7f4f5a4dad2654644ed3800bdb8742a14462e9406027da019be9c942ea580e13",
+        "target_label_counts": {
+          "0": 2129,
+          "1": 488
+        },
+        "target_n_below_historical_100_gate": false,
+        "target_selection_uses_labels": false
+      }
+    },
+    "preparation_sha256": "1bd4c09c015fb939db274dc1c2f7597a651d2226c2dced0fa9993c8742f51351"
+  }
+}

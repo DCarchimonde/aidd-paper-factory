@@ -1,0 +1,17 @@
+{
+  "synthetic_fixture_only": true,
+  "jobs": 960,
+  "contrasts": 770,
+  "code_sha256": "dc00c839885b7396ed71c7defa4bb2e8e74e3998244fd4fee213227da6b5020f",
+  "compiled": true,
+  "loaded_reporting_source_sha256": "dc00c839885b7396ed71c7defa4bb2e8e74e3998244fd4fee213227da6b5020f",
+  "final_reporting_source_sha256": "1457f97362bcfbee8e44c4837a565320bc72931f8286d7f764dd2e3af7d4b469",
+  "mechanism_source_sha256": "762d56e3465bdfb609ae89b78b01e7c4e8c1afb1e250cc48c54ba4d2f423f9cb",
+  "full_pipeline_executed_pre_nan_patch": true,
+  "final_nan_patch_regression_passed": true,
+  "final_gate_function_reexecuted_on_complete_fixture": true,
+  "all_defined_fixture_means_unchanged": true,
+  "final_gate_csv_sha256": "2606591d879304977003b0dce85bee5dec87588b55cfef1e42bf294995aa9398",
+  "regression_log_sha256": "05c2d089b442b5e8b116c69b06894a7a7f209cea82dcbaad2459ee66e4a6eef9",
+  "explanation": "The long-running synthetic contract loaded dc00c8 before the final gate-NaN patch. It imported the categorical-compatible mechanism module later. The NaN patch has a separate missing-class regression and was then rerun on all fixture cell metrics; all defined means are identical. No molecular research results were generated."
+}

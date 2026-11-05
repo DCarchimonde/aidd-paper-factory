@@ -13,6 +13,32 @@ from paper2_admet_benchmark.revision_2026 import runner
 
 
 class RunnerTests(unittest.TestCase):
+    def test_cuda_preflight_runs_tensor_backward_and_rejects_unsupported_gpu(self):
+        from unittest.mock import MagicMock
+        from paper2_admet_benchmark.revision_2026.execute_revision import resolve_device
+        import torch
+        probe = MagicMock()
+        probe.__matmul__.return_value = probe
+        probe.square.return_value = probe
+        probe.mean.return_value = probe
+        with patch.object(torch.cuda, 'is_available', return_value=True), \
+             patch.object(torch, 'randn', return_value=probe) as create, \
+             patch.object(torch.cuda, 'synchronize') as sync:
+            self.assertEqual(resolve_device('auto'), 'cuda')
+            create.assert_called_once_with((4, 4), device='cuda', requires_grad=True)
+            probe.backward.assert_called_once()
+            sync.assert_called_once()
+        with patch.object(torch.cuda, 'is_available', return_value=True), \
+             patch.object(torch, 'randn', side_effect=RuntimeError('no kernel image available')):
+            with self.assertRaisesRegex(RuntimeError, 'before data acquisition'):
+                resolve_device('auto')
+        with patch.object(torch.cuda, 'is_available', return_value=False), \
+             patch.object(torch, 'randn') as create:
+            self.assertEqual(resolve_device('auto'), 'cpu')
+            with self.assertRaisesRegex(RuntimeError, 'cannot use a CUDA device'):
+                resolve_device('cuda')
+            create.assert_not_called()
+
     def test_rdkit_contract_checked_before_download(self):
         from rdkit import rdBase
         with tempfile.TemporaryDirectory() as td, \
@@ -161,6 +187,162 @@ class RunnerTests(unittest.TestCase):
             self.assertTrue(all(member.shape == (8, 2) for member in methods.values()))
         self.assertFalse(diagnostics["kde"]["full_codrug_reproduction"])
         self.assertFalse(diagnostics["kmm"]["full_kmm_cp_reproduction"])
+
+    def test_declared_method_catalog_matches_runtime(self):
+        from paper2_admet_benchmark.revision_2026 import execute_revision as execution
+        from paper2_admet_benchmark.revision_2026.full_baselines import codrug, kmm_cp
+        from paper2_admet_benchmark.revision_2026 import independent_data
+        protocol = json.loads(runner.DEFAULT_PROTOCOL.read_text())
+        specs = execution.case_specs(protocol, independent_data.case_specs())
+        jobs = execution.build_required_jobs(protocol, specs, codrug.METHOD_NAMES, kmm_cp.METHOD_NAMES)
+        self.assertEqual(len(specs), 160)
+        self.assertEqual(len(jobs), 960)
+        self.assertEqual(len(set(j["job_id"] for j in jobs)), 960)
+        self.assertTrue(all("codrug_margin_swap" in {x["model"] for x in jobs if x["phase"] == phase}
+                            for phase in {j["phase"] for j in jobs}))
+        self.assertEqual(len(runner.expected_method_names(protocol, True)), 116)
+
+    def test_every_gate_ablation_has_own_nontrivial_class_budget(self):
+        from paper2_admet_benchmark.scripts.racer_c4.racer_c4_core import DensityRatioResult
+        protocol = json.loads(runner.DEFAULT_PROTOCOL.read_text())
+        lock = yaml.safe_load(runner.LEGACY_LOCK.read_text())
+        y = np.repeat([0, 1], 100)
+        cp = np.concatenate([np.linspace(.01, .2, 100), np.linspace(.8, .99, 100)])
+        qp = np.linspace(.001, .999, 200)
+        ratios = {view: DensityRatioResult(np.ones(200), np.roll(np.linspace(.1, 30, 200), index * 27),
+                     .7, 200., 100., 100., 0., 0., .2, .1)
+                  for index, view in enumerate((*runner.VIEWS, 'ecfp_bits'))}
+        audits = {view: runner.audit_density_ratio(view, ratio, y, len(qp), **lock['transport']['audit'])
+                  for view, ratio in ratios.items()}
+        self.assertTrue(all(a.active for a in audits.values()))
+        methods = runner.generate_methods(cp, y, qp, [f'id{i}' for i in range(200)], np.linspace(0, 1, 200),
+            ratios, audits, lock, protocol, 19, .1, sensitivities=True)
+        self.assertEqual(set(methods), set(runner.expected_method_names(protocol, True)))
+        base = methods['mondrian_lac_empty_to_full']
+        names = [name for name in methods if name.startswith('matched_tame_')]
+        self.assertEqual(len(names), 18)
+        nonzero = 0
+        for name in names:
+            reference = name[len('matched_'):-len('_omitted_label_probability')]
+            for label in (0, 1):
+                pool = (base.sum(1) == 1) & base[:, label]
+                actual = int((methods[reference][pool].sum(1) == 2).sum())
+                matched = int((methods[name][pool].sum(1) == 2).sum())
+                self.assertEqual(actual, matched, (reference, label))
+                nonzero += actual
+        self.assertGreater(nonzero, 0, 'a trivial all-fallback test does not validate matched budgets')
+
+    def test_pilot_subset_is_marked_and_uses_no_target_labels(self):
+        from paper2_admet_benchmark.revision_2026.execute_revision import reduce_pilot_case
+        source = [dict(structure_id=f"src{i:03d}", standardized_smiles="C") for i in range(200)]
+        target = [dict(sample_id=f"s{i:03d}", structure_id=f"tar{i:03d}", standardized_smiles="CC") for i in range(50)]
+        labels = {r["sample_id"]: {"ep": i % 2} for i, r in enumerate(target)}
+        case = {"source_rows": source, "source_y": np.tile([0, 1], 100), "target_rows": target, "labels": labels}
+        a = reduce_pilot_case(case)
+        permuted = {**case, "labels": {k: {"ep": 1-v["ep"]} for k, v in labels.items()}}
+        b = reduce_pilot_case(permuted)
+        self.assertEqual([r["sample_id"] for r in a["target_rows"]], [r["sample_id"] for r in b["target_rows"]])
+        self.assertEqual(len(a["source_rows"]), 160)
+        self.assertEqual(len(a["target_rows"]), 32)
+        self.assertTrue(a["split_metadata"]["pilot_only"])
+
+    def test_result_package_contains_verified_manifest(self):
+        import zipfile
+        from paper2_admet_benchmark.revision_2026.execute_revision import package_results
+        with tempfile.TemporaryDirectory() as td:
+            output = Path(td) / "run"
+            output.mkdir()
+            (output / "result.json").write_text('{"real_result": false}')
+            package = Path(td) / "result.zip"
+            receipt = package_results(output, package)
+            self.assertEqual(receipt["sha256"], runner.sha256_file(package))
+            with zipfile.ZipFile(package) as archive:
+                manifest = json.loads(archive.read("BUNDLE_CONTENT_SHA256.json"))
+                self.assertEqual(manifest["result.json"], runner.sha256_file(output / "result.json"))
+            with self.assertRaises(FileExistsError):
+                package_results(output, package)
+            rebuilt = package_results(output, package, resume=True)
+            self.assertEqual(rebuilt["sha256"], runner.sha256_file(package))
+            self.assertEqual(len(list((Path(td) / "run_bundle_history").glob("*.zip"))), 1)
+
+    def test_reporting_stage_resumes_after_partial_and_rejects_corruption(self):
+        from paper2_admet_benchmark.revision_2026.execute_revision import completed_stage
+        with tempfile.TemporaryDirectory() as td:
+            output = Path(td)
+            def incomplete(directory):
+                directory.mkdir()
+                (directory / "table.csv").write_text("partial")
+                raise RuntimeError("interrupted")
+            with self.assertRaisesRegex(RuntimeError, "interrupted"):
+                completed_stage(output, "report", incomplete)
+            def complete(directory):
+                directory.mkdir()
+                (directory / "table.csv").write_text("complete")
+                return {"status": "complete"}
+            self.assertEqual(completed_stage(output, "report", complete)["status"], "complete")
+            self.assertEqual(len(list((output / "incomplete_stage_history").iterdir())), 1)
+            self.assertEqual(completed_stage(output, "report", lambda _: self.fail("recomputed"))["status"], "complete")
+            (output / "report/table.csv").write_text("changed")
+            with self.assertRaisesRegex(RuntimeError, "changed cached input"):
+                completed_stage(output, "report", complete)
+
+    def test_lightweight_bundle_omits_weights_rows_and_temporary_files(self):
+        import zipfile
+        from paper2_admet_benchmark.revision_2026.execute_revision import package_results
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td) / 'run'
+            cell = root / 'full/cell/backbone'
+            cell.mkdir(parents=True)
+            for name in ('training_checkpoint.pt', '.training_checkpoint.pt.abcd', 'state.tmp'):
+                (cell / name).write_text(name)
+            (cell.parent / 'predictions.csv').write_text('private rows')
+            (cell.parent / 'metrics.csv').write_text('aggregate')
+            (cell.parent / 'complete.json').write_text('{}')
+            review = package_results(root, Path(td) / 'review.zip', review=True)
+            full = package_results(root, Path(td) / 'full.zip')
+            with zipfile.ZipFile(review['path']) as archive:
+                names = archive.namelist()
+                self.assertFalse(any(name.endswith('.pt') or name.endswith('predictions.csv') for name in names))
+                self.assertTrue(any(name.endswith('metrics.csv') for name in names))
+            with zipfile.ZipFile(full['path']) as archive:
+                self.assertTrue(any(name.endswith('training_checkpoint.pt') for name in archive.namelist()))
+                self.assertFalse(any('.abcd' in name or name.endswith('.tmp') for name in archive.namelist()))
+            self.assertTrue((cell / '.training_checkpoint.pt.abcd').exists())
+
+    def test_transport_parts_reassemble_and_reject_tamper(self):
+        import subprocess
+        import sys
+        from paper2_admet_benchmark.revision_2026.execute_revision import split_bundle
+        with tempfile.TemporaryDirectory() as td:
+            archive = Path(td) / 'sample.zip'
+            archive.write_bytes(bytes(range(256)) * 31)
+            receipt = {'path': str(archive), 'sha256': runner.sha256_file(archive)}
+            parts = split_bundle(receipt, part_size=1000)
+            folder = Path(parts['directory'])
+            rebuilt = Path(td) / 'rebuilt.zip'
+            subprocess.run([sys.executable, str(folder / 'reassemble.py'), str(rebuilt)], check=True, capture_output=True)
+            self.assertEqual(rebuilt.read_bytes(), archive.read_bytes())
+            self.assertEqual(split_bundle(receipt, part_size=1000)['parts'], 8)
+            first = sorted(folder.glob('*.part*'))[0]
+            first.write_bytes(b'corrupted')
+            with self.assertRaisesRegex(RuntimeError, 'changed cached input'):
+                split_bundle(receipt, part_size=1000)
+            result = subprocess.run([sys.executable, str(folder / 'reassemble.py'), str(Path(td) / 'bad.zip')], capture_output=True)
+            self.assertNotEqual(result.returncode, 0)
+
+    def test_execution_log_keeps_failure_and_traceback(self):
+        from paper2_admet_benchmark.revision_2026.execute_revision import execution_log
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            with self.assertRaisesRegex(ValueError, 'fixture failure'):
+                with execution_log(root):
+                    print('fixture stage reached')
+                    raise ValueError('fixture failure')
+            self.assertIn('fixture stage reached', (root / 'execution.log').read_text())
+            self.assertIn('Traceback', (root / 'execution.log').read_text())
+            failures = list((root / 'failures').glob('*.json'))
+            self.assertEqual(len(failures), 1)
+            self.assertEqual(json.loads(failures[0].read_text())['status'], 'execution_failed_not_complete')
 
 
 if __name__ == "__main__":

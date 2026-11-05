@@ -66,7 +66,8 @@ def package_versions() -> dict[str, str]:
 
 
 def code_hashes() -> dict[str, str]:
-    paths = list(HERE.glob("*.py")) + list(LEGACY.glob("*.py"))
+    paths = [p for p in HERE.rglob("*.py") if "tests" not in p.parts and not p.name.startswith("test_")]
+    paths += list(LEGACY.glob("*.py"))
     paths += [P2 / "scripts/racer_c/prepare_tox21_challenge.py",
               P2 / "scripts/racer_c/prepare_classification_endpoint.py",
               P2 / "protocols/chemical_standardization_contract.yaml"]
@@ -214,7 +215,7 @@ def estimate_views(cal_x, target_x, cal_phys, target_phys, cal_logits, target_lo
 
 
 def generate_methods(cal_p, cal_y, target_p, ids, similarity, ratios, audits, lock,
-                     protocol, seed, alpha, sensitivities=False):
+                     protocol, seed, alpha, sensitivities=False, diagnostics=None):
     """Pure target-label-free decisions; target outcomes are not arguments."""
     sets = {name: core.conformal_sets(cal_p, cal_y, target_p, alpha=alpha, method=name)
             for name in ("marginal_lac", "mondrian_lac", "marginal_aps", "mondrian_aps")}
@@ -264,6 +265,22 @@ def generate_methods(cal_p, cal_y, target_p, ids, similarity, ratios, audits, lo
                 sets[f"tame_label1_sensitivity_{parameter}_{value:g}"] = transport_envelope(
                     baseline, [weighted[v] for v in VIEWS], changed,
                     protected_labels=[1], quorum="all", minimum_active_views=2).membership
+    ablation_references = ["tame_label1_no_gates", "tame_label1_union"] + [f"tame_label1_single_{v}" for v in VIEWS]
+    if sensitivities:
+        ablation_references += [f"tame_label1_sensitivity_{parameter}_{value:g}"
+                                for parameter, values in protocol["audit_sensitivity"].items() for value in values]
+    for reference in ablation_references:
+        sets[f"matched_{reference}_omitted_label_probability"] = core.matched_budget_deferral(
+            baseline, sets[reference], matched_priorities["omitted_label_probability"], ids, match_classes=True)
+    control_config = protocol.get("transport_null", {})
+    if control_config.get("enabled", False):
+        from paper2_admet_benchmark.revision_2026.target_null import generate_controls
+        controls, control_diagnostics = generate_controls(cal_p, cal_y, target_p, ids, baseline,
+            ratios, audits, VIEWS, alpha=alpha, seed=seed,
+            replicates=int(control_config["replicates"]), edges=control_config["probability_bin_edges"])
+        sets.update(controls)
+        if diagnostics is not None:
+            diagnostics["query_weight_alignment_controls"] = control_diagnostics
     return sets
 
 
@@ -289,7 +306,7 @@ def ensure_run(output: Path, identity: dict, resume: bool) -> None:
 
 
 def protocol_reference_status():
-    return ["full_CoDrug_pending_external_reproduction", "full_KMM_CP_pending_external_reproduction"]
+    return ["full_CoDrug_and_KMM_CP_are_run_by_execute_revision_not_this_shared_predictor_subcommand"]
 
 
 def validate_cell_receipt(cell: Path) -> bool:
@@ -303,7 +320,8 @@ def validate_cell_receipt(cell: Path) -> bool:
 
 def write_cell(cell, phase, endpoint, seed, model, target_rows, labels, eligible,
                p_all, cal_rows, cal_y, cal_p, all_roles, methods_by_alpha, audits,
-               component_diagnostics=None):
+               component_diagnostics=None, selection_by_method=None, raw_methods_by_alpha=None,
+               max_train_tanimoto=None):
     cell.mkdir(parents=True, exist_ok=True)
     rows, metrics, target_manifest = [], [], []
     eval_y_all = np.asarray([labels[r["sample_id"]][endpoint] for r in target_rows], dtype=float)
@@ -313,6 +331,7 @@ def write_cell(cell, phase, endpoint, seed, model, target_rows, labels, eligible
             "sample_id": row["sample_id"], "structure_id": row["structure_id"],
             "standardized_smiles": row["standardized_smiles"],
             "probability_1": float(p_all[i]) if np.isfinite(p_all[i]) else "",
+            "max_train_tanimoto": float(max_train_tanimoto[i]) if max_train_tanimoto is not None and np.isfinite(max_train_tanimoto[i]) else "",
             "eligible": int(eligible[i]),
             "excluded_structure_overlap": int(row.get("excluded_structure_overlap", 0)),
             "excluded_structure_invalid": int(row.get("structure_status", "pass") != "pass")})
@@ -320,10 +339,18 @@ def write_cell(cell, phase, endpoint, seed, model, target_rows, labels, eligible
         for method, small_set in methods.items():
             membership = core.full_sets(len(target_rows))
             membership[eligible] = small_set
+            raw_membership = membership.copy()
+            if raw_methods_by_alpha is not None:
+                raw_membership[eligible] = raw_methods_by_alpha[alpha][method]
+            selected = eligible.copy()
+            if selection_by_method is not None:
+                selected[eligible] = selection_by_method[method]
             for i, manifest_row in enumerate(target_manifest):
                 rows.append({**manifest_row, "alpha": alpha, "method": method,
                     "y": int(eval_y_all[i]) if np.isfinite(eval_y_all[i]) else "",
-                    "include_0": int(membership[i, 0]), "include_1": int(membership[i, 1])})
+                    "include_0": int(membership[i, 0]), "include_1": int(membership[i, 1]),
+                    "method_selected": int(selected[i]),
+                    "original_include_0": int(raw_membership[i, 0]), "original_include_1": int(raw_membership[i, 1])})
             metrics.append({"phase": phase, "endpoint": endpoint, "seed": seed, "model": model,
                 "alpha": alpha, "method": method, "n_target": len(target_rows),
                 "n_eligible": int(eligible.sum()), "n_missing_labels": int((eligible & ~observed).sum()),
@@ -367,6 +394,98 @@ def density_components(cal_phys, target_phys, cal_p, cal_y, target_p, alphas, se
     return outputs, diagnostics
 
 
+def expected_method_names(protocol, sensitivities=True, selected_density=()):
+    """The scheduled method set is defined before target outcomes are read."""
+    methods = ["marginal_lac", "mondrian_lac", "marginal_aps", "mondrian_aps",
+               "mondrian_lac_empty_to_full"]
+    methods += [f"lr_weighted_mondrian_{v}" for v in ("ecfp_bits", *VIEWS)]
+    methods += [f"tame_{r}" for r in ("label0_historical", "label1_active", "both")]
+    methods += ["tame_label1_no_gates", "tame_label1_union"]
+    methods += [f"tame_label1_single_{v}" for v in VIEWS]
+    methods += [f"matched_{r}_{k}" for r in ("label0_historical", "label1_active", "both")
+                for k in ("uncertainty", "ad", "random", "omitted_label_probability")]
+    methods += [f"{family}_{kind}_{float(f):g}" for f in protocol["fixed_deferral_fractions"]
+                for kind in ("uncertainty", "ad", "random") for family in ("mondrian_defer", "point_abstain")]
+    methods += ["full_set"]
+    if sensitivities:
+        methods += [f"tame_label1_sensitivity_{parameter}_{value:g}"
+                    for parameter, values in protocol["audit_sensitivity"].items() for value in values]
+    ablation_references = ["tame_label1_no_gates", "tame_label1_union"] + [f"tame_label1_single_{v}" for v in VIEWS]
+    if sensitivities:
+        ablation_references += [f"tame_label1_sensitivity_{parameter}_{value:g}"
+                               for parameter, values in protocol["audit_sensitivity"].items() for value in values]
+    methods += [f"matched_{name}_omitted_label_probability" for name in ablation_references]
+    if "kde" in selected_density:
+        methods.append("kde_ratio_mondrian_physchem_component")
+    if "kmm" in selected_density:
+        methods.append("kmm_mondrian_physchem_component")
+    if protocol.get("transport_null", {}).get("enabled", False):
+        from paper2_admet_benchmark.revision_2026.target_null import method_names
+        methods += method_names(protocol["transport_null"]["replicates"])
+    return methods
+
+
+def execute_shared_case(source_rows, y, target_rows, labels, *, phase, endpoint, seed,
+                        models, alphas, protocol, lock, output, jobs=2, sensitivities=True,
+                        selected_density=(), prepared_features=None):
+    """Execute one arbitrary binary endpoint on a common target universe.
+
+    Used for the historical challenge and the separately sourced validation
+    panels. Selection and set construction never receive target outcomes.
+    """
+    valid = np.asarray([r.get("structure_status", "pass") == "pass" for r in target_rows])
+    if prepared_features is None:
+        x, source_phys = fingerprints(source_rows), physchem_features(source_rows)
+        valid_rows = [r for r, ok in zip(target_rows, valid) if ok]
+        vx, vp = fingerprints(valid_rows), physchem_features(valid_rows)
+        tx = np.zeros((len(target_rows), vx.shape[1]), dtype=vx.dtype)
+        tp = np.zeros((len(target_rows), vp.shape[1]), dtype=float)
+        tx[valid], tp[valid] = vx, vp
+    else:
+        x, source_phys, tx, tp = prepared_features
+    source_ids = {r["structure_id"] for r in source_rows}
+    overlap = np.asarray([r["structure_id"] in source_ids for r in target_rows])
+    eligible = valid & ~overlap
+    rows_for_endpoint = [{**r, "excluded_structure_overlap": int(overlap[i])} for i, r in enumerate(target_rows)]
+    if eligible.sum() < 2:
+        raise RuntimeError(f"{endpoint}: less than two usable target structures")
+    pending = [model for model in models if not validate_cell_receipt(
+        output / "cells" / f"{phase}__{endpoint}__{seed}__{model}")]
+    if not pending:
+        print(f"resume verified {endpoint} seed={seed}", flush=True)
+        return
+    roles, predictions = fit_predictors(x, y, tx[eligible], lock, seed, jobs, pending)
+    fit, router, cal = roles
+    source_roles = [{"structure_id": source_rows[i]["structure_id"],
+                     "standardized_smiles": source_rows[i]["standardized_smiles"], "y": int(y[i]), "role": role}
+                    for role, indices in zip(("fit", "router", "conformal"), roles) for i in indices]
+    similarity = max_tanimoto(x[fit], tx[eligible])
+    ids = [r["sample_id"] for r, ok in zip(target_rows, eligible) if ok]
+    expected = set(expected_method_names(protocol, sensitivities, selected_density))
+    for model in pending:
+        cp, qp, cl, ql = predictions[model]
+        ratios, audits = estimate_views(x[cal], tx[eligible], source_phys[cal], tp[eligible], cl, ql, y[cal], lock, seed)
+        generation_audits = {}
+        methods = {alpha: generate_methods(cp, y[cal], qp, ids, similarity, ratios, audits, lock,
+                   protocol, seed, alpha, sensitivities, generation_audits) for alpha in alphas}
+        component_sets, component_audits = density_components(source_phys[cal], tp[eligible],
+            cp, y[cal], qp, alphas, selected_density, protocol)
+        component_audits.update(generation_audits)
+        for alpha in alphas:
+            methods[alpha].update(component_sets[alpha])
+            if set(methods[alpha]) != expected:
+                raise RuntimeError("generated methods differ from the prespecified matrix")
+        p_all = np.full(len(target_rows), np.nan)
+        p_all[eligible] = qp
+        sim_all = np.full(len(target_rows), np.nan)
+        sim_all[eligible] = similarity
+        cell = output / "cells" / f"{phase}__{endpoint}__{seed}__{model}"
+        write_cell(cell, phase, endpoint, seed, model, rows_for_endpoint, labels, eligible, p_all,
+                   [source_rows[i] for i in cal], y[cal], cp, source_roles, methods, audits, component_audits,
+                   max_train_tanimoto=sim_all)
+        print(f"complete {phase} {endpoint} seed={seed} model={model}", flush=True)
+
+
 def run(args, protocol, lock):
     sources, processed = prepare(args.cache, lock)
     target_rows, labels, label_path = load_target(args.phase, sources, lock, args.cache)
@@ -403,41 +522,12 @@ def run(args, protocol, lock):
     for endpoint in endpoints:
         source_rows, y = read_clean_endpoint(processed / f"{endpoint}_clean.csv")
         x, source_phys = fingerprints(source_rows), physchem_features(source_rows)
-        source_ids = {r["structure_id"] for r in source_rows}
-        overlap = np.asarray([r["structure_id"] in source_ids for r in target_rows])
-        eligible = valid & ~overlap
-        rows_for_endpoint = [{**r, "excluded_structure_overlap": int(overlap[i])} for i, r in enumerate(target_rows)]
-        if eligible.sum() < 2:
-            raise RuntimeError(f"{endpoint}: less than two usable target structures")
         for seed in seeds:
-            pending = [model for model in models if not validate_cell_receipt(
-                args.output / "cells" / f"{args.phase}__{endpoint}__{seed}__{model}")]
-            if not pending:
-                print(f"resume verified {endpoint} seed={seed}", flush=True)
-                continue
-            roles, predictions = fit_predictors(x, y, target_x[eligible], lock, seed, args.jobs, pending)
-            fit, router, cal = roles
-            source_roles = [{"structure_id": source_rows[i]["structure_id"],
-                             "standardized_smiles": source_rows[i]["standardized_smiles"], "y": int(y[i]), "role": role}
-                            for role, indices in zip(("fit", "router", "conformal"), roles) for i in indices]
-            similarity = max_tanimoto(x[fit], target_x[eligible])
-            ids = [r["sample_id"] for r, ok in zip(target_rows, eligible) if ok]
-            for model in pending:
-                cp, qp, cl, ql = predictions[model]
-                ratios, audits = estimate_views(x[cal], target_x[eligible], source_phys[cal], target_phys[eligible],
-                                                cl, ql, y[cal], lock, seed)
-                methods = {alpha: generate_methods(cp, y[cal], qp, ids, similarity, ratios, audits, lock,
-                           protocol, seed, alpha, args.sensitivities) for alpha in alphas}
-                component_sets, component_audits = density_components(source_phys[cal], target_phys[eligible],
-                    cp, y[cal], qp, alphas, selected_density, protocol)
-                for alpha in alphas:
-                    methods[alpha].update(component_sets[alpha])
-                p_all = np.full(len(target_rows), np.nan)
-                p_all[eligible] = qp
-                cell = args.output / "cells" / f"{args.phase}__{endpoint}__{seed}__{model}"
-                write_cell(cell, args.phase, endpoint, seed, model, rows_for_endpoint, labels, eligible,
-                           p_all, [source_rows[i] for i in cal], y[cal], cp, source_roles, methods, audits, component_audits)
-                print(f"complete {endpoint} seed={seed} model={model} elapsed_s={time.monotonic()-start:.1f}", flush=True)
+            execute_shared_case(source_rows, y, target_rows, labels, phase=args.phase,
+                endpoint=endpoint, seed=seed, models=models, alphas=alphas, protocol=protocol,
+                lock=lock, output=args.output, jobs=args.jobs, sensitivities=args.sensitivities,
+                selected_density=selected_density,
+                prepared_features=(x, source_phys, target_x, target_phys))
     summaries = []
     for endpoint in endpoints:
         for seed in seeds:

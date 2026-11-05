@@ -1,0 +1,116 @@
+{
+  "command": [
+    "/workspace/scratch/797a12331f86/aidd-paper-factory/.local/chemolab_delivery_env/bin/python",
+    "-m",
+    "paper2_admet_benchmark.revision_2026.execute_revision",
+    "--pilot",
+    "--device",
+    "cpu",
+    "--jobs",
+    "2",
+    "--cache",
+    ".local/chemolab_complete_validation_cache_v4",
+    "--output",
+    ".local/chemolab_complete_pilot_v7",
+    "--resume"
+  ],
+  "exit_code": 0,
+  "elapsed_seconds": 4.240782482000213,
+  "prediction_files": 12,
+  "checkpoint_files": 6,
+  "all_recorded_bytes_and_mtimes_unchanged": true,
+  "resume_log": ".local/chemolab_pilot_v7_resume.log",
+  "artifacts": {
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__codrug/predictions.csv": {
+      "sha256": "55d2002043033af621a0502300786eb348617d8e794da6fd1838b353c3da9953",
+      "mtime_ns": 1793852117504114640,
+      "bytes": 43692
+    },
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__codrug_margin_swap/predictions.csv": {
+      "sha256": "d250aafc0b103700ef13d94c9ec771fad5d36967d1d4d339f8e23a8737f071a1",
+      "mtime_ns": 1793852121169810077,
+      "bytes": 46074
+    },
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__kmm_cp/predictions.csv": {
+      "sha256": "c7679e1e773379a5b0925450e43e8f7150c2611ce4e7bf627c230aa340ec57e4",
+      "mtime_ns": 1793852123425808400,
+      "bytes": 135986
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__codrug/predictions.csv": {
+      "sha256": "af813792212f1803866af03790331e1d76ad1d48bd525d86b977f306c4548f36",
+      "mtime_ns": 1793852130032195309,
+      "bytes": 56436
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__codrug_margin_swap/predictions.csv": {
+      "sha256": "6223a8689d9fc0479a47a694ac94dd5788a2f0ee617d861c1a36be3ec12835f3",
+      "mtime_ns": 1793852134838241689,
+      "bytes": 58734
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__kmm_cp/predictions.csv": {
+      "sha256": "9d5103ce6a0af279019452af20bc972875a1f464530d47a657e4d0ddaeaecca2",
+      "mtime_ns": 1793852137940110414,
+      "bytes": 174614
+    },
+    ".local/chemolab_complete_pilot_v7/shared/development/cells/development__Tox21_NR_AhR__101__equal_logit/predictions.csv": {
+      "sha256": "da3f25d48364f1a1725d6d3285b6430b174e2b5a35f21335b4b21a7b46c2b2bc",
+      "mtime_ns": 1793852013257574247,
+      "bytes": 2856078
+    },
+    ".local/chemolab_complete_pilot_v7/shared/development/cells/development__Tox21_NR_AhR__101__logistic/predictions.csv": {
+      "sha256": "90ffbed926419327fc303375b58ec3a73ecda1b710f8e7c42ce1034f901c6189",
+      "mtime_ns": 1793852012689577442,
+      "bytes": 2821974
+    },
+    ".local/chemolab_complete_pilot_v7/shared/development/cells/development__Tox21_NR_AhR__101__stack/predictions.csv": {
+      "sha256": "6a5e07281dda57bd25732fa79e1343b91cb64fbad67d0caf3c166717807e883a",
+      "mtime_ns": 1793852012989575755,
+      "bytes": 2788914
+    },
+    ".local/chemolab_complete_pilot_v7/shared/independent_scaffold/cells/independent_scaffold__hERG__311__equal_logit/predictions.csv": {
+      "sha256": "cc9cf0fd0752ff7e6ed5d07131214b86df1dbf3fb5b3bd695ae01459139c9ca5",
+      "mtime_ns": 1793852125048256930,
+      "bytes": 3602190
+    },
+    ".local/chemolab_complete_pilot_v7/shared/independent_scaffold/cells/independent_scaffold__hERG__311__logistic/predictions.csv": {
+      "sha256": "262d0cb030994e63819ef65be64f54994db03742427e2836585b0a4a49481221",
+      "mtime_ns": 1793852124424262702,
+      "bytes": 3563562
+    },
+    ".local/chemolab_complete_pilot_v7/shared/independent_scaffold/cells/independent_scaffold__hERG__311__stack/predictions.csv": {
+      "sha256": "a8a790516d9118a96d0a95332c8936555008b9563807cbcc28e57823075bccb0",
+      "mtime_ns": 1793852124768259520,
+      "bytes": 3531198
+    },
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__codrug/backbone/training_checkpoint.pt": {
+      "sha256": "b8c418b26ed03d6dc30e6eeebcec5d13df6390fce7a5cd2def44784aac20b196",
+      "mtime_ns": 1793852116868353464,
+      "bytes": 120676000
+    },
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__codrug_margin_swap/backbone/training_checkpoint.pt": {
+      "sha256": "00389aad8297e08fc3066359aeb2fc1b92b72a8c8c8147742646c05e0e196d5b",
+      "mtime_ns": 1793852120640304656,
+      "bytes": 120676000
+    },
+    ".local/chemolab_complete_pilot_v7/full/development/cells/development__Tox21_NR_AhR__101__kmm_cp/backbone/training_checkpoint.pt": {
+      "sha256": "18b5f52b7f2938a201fffd41d3699a429c1c927c51e22858d74ae8b955759549",
+      "mtime_ns": 1793852123120274762,
+      "bytes": 148512140
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__codrug/backbone/training_checkpoint.pt": {
+      "sha256": "5f5cc306d202264b44d64f3599d5dcf198ffc6fb06fce768c37cb839f50adad7",
+      "mtime_ns": 1793852129220206048,
+      "bytes": 120676000
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__codrug_margin_swap/backbone/training_checkpoint.pt": {
+      "sha256": "6a014613b0a73980319ca36d52befcb7e617be5dc1ef63a60f43b17ab183cbc0",
+      "mtime_ns": 1793852134072161150,
+      "bytes": 120676000
+    },
+    ".local/chemolab_complete_pilot_v7/full/independent_scaffold/cells/independent_scaffold__hERG__311__kmm_cp/backbone/training_checkpoint.pt": {
+      "sha256": "9481dabc1a10df1a3bc4a745f101506af35b4f8bed655ea799ea8c2c9904ec68",
+      "mtime_ns": 1793852137592114979,
+      "bytes": 148512140
+    }
+  },
+  "source_hashes_match_current": true
+}

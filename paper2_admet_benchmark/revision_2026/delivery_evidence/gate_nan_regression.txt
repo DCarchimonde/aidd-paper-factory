@@ -1,0 +1,6 @@
+test_gate_strata_keep_undefined_class_cell_in_denominator (paper2_admet_benchmark.revision_2026.tests.test_reporting.ReportingTests.test_gate_strata_keep_undefined_class_cell_in_denominator) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.011s
+
+OK

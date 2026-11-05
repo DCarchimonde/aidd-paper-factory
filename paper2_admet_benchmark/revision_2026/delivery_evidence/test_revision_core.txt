@@ -1,0 +1,106 @@
+test_aps_candidates_and_tie_rule (test_core.CoreTests.test_aps_candidates_and_tie_rule) ... ok
+test_bad_reference_cannot_remove_baseline_label (test_core.CoreTests.test_bad_reference_cannot_remove_baseline_label) ... ok
+test_candidate_specific_mondrian_quantiles (test_core.CoreTests.test_candidate_specific_mondrian_quantiles) ... ok
+test_class_matched_budget_and_row_order_invariance (test_core.CoreTests.test_class_matched_budget_and_row_order_invariance) ... ok
+test_finite_sample_and_missing_calibration_class (test_core.CoreTests.test_finite_sample_and_missing_calibration_class) ... ok
+test_invalid_probabilities_and_fractional_labels_fail (test_core.CoreTests.test_invalid_probabilities_and_fractional_labels_fail) ... ok
+test_metrics_denominators_and_empty_deferral (test_core.CoreTests.test_metrics_denominators_and_empty_deferral) ... ok
+test_missing_class_does_not_look_like_good_minimum_coverage (test_core.CoreTests.test_missing_class_does_not_look_like_good_minimum_coverage) ... ok
+test_protected_label_variants_and_baseline_containment (test_core.CoreTests.test_protected_label_variants_and_baseline_containment) ... ok
+test_random_ad_and_point_rules (test_core.CoreTests.test_random_ad_and_point_rules) ... ok
+test_components_execute_and_label_alignment_is_checked (test_density_baselines.DensityTests.test_components_execute_and_label_alignment_is_checked) ... ok
+test_empirical_quantile_uses_candidate_class_and_no_query_mass (test_density_baselines.DensityTests.test_empirical_quantile_uses_candidate_class_and_no_query_mass) ... ok
+test_kde_equal_domains_ratio_one_and_sample_size_normalization (test_density_baselines.DensityTests.test_kde_equal_domains_ratio_one_and_sample_size_normalization) ... ok
+test_kde_extreme_shift_is_clipped_without_overflow (test_density_baselines.DensityTests.test_kde_extreme_shift_is_clipped_without_overflow) ... ok
+test_kmm_identity_domain_feasible_weights_and_improved_objective (test_density_baselines.DensityTests.test_kmm_identity_domain_feasible_weights_and_improved_objective) ... ok
+test_kmm_rejects_failed_or_infeasible_solver (test_density_baselines.DensityTests.test_kmm_rejects_failed_or_infeasible_solver) ... ok
+test_kmm_size_cap_is_not_silent_subsampling (test_density_baselines.DensityTests.test_kmm_size_cap_is_not_silent_subsampling) ... ok
+test_zero_weight_class_conservative_infinite_threshold (test_density_baselines.DensityTests.test_zero_weight_class_conservative_infinite_threshold) ... ok
+test_annotation_conflict_excludes_whole_structure_not_majority (test_independent_data.IndependentDataTests.test_annotation_conflict_excludes_whole_structure_not_majority) ... [12:13:17] SMILES Parse Error: syntax error while parsing: invalid_smiles
+[12:13:17] SMILES Parse Error: check for mistakes around position 1:
+[12:13:17] invalid_smiles
+[12:13:17] ^
+[12:13:17] SMILES Parse Error: Failed parsing SMILES 'invalid_smiles' for input: 'invalid_smiles'
+[12:13:17] SMILES Parse Error: syntax error while parsing: invalid_smiles
+[12:13:17] SMILES Parse Error: check for mistakes around position 1:
+[12:13:17] invalid_smiles
+[12:13:17] ^
+[12:13:17] SMILES Parse Error: Failed parsing SMILES 'invalid_smiles' for input: 'invalid_smiles'
+ok
+test_cases_outside_locked_matrix_are_rejected_before_download (test_independent_data.IndependentDataTests.test_cases_outside_locked_matrix_are_rejected_before_download) ... ok
+test_changed_cached_raw_bytes_fail_before_network (test_independent_data.IndependentDataTests.test_changed_cached_raw_bytes_fail_before_network) ... ok
+test_duplicate_structure_or_unknown_regime_fails (test_independent_data.IndependentDataTests.test_duplicate_structure_or_unknown_regime_fails) ... ok
+test_infeasible_scaffold_partition_does_not_search_alternative_seeds (test_independent_data.IndependentDataTests.test_infeasible_scaffold_partition_does_not_search_alternative_seeds) ... ok
+test_outer_selection_cannot_read_labels_and_is_order_invariant (test_independent_data.IndependentDataTests.test_outer_selection_cannot_read_labels_and_is_order_invariant) ... ok
+test_source_identity_and_complete_case_matrix (test_independent_data.IndependentDataTests.test_source_identity_and_complete_case_matrix) ... ok
+test_frozen_raw_cleaning_roles_and_target_identity_all_40_cases (test_independent_data.IndependentRealDataTests.test_frozen_raw_cleaning_roles_and_target_identity_all_40_cases) ... ok
+test_categorical_structure_ids_match_plain_input (test_mechanism_diagnostics.MechanismTests.test_categorical_structure_ids_match_plain_input) ... /workspace/scratch/797a12331f86/aidd-paper-factory/paper2_admet_benchmark/revision_2026/tests/test_mechanism_diagnostics.py:62: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.
+  combined = pd.concat([data, invalid], ignore_index=True)
+ok
+test_class_budget_mismatch_rejected_even_if_total_equal (test_mechanism_diagnostics.MechanismTests.test_class_budget_mismatch_rejected_even_if_total_equal) ... ok
+test_discordant_rescue_and_exact_identities (test_mechanism_diagnostics.MechanismTests.test_discordant_rescue_and_exact_identities) ... ok
+test_excluded_invalid_structure_keeps_full_manifest_identity (test_mechanism_diagnostics.MechanismTests.test_excluded_invalid_structure_keeps_full_manifest_identity) ... ok
+test_file_roundtrip_and_no_overwrite (test_mechanism_diagnostics.MechanismTests.test_file_roundtrip_and_no_overwrite) ... ok
+test_mismatched_identity_probabilities_and_nonnested_sets_rejected (test_mechanism_diagnostics.MechanismTests.test_mismatched_identity_probabilities_and_nonnested_sets_rejected) ... ok
+test_missing_labels_preserve_budget_but_change_efficiency_identity (test_mechanism_diagnostics.MechanismTests.test_missing_labels_preserve_budget_but_change_efficiency_identity) ... ok
+test_row_order_does_not_change_results (test_mechanism_diagnostics.MechanismTests.test_row_order_does_not_change_results) ... ok
+test_actual_execution_manifest_to_figures_and_compiled_manuscript (test_reporting.CompleteExecutionContractTests.test_actual_execution_manifest_to_figures_and_compiled_manuscript) ... skipped 'set RUN_FULL_REPORT_TEST=1 for complete synthetic contract'
+test_gate_strata_keep_undefined_class_cell_in_denominator (test_reporting.ReportingTests.test_gate_strata_keep_undefined_class_cell_in_denominator) ... ok
+test_matched_budget_uses_unlabeled_target_population (test_reporting.ReportingTests.test_matched_budget_uses_unlabeled_target_population) ... ok
+test_method_label_mismatch_rejected_even_with_valid_hash (test_reporting.ReportingTests.test_method_label_mismatch_rejected_even_with_valid_hash) ... ok
+test_mismatch_predicted_class_budget_is_rejected (test_reporting.ReportingTests.test_mismatch_predicted_class_budget_is_rejected) ... ok
+test_no_matrix_no_output_no_fabricated_result (test_reporting.ReportingTests.test_no_matrix_no_output_no_fabricated_result) ... ok
+test_no_silent_nanmean_or_seed_probability_averaging (test_reporting.ReportingTests.test_no_silent_nanmean_or_seed_probability_averaging) ... ok
+test_primary_is_not_rescued_by_secondary_positive_result (test_reporting.ReportingTests.test_primary_is_not_rescued_by_secondary_positive_result) ... ok
+test_receipt_and_method_matrix_checked (test_reporting.ReportingTests.test_receipt_and_method_matrix_checked) ... ok
+test_result_prose_uses_actual_values_and_negative_conclusion (test_reporting.ReportingTests.test_result_prose_uses_actual_values_and_negative_conclusion) ... ok
+test_selected_denominator_never_replaces_full_cohort (test_reporting.ReportingTests.test_selected_denominator_never_replaces_full_cohort) ... ok
+test_cuda_preflight_runs_tensor_backward_and_rejects_unsupported_gpu (test_runner.RunnerTests.test_cuda_preflight_runs_tensor_backward_and_rejects_unsupported_gpu) ... ok
+test_declared_method_catalog_matches_runtime (test_runner.RunnerTests.test_declared_method_catalog_matches_runtime) ... ok
+test_every_gate_ablation_has_own_nontrivial_class_budget (test_runner.RunnerTests.test_every_gate_ablation_has_own_nontrivial_class_budget) ... ok
+test_exact_tanimoto_and_zero_fingerprints (test_runner.RunnerTests.test_exact_tanimoto_and_zero_fingerprints) ... ok
+test_execution_log_keeps_failure_and_traceback (test_runner.RunnerTests.test_execution_log_keeps_failure_and_traceback) ... execution started UTC=2026-11-05T04:13:20Z
+Traceback (most recent call last):
+  File "/workspace/scratch/797a12331f86/aidd-paper-factory/paper2_admet_benchmark/revision_2026/execute_revision.py", line 56, in execution_log
+    yield
+  File "/workspace/scratch/797a12331f86/aidd-paper-factory/paper2_admet_benchmark/revision_2026/tests/test_runner.py", line 340, in test_execution_log_keeps_failure_and_traceback
+    raise ValueError('fixture failure')
+ValueError: fixture failure
+
+ok
+test_lightweight_bundle_omits_weights_rows_and_temporary_files (test_runner.RunnerTests.test_lightweight_bundle_omits_weights_rows_and_temporary_files) ... ok
+test_mock_sources_end_to_end_and_verified_resume (test_runner.RunnerTests.test_mock_sources_end_to_end_and_verified_resume)
+Train real small estimators, emit files, validate summary, resume. ... fixture stage reached
+complete development Tox21_NR_AhR seed=101 model=logistic
+resume verified Tox21_NR_AhR seed=101
+ok
+test_model_probabilities_share_roles_and_equal_logits (test_runner.RunnerTests.test_model_probabilities_share_roles_and_equal_logits) ... ok
+test_optional_density_components_are_explicit_and_alpha_aligned (test_runner.RunnerTests.test_optional_density_components_are_explicit_and_alpha_aligned) ... ok
+test_output_rejects_legacy_results (test_runner.RunnerTests.test_output_rejects_legacy_results) ... ok
+test_pilot_subset_is_marked_and_uses_no_target_labels (test_runner.RunnerTests.test_pilot_subset_is_marked_and_uses_no_target_labels) ... ok
+test_rdkit_contract_checked_before_download (test_runner.RunnerTests.test_rdkit_contract_checked_before_download) ... ok
+test_reporting_stage_resumes_after_partial_and_rejects_corruption (test_runner.RunnerTests.test_reporting_stage_resumes_after_partial_and_rejects_corruption) ... ok
+test_result_package_contains_verified_manifest (test_runner.RunnerTests.test_result_package_contains_verified_manifest) ... ok
+test_resume_checks_actual_completed_bytes (test_runner.RunnerTests.test_resume_checks_actual_completed_bytes) ... ok
+test_resume_rejects_changed_inputs (test_runner.RunnerTests.test_resume_rejects_changed_inputs) ... ok
+test_transport_parts_reassemble_and_reject_tamper (test_runner.RunnerTests.test_transport_parts_reassemble_and_reject_tamper) ... ok
+test_writer_retains_missing_labels_and_exclusions (test_runner.RunnerTests.test_writer_retains_missing_labels_and_exclusions) ... ok
+test_identical_methods_zero_paired_uncertainty (test_summary.SummaryTests.test_identical_methods_zero_paired_uncertainty) ... ok
+test_identity_mismatch_fails (test_summary.SummaryTests.test_identity_mismatch_fails) ... ok
+test_label_mismatch_fails (test_summary.SummaryTests.test_label_mismatch_fails) ... ok
+test_missing_class_fails (test_summary.SummaryTests.test_missing_class_fails) ... ok
+test_repeated_endpoint_shared_molecules_preserves_interval (test_summary.SummaryTests.test_repeated_endpoint_shared_molecules_preserves_interval) ... ok
+test_seed_repetition_is_not_extra_evidence (test_summary.SummaryTests.test_seed_repetition_is_not_extra_evidence) ... ok
+test_constant_query_weight_has_no_ranking_gain_at_matched_budget (test_synthetic_mechanisms.SyntheticMechanismTests.test_constant_query_weight_has_no_ranking_gain_at_matched_budget) ... ok
+test_oracle_ratio_matches_independent_density_calculation (test_synthetic_mechanisms.SyntheticMechanismTests.test_oracle_ratio_matches_independent_density_calculation) ... ok
+test_report_outputs_and_no_overwrite (test_synthetic_mechanisms.SyntheticMechanismTests.test_report_outputs_and_no_overwrite) ... ok
+test_same_x_concept_shift_has_identical_audits_and_predictions (test_synthetic_mechanisms.SyntheticMechanismTests.test_same_x_concept_shift_has_identical_audits_and_predictions) ... ok
+test_support_loss_never_fabricates_an_oracle (test_synthetic_mechanisms.SyntheticMechanismTests.test_support_loss_never_fabricates_an_oracle) ... ok
+test_controls_keep_baseline_and_exact_class_budget (test_target_null.QueryNullTests.test_controls_keep_baseline_and_exact_class_budget) ... ok
+test_permutation_preserves_bins_and_is_id_order_invariant (test_target_null.QueryNullTests.test_permutation_preserves_bins_and_is_id_order_invariant) ... ok
+test_rejects_bad_input (test_target_null.QueryNullTests.test_rejects_bad_input) ... ok
+
+----------------------------------------------------------------------
+Ran 77 tests in 3.816s
+
+OK (skipped=1)

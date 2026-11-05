@@ -16,7 +16,7 @@ HEADER=r'''
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\small CHEMOLAB 拒稿重投 / 二作执行交接}
-\fancyhead[R]{\small 方案版本 2026-11-04}
+\fancyhead[R]{\small 全面修订 2026-11-05}
 \fancyfoot[C]{\small\thepage}
 \setlength{\headheight}{15pt}
 \XeTeXlinebreaklocale "zh"
@@ -35,7 +35,7 @@ def main():
     p.add_argument('--mainfont',default='Noto Sans CJK SC')
     p.add_argument('--monofont',default='DejaVu Sans Mono')
     a=p.parse_args()
-    output=HERE/'CHEMOLAB_Second_Author_Plan_20261104.pdf'
+    output=HERE/'CHEMOLAB_Full_Revision_Operator_Plan_20261105.pdf'
     with tempfile.TemporaryDirectory() as temp:
         header=Path(temp)/'header.tex';header.write_text(HEADER,encoding='utf-8')
         filt=Path(temp)/'wrap.lua';filt.write_text(FILTER,encoding='utf-8')

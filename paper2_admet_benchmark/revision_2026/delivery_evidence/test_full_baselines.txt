@@ -1,0 +1,27 @@
+test_auxiliary_filter_does_not_relax_empty_pool (test_codrug.GraphTrainingTests.test_auxiliary_filter_does_not_relax_empty_pool) ... ok
+test_auxiliary_scaffold_error_is_excluded_and_counted (test_codrug.GraphTrainingTests.test_auxiliary_scaffold_error_is_excluded_and_counted) ... ok
+test_auxiliary_string_cache_preserves_pool_counts_and_margin_reuse (test_codrug.GraphTrainingTests.test_auxiliary_string_cache_preserves_pool_counts_and_margin_reuse) ... ok
+test_complete_training_checkpoint_and_target_label_absence (test_codrug.GraphTrainingTests.test_complete_training_checkpoint_and_target_label_absence) ... ok
+test_energy_formula_and_graph_gradients (test_codrug.GraphTrainingTests.test_energy_formula_and_graph_gradients) ... ok
+test_graph_permutation_batch_and_isolated_atom (test_codrug.GraphTrainingTests.test_graph_permutation_batch_and_isolated_atom) ... ok
+test_vanilla_kmm_protocol_no_auxiliary (test_codrug.GraphTrainingTests.test_vanilla_kmm_protocol_no_auxiliary) ... ok
+test_kde_domains_and_no_outcome_parameter (test_codrug.WeightedSetTests.test_kde_domains_and_no_outcome_parameter) ... ok
+test_pinned_auxiliary_rejects_bad_hash (test_codrug.WeightedSetTests.test_pinned_auxiliary_rejects_bad_hash) ... ok
+test_scale_invariance_and_candidate_class (test_codrug.WeightedSetTests.test_scale_invariance_and_candidate_class) ... ok
+test_test_atom_and_uniform_ratio (test_codrug.WeightedSetTests.test_test_atom_and_uniform_ratio) ... ok
+test_constant_feature_bandwidth_is_explicit_not_nan (test_kmm_cp.KMMCPTests.test_constant_feature_bandwidth_is_explicit_not_nan) ... ok
+test_empirical_quantile_does_not_silently_add_query_atom (test_kmm_cp.KMMCPTests.test_empirical_quantile_does_not_silently_add_query_atom) ... ok
+test_full_fit_refits_on_selected_cohort_and_keeps_population_denominators (test_kmm_cp.KMMCPTests.test_full_fit_refits_on_selected_cohort_and_keeps_population_denominators) ... ok
+test_joint_qp_matches_mass_and_filters_unsupported_targets (test_kmm_cp.KMMCPTests.test_joint_qp_matches_mass_and_filters_unsupported_targets) ... ok
+test_literal_paper_threshold_and_candidate_threshold_remain_distinct (test_kmm_cp.KMMCPTests.test_literal_paper_threshold_and_candidate_threshold_remain_distinct) ... ok
+test_missing_calibration_class_has_explicit_infinite_threshold (test_kmm_cp.KMMCPTests.test_missing_calibration_class_has_explicit_infinite_threshold) ... ok
+test_mmd_statistic_matches_direct_pair_sums (test_kmm_cp.KMMCPTests.test_mmd_statistic_matches_direct_pair_sums) ... ok
+test_outcome_changes_do_not_change_density_or_selection_fit (test_kmm_cp.KMMCPTests.test_outcome_changes_do_not_change_density_or_selection_fit) ... ok
+test_permutation_bandwidth_selection_is_deterministic_and_auditable (test_kmm_cp.KMMCPTests.test_permutation_bandwidth_selection_is_deterministic_and_auditable) ... ok
+test_solver_failure_and_caps_are_not_silent_fallbacks (test_kmm_cp.KMMCPTests.test_solver_failure_and_caps_are_not_silent_fallbacks) ... ok
+test_standard_qp_identity_domain_recovers_uniform_solution (test_kmm_cp.KMMCPTests.test_standard_qp_identity_domain_recovers_uniform_solution) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 2.935s
+
+OK

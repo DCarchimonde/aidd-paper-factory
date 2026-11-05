@@ -1,0 +1,20 @@
+test_counts_only_cannot_claim_actual_change (test_audit_legacy_quantiles.LegacyAuditTests.test_counts_only_cannot_claim_actual_change) ... ok
+test_membership_change_differs_from_true_coverage_change (test_audit_legacy_quantiles.LegacyAuditTests.test_membership_change_differs_from_true_coverage_change) ... ok
+test_missing_files_are_not_zero_impact (test_audit_legacy_quantiles.LegacyAuditTests.test_missing_files_are_not_zero_impact) ... ok
+test_tiny_class_has_infinite_corrected_threshold (test_audit_legacy_quantiles.LegacyAuditTests.test_tiny_class_has_infinite_corrected_threshold) ... ok
+test_aligns_by_id_and_preserves_unselected_original (test_external_adapter.ExternalAdapterTests.test_aligns_by_id_and_preserves_unselected_original) ... ok
+test_does_not_overwrite_previous_import (test_external_adapter.ExternalAdapterTests.test_does_not_overwrite_previous_import) ... ok
+test_rejects_bad_flags_and_alpha (test_external_adapter.ExternalAdapterTests.test_rejects_bad_flags_and_alpha) ... ok
+test_rejects_duplicate_missing_and_unexpected_ids (test_external_adapter.ExternalAdapterTests.test_rejects_duplicate_missing_and_unexpected_ids) ... ok
+test_rejects_provenance_mismatch_or_label_use (test_external_adapter.ExternalAdapterTests.test_rejects_provenance_mismatch_or_label_use) ... ok
+test_rejects_target_labels_even_when_blank (test_external_adapter.ExternalAdapterTests.test_rejects_target_labels_even_when_blank) ... ok
+test_full_and_selected_denominators (test_score_external.ExternalScoringTests.test_full_and_selected_denominators) ... ok
+test_hash_checked_before_reference_is_read (test_score_external.ExternalScoringTests.test_hash_checked_before_reference_is_read) ... ok
+test_rejects_conflicting_labels_across_methods (test_score_external.ExternalScoringTests.test_rejects_conflicting_labels_across_methods) ... ok
+test_rejects_structure_or_phase_mismatch (test_score_external.ExternalScoringTests.test_rejects_structure_or_phase_mismatch) ... ok
+test_zero_selected_cohort_is_reported (test_score_external.ExternalScoringTests.test_zero_selected_cohort_is_reported) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.027s
+
+OK

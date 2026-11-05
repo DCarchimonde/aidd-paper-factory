@@ -88,3 +88,39 @@ transport checks 的 ESS、clipping、AUC、balance 门限存在于配置 `:107�
 - 本次未运行真实数据完整训练矩阵；没有生成新 EPA/ADMET 性能结论。
 - 新 quantile audit 有有限样本边界、实际集合变化与真覆盖变化区分、重复行拒绝、counts-only 与 missing-input 区分、禁止覆盖输出测试。
 - 六主端点 equal-logit 的配对比较、Stage I 小类分位数实际影响、同预算强对照、新队列结果均需要第二作者执行并回传逐行证据。
+
+## 8. 完整修订实现的第二轮独立审查（2026-11-05）
+
+新增文献方法、其他 assay family 和机制诊断后，仍不能预先判断算法优势成立。以下结论属于实现审查与研究设计边界。
+
+### 必须与主结果一起呈现的失败边界
+
+- 新 AMES、标准 hERG、DILI 是新的 endpoint family，固定 random/scaffold 划分是同一公开数据内的源/目标划分，不是独立采集队列，也不是前瞻盲测。清洗会读取标签以排除缺失/冲突，目标选择仅依赖结构；两件事须分别表述。
+- hERG 清洗约 607 个结构，80% source 再分 20% calibration，校准约 97 个，可能触发原有 `minimum_source_n=100` 门；DILI 同样稀疏且 target 约 95 个，触发 `minimum_target_n=100`。这些应保留为固定规则的适用范围结果，不能见结果后降低门限使方法启动。不能把三个新 family 说成三个均有活跃 transport 增益的验证。
+- 同 alpha 不代表同工作量。完整 CoDrug/KMM-CP 系统比较检验端到端性能，方法/模型不同的优势不能归于 TAME 包装。主要 transport 增量仍需同底层预测、同原 singleton 类预算的概率基线。
+- 查询权重置乱控制只破坏分子身份与查询权重的对应，不破坏目标分布拟合、源校准权重或两 view 的联合分布。其结论必须限于 query-specific weighting 的增量。
+
+### 一个可检验的结构事实
+
+在二分类 LAC、固定 calibration、固定 active views、保护 label 1 的情形，如果每个 view 的 query weight 对所有查询恒定，则该 view 是否加入 label 1 仅由 `p1 >= fixed cutoff` 决定。交集/并集仍是固定 p1 截断。因此在 baseline `{0}` 池中，TAME 只是按最高 p1 追加 deferral；同类预算的 omitted-label-probability 基线会选中相同集合。源 calibration reweighting 可改变追加数量，却不能单独产生额外分子排序信息。真正可能使等预算结果不同的是逐分子的 query weight。这个事实解释为什么需要 discordant-set 和 query-alignment 检查；它不是新的覆盖定理。
+
+### 已加入的机制输出
+
+`mechanism_diagnostics.py` 只读取预测 CSV，先验证三个方法具有完整相同目标身份、eligibility、概率和标签，且都包含共同 baseline；预算检查使用全部 eligible 目标，包括缺失结果。输出两方法共同、各自独有、均未追加 deferral 的分子，并按 p1 和 fit-only 最大 Tanimoto 的固定 0.1 分箱描述实际救回错误数。seed 按固定重复拟合均值展示，不合并为额外分子。
+
+baseline `{0}` 池中，令 `e_T,e_P` 为两方法把真实 active 的错误 `{0}` 转为 deferral 的数量，`m_T^obs,m_P^obs` 为有观察结果子集中的追加数量，则：
+
+- false-inactive exposure 差（T−P）为 `(e_P-e_T)/N_active`；
+- inactive correct-singleton yield 差为 `(e_T-e_P+m_P^obs-m_T^obs)/N_inactive`。
+
+全部 eligible 上预算相同不意味着有标签子集上的预算相同，不能省略后一式的缺失结果修正项。此诊断不用于选择分子、端点或阈值。
+
+`synthetic_mechanisms.py` 有四个固定情境：no shift、已知 Gaussian 密度比的 covariate shift、support loss、完全同 X 的 concept shift。分类器是冻结的已知源 posterior；所有预测先于 target outcome 评估。无 shift 与 concept shift 严格共用 X、calibration、sets、ratio 和 audits，仅改变 target 的 `P(Y|X)`，通过 fingerprint 验证。support loss 明确不提供不存在的 oracle likelihood ratio；concept shift 即使 X ratio 已知也不满足联合密度比的使用前提。
+
+开发验证实际运行了固定 30 个 replicate（seed 73000–73029，calibration 400、target 800），仅是小型机制仿真。30/30 no-shift/concept 对有相同 fingerprint，两个 view 的 gates 都通过；TAME 的 overall coverage 均值分别约 0.9028 与 0.3989。这显示 label-free transport 门不能认证条件机制不变，不能解读为分子性能。Gaussian 向正方向平移时弱类变为 label 0，固定 label-1 保护不能修复弱类，也再次说明需要事先明确决策方向。正式一键执行仍生成独立可核查的仿真输出。
+
+### 完整 KMM-CP 的独立数值核查
+
+只读审查 `full_baselines/kmm_cp.py` 的 MMD、standard/joint QP、threshold selection、selected-target refit 和两套 population 分母；未发现这些部分的算法错误。额外采用与代码不同的 SciPy SLSQP 对原始 RKHS 目标核对一个非等长 `n=5,m=8` 的 joint problem：OSQP 原始目标 0.05812432407975，SLSQP 0.05812432408060，最大坐标差约 4.73e-6，确认 cross-term 与 n/m scaling。一个手工四行例子验证 selected coverage 分母为 2、full coverage 分母为 4，且 class-specific retention 单列。该检查不代表复现原论文实测结果。
+
+CoDrug 的辅助池筛选依赖 calibration X：原论文附录 B.3.2 总述包含 training and calibration，scaffold bullet 又只写 training；实现选择与差异已在 `full_baselines/CODRUG_IMPLEMENTATION.md` 披露。不能描述为模型训练与 calibration X 完全独立，更不能据此声称经典 split-CP 精确有限样本保证。

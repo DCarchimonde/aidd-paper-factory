@@ -1,5 +1,5 @@
 {
-  "version": "chemolab-revision-2026-11-04-v1",
+  "version": "chemolab-revision-2026-11-05-v2",
   "study_status": "revision_experiment_plan_not_completed",
   "historical_commit": "d2e05ad1b948ea8c19b8d67783a659a385c54240",
   "data_interpretation": {
@@ -109,12 +109,13 @@
   },
   "threshold_status": "legacy heuristic operational thresholds; sensitivity settings are not guarantees or transferable validity certificates",
   "full_reference_baselines_required": [
-    "CoDrug_official_or_verified_reproduction",
-    "KMM-CP_official_or_verified_reproduction"
+    "CoDrug_paper_as_printed_independent_implementation",
+    "CoDrug_margin_swap_prespecified_sensitivity",
+    "KMM_CP_and_selective_KMM_CP_paper_based_independent_implementation"
   ],
-  "reference_baseline_status": "external_reproduction_required_before_manuscript_superiority_claim",
+  "reference_baseline_status": "automatic_paper_based_independent_reproductions_implemented_requires_execution",
   "inference": "shared-structure paired bootstrap across endpoints; seeds are repeated fits, not independent samples; no tuning on retrospective EPA outcomes",
-  "execution": "CPU; model jobs explicitly limited; no full experiments completed by this code delivery",
+  "execution": "Full automatic CPU/CUDA matrix; supplied implementation and validation are separate from completed scientific results",
   "primary_comparison": {
     "predictor": "stack",
     "alpha": 0.1,
@@ -140,5 +141,64 @@
     "intervals": "pointwise_exploratory",
     "minimum_valid_bootstrap_fraction": 0.95,
     "seed_replicates_independent": false
+  },
+  "complete_execution": {
+    "historical_phases": [
+      "development",
+      "retrospective_epa"
+    ],
+    "independent_phases": [
+      "independent_random",
+      "independent_scaffold"
+    ],
+    "audit_sensitivities": true,
+    "density_components": [],
+    "full_models": [
+      "codrug",
+      "codrug_margin_swap",
+      "kmm_cp"
+    ],
+    "backbone_overrides": {},
+    "kmm_overrides": {},
+    "operator_choices": [
+      "device",
+      "threads",
+      "cache_location",
+      "output_location"
+    ],
+    "scientific_matrix_changes_require_new_protocol": true,
+    "codrug_margin_sensitivity": {
+      "paper_as_printed": {
+        "margin_in": -5.0,
+        "margin_out": -35.0
+      },
+      "margin_swap": {
+        "margin_in": -35.0,
+        "margin_out": -5.0
+      },
+      "same_other_training_settings": true,
+      "selection_by_observed_performance": false
+    }
+  },
+  "transport_null": {
+    "enabled": true,
+    "replicates": 5,
+    "probability_bin_edges": [
+      0,
+      0.2,
+      0.4,
+      0.6,
+      0.8,
+      1.0
+    ],
+    "interpretation": "Within-bin permutation of target query weight identity, preserving source calibration weights, density fits and joint-view weight distribution",
+    "own_class_matched_probability_comparator": true
+  },
+  "synthetic_mechanisms": {
+    "replicates": 30,
+    "seed": 73000,
+    "n_calibration": 400,
+    "n_target": 800,
+    "alpha": 0.1
   }
 }

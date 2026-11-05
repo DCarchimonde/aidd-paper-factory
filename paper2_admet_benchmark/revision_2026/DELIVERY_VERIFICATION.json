@@ -1,67 +1,39 @@
 {
-  "delivery_date_client": "2026-11-05",
-  "plan_version": "2026-11-04",
-  "historical_base_commit": "d2e05ad1b948ea8c19b8d67783a659a385c54240",
-  "status": "code_and_experiment_handoff_verified_not_submission_ready",
-  "tests": {
-    "revision_external_and_audit": {
-      "tests_passed": 15,
-      "log_sha256": "50aa9fd76f817abf4f5a95c2c90a1359fa8dbf9e67148f60230b736cc1313dee"
-    },
-    "revision_numerical_and_runner": {
-      "tests_passed": 33,
-      "log_sha256": "c1e551b094adefca8946539760f41c6621e5f535b30b0f15bfbc00082b6f943b"
-    },
-    "historical_racer_c4": {
-      "tests_passed": 21,
-      "log_sha256": "fc4d42af03328d0141221e5d3f9e1f0a7ae32d9b73d391f2ea1be710f48b601f"
-    }
+  "artifact_checks": {
+    "chinese_operator_plan_pages": 5,
+    "synthetic_report_render_is_not_research": true,
+    "working_manuscript_and_plan_rendered_checked": true,
+    "working_manuscript_pages": 17
   },
-  "tests_total": 69,
-  "real_data_preparation": {
-    "status": "completed_all_12_tox21_endpoint_cleaning",
-    "raw_hashes_match_historical_lock": true,
-    "rdkit_required": "2026.03.4",
-    "initial_preflight_issue_fixed": "current RDKit 2026.09.1 was incompatible; dependency changed to 2026.3.4 and pre-download version check added"
+  "completion_limits": {
+    "cuda_physically_tested": false,
+    "formal_molecular_superiority_established": false,
+    "full_reference_implementations_completed": true,
+    "full_revision_research_matrix_completed": false,
+    "legacy_stage1_impact_reconstructed": false,
+    "legacy_stage1_results_used_in_new_primary_analysis": false,
+    "new_epa_blind_test": false,
+    "ready_to_resubmit": false
   },
-  "real_pilot": {
-    "phase": "development",
-    "endpoint": "Tox21_NR_AhR",
-    "seed": 101,
-    "models": [
-      "logistic",
-      "stack",
-      "equal_logit"
-    ],
-    "alpha": 0.1,
-    "audit_sensitivities": true,
-    "methods_per_model": 78,
-    "completed_predictor_cells": 3,
-    "training_and_output_messages": [
-      "complete Tox21_NR_AhR seed=101 model=logistic elapsed_s=10.3",
-      "complete Tox21_NR_AhR seed=101 model=stack elapsed_s=10.8",
-      "complete Tox21_NR_AhR seed=101 model=equal_logit elapsed_s=11.5"
-    ],
-    "verified_resume": true,
-    "paired_summary_ran": true,
-    "bootstrap_replicates": 2000,
-    "summary_clusters": 266,
-    "purpose": "pipeline validation only; not a full comparative study and not used to select methods"
-  },
-  "source_code_sha256_at_pilot": {
+  "current_runtime_source_hashes": {
     "paper2_admet_benchmark/protocols/chemical_standardization_contract.yaml": "e339d264fd731b93357c01c425c3e9cb0fda5e94a07a15dd010de8a637d9907a",
     "paper2_admet_benchmark/revision_2026/__init__.py": "21e5a5e55dcfc14682e16337b27656a727545362b3707a996067cfb6c2f90683",
     "paper2_admet_benchmark/revision_2026/audit_legacy_quantiles.py": "df7b917b0b0522a443b587b22c0c67b929e1856251142376583eeb762a25b3d0",
-    "paper2_admet_benchmark/revision_2026/build_handoff_pdf.py": "1178f0d16c182545ef5c32a6fb099239747630255204a86dfd3e7a57a2256be6",
+    "paper2_admet_benchmark/revision_2026/build_handoff_pdf.py": "915bc533229eacd84896f0d2a374c59bde5ac968fd8d4014953cc50570cbe5b2",
     "paper2_admet_benchmark/revision_2026/core.py": "22ac02f35dc4b7d08b936046b4e63362b7d51dbf7488c6339f88191b540998c9",
     "paper2_admet_benchmark/revision_2026/density_baselines.py": "4742b8b5f3c24eb5e136906dc0ce58f94d1b2674306a438d0860b0d21c6220a2",
+    "paper2_admet_benchmark/revision_2026/execute_revision.py": "d815b3ca4add5bdd3f79ea51d47de82cdb69daab63df306c0f72be8cdff16a46",
     "paper2_admet_benchmark/revision_2026/external_adapter.py": "d1109128c795856dd18be75453e2c9d2c0b1ddb60229a0e1c15ac713d8659736",
-    "paper2_admet_benchmark/revision_2026/runner.py": "3ed3ac56d87ac7d213a431f9dfd8756eab684cbecb49a9505c3f5a4fc1191697",
+    "paper2_admet_benchmark/revision_2026/full_baselines/codrug.py": "a333ca46ab8b6146a1da1c5841994b27699253d99fd48172430fb3a0298ae9ac",
+    "paper2_admet_benchmark/revision_2026/full_baselines/kmm_cp.py": "8893e0d0cbf1b2ddcee0fe91b548864c65fb3bc64013bacefb06c406dc449f09",
+    "paper2_admet_benchmark/revision_2026/independent_data.py": "5e2f77b0b28eb30f4b56c7376f606fee4e8e9e71429967be411367e41d06244d",
+    "paper2_admet_benchmark/revision_2026/mechanism_diagnostics.py": "762d56e3465bdfb609ae89b78b01e7c4e8c1afb1e250cc48c54ba4d2f423f9cb",
+    "paper2_admet_benchmark/revision_2026/reporting.py": "1457f97362bcfbee8e44c4837a565320bc72931f8286d7f764dd2e3af7d4b469",
+    "paper2_admet_benchmark/revision_2026/runner.py": "4df8b4a793e3e0a48d9cef76234345624956b89347e7694b6436e3e36dc50f98",
     "paper2_admet_benchmark/revision_2026/score_external.py": "5e67df6997c6ef71bf9c39dbd1822dd74851ccf2f6a8ea545c72e8ff3bbad811",
     "paper2_admet_benchmark/revision_2026/summarize.py": "05074e894e75580744869bb8e468a871f9a14c51c5d823cc98edf114813ccc32",
-    "paper2_admet_benchmark/revision_2026/test_audit_legacy_quantiles.py": "dbd9439ee1dae72b3e5ef0d44ee9366882308f6e19078de6d26806f5ab45036b",
-    "paper2_admet_benchmark/revision_2026/test_external_adapter.py": "ff3aad411732186517a35acbc5edc4145705227d116b1559e91bf939397d9310",
-    "paper2_admet_benchmark/revision_2026/test_score_external.py": "f6f01367169efb164ccdc1400081aeb88353acc2fe784bfda42e2b92d7e2249e",
+    "paper2_admet_benchmark/revision_2026/synthetic_mechanisms.py": "9e5e1882740b693dd5adadfa65c83975785bfa2f04da1b88690f589e40ea1c3f",
+    "paper2_admet_benchmark/revision_2026/target_null.py": "07b69f90a1e7217f9297c723a14d81d442290fd2c066f0a67a92b52e8545d302",
     "paper2_admet_benchmark/scripts/racer_c/prepare_classification_endpoint.py": "367961e7a927e5227eaac4729bdd164280cc7c8541e5c5fd98a8f274436f8d60",
     "paper2_admet_benchmark/scripts/racer_c/prepare_tox21_challenge.py": "9f6fc5240fa53b5dcc3cffbc38ac5a2c89c0f20d9eb6381605111564e1b68da1",
     "paper2_admet_benchmark/scripts/racer_c4/__init__.py": "840577eaf1407e0a0dd7edae24d80ced67bff84831757a6b131dc485422e5400",
@@ -70,29 +42,130 @@
     "paper2_admet_benchmark/scripts/racer_c4/recompute_racer_c4_inference.py": "22d0008fc221aefc0a31b3bb0ef7022348844ac9cc50e846da92fb8c720cbfb4",
     "paper2_admet_benchmark/scripts/racer_c4/run_prospective_racer_c4.py": "a7d01e98b10b7ab51466064e6d582a5eddca09d544fb5c7764ae22ea7f7e9456"
   },
+  "date": "2026-11-05",
+  "delivery_kind": "complete_revision_implementation_with_operator_only_handoff",
   "environment": {
+    "hardware": {
+      "cpu": "x86_64",
+      "cuda_tiny_forward_backward_preflight_passed": false,
+      "cudnn_version": null,
+      "device": "cpu",
+      "logical_cpu_count": 9,
+      "platform": "Linux-6.18.57-x86_64-with-glibc2.39",
+      "torch": "2.5.1+cpu",
+      "torch_compiled_cuda_architectures": [],
+      "torch_cuda_runtime": null
+    },
     "packages": {
       "PyYAML": "6.0.3",
+      "matplotlib": "3.10.8",
       "numpy": "2.3.5",
+      "osqp": "1.0.4",
       "pandas": "2.2.3",
       "rdkit": "2026.3.4",
       "scikit-learn": "1.8.0",
       "scipy": "1.17.0",
-      "threadpoolctl": "3.6.0"
+      "threadpoolctl": "3.6.0",
+      "torch": "2.5.1+cpu"
     },
     "python": "3.12.14"
   },
-  "completion_limits": {
-    "full_revision_matrix_completed": false,
-    "full_CoDrug_completed": false,
-    "full_KMM_CP_completed": false,
-    "legacy_stage1_actual_quantile_impact_determined": false,
-    "new_EPA_blind_test": false,
-    "ready_to_resubmit": false
+  "evidence_sha256": {
+    "README.md": "09f2742532f30360429822a3169c23d6bc40c73ccbe7ff774055f131bb05b509",
+    "gate_nan_regression.txt": "05c2d089b442b5e8b116c69b06894a7a7f209cea82dcbaad2459ee66e4a6eef9",
+    "independent_data_preparation.json": "a47320a8fb3deeee12153836e9c65a75befc7015f94b267bc4575cfad694068b",
+    "real_pilot_final.json": "13c33729041b0b306128530b9da9713b12345f97a7e9229bb5a30166c6f6343d",
+    "real_pilot_final_execution.txt": "3db37172cc99df2217006af1992bf9d1bbdfed633723e5f06c732cab8f67850e",
+    "real_pilot_final_resume.txt": "52334b7eece2212aae1fdaff0bcd253341ae651cb88c582eaf1d3c40d8cc60ed",
+    "real_pilot_final_resume_verification.json": "c92b57d9643d1bc5a1945fcd3dff867da09d2d3d5eeac9eaa601081c733f0435",
+    "synthetic_full_report_contract.json": "c9c7bf831bb8cb9e85b649f4b305dc12b4cdd8483c8bdbe8015d6dd371758c91",
+    "synthetic_full_report_contract.txt": "c1b538068acbd50a35dcb251cb15aafd4786abc609de9fe10d3a970a6fd0825f",
+    "test_contracts.txt": "830f4fde1701b0f4a46cd0541cb0737a7f69fce2e740950722295790c2dd0e1b",
+    "test_full_baselines.txt": "246bc37dc24fe9ea98d735bfbe5ea8c4bbd1a8d09974c32c638c5424a1715693",
+    "test_legacy_unchanged.txt": "8010ac45245c4be45c9c89ecf14b1d1a0881913fda479148f9f6b6ec2ac2f86b",
+    "test_revision_core.txt": "e40e6a33cb8d64a531138fef0af3b2931a9da9de4420034f3c60f95f20590960"
   },
-  "pdf_checks": {
-    "chinese_handoff_pages": 5,
-    "revised_working_manuscript_pages": 13,
-    "layout_rendered_and_checked": true
-  }
+  "formal_plan": {
+    "additional_tasks": [
+      "AMES",
+      "hERG",
+      "DILI",
+      "CYP2D6_Veith"
+    ],
+    "bootstrap_replicates": 2000,
+    "data_seed_cases": 160,
+    "historical_tox21_endpoints": 12,
+    "neural_network_fits": 480,
+    "predictor_cells": 960,
+    "shared_methods_per_alpha": 116
+  },
+  "manuscript_template_sha256": "43cccc194d72c1669b3be3ad7f29aea534d36622b2399c68c568201a36470cfa",
+  "ordinary_tests_passed": 134,
+  "original_submission_commit": "d2e05ad1b948ea8c19b8d67783a659a385c54240",
+  "previous_partial_delivery_commit": "6301584a72881675ae89ef06c27293fcafc53771",
+  "real_pilot": {
+    "alpha_count": 3,
+    "case_count": 2,
+    "elapsed_training_validation_seconds": 134.74281109599997,
+    "epochs": 2,
+    "graph_size": 512,
+    "maximum_source_rows_per_case": 160,
+    "neural_network_fits": 6,
+    "peak_resident_memory_mb": 1232.30078125,
+    "prediction_and_checkpoint_bytes_and_mtimes_unchanged": true,
+    "prediction_rows": 68736,
+    "predictor_cells": 12,
+    "purpose": "software pipeline only, not research performance",
+    "shared_methods_per_alpha": 116,
+    "status": "diagnostic_pilot_complete_not_formal_results",
+    "strict_resume_verified": true,
+    "target_rows_per_case": 32
+  },
+  "synthetic_full_report_contract": {
+    "all_defined_fixture_means_unchanged": true,
+    "code_sha256": "dc00c839885b7396ed71c7defa4bb2e8e74e3998244fd4fee213227da6b5020f",
+    "compiled": true,
+    "contrasts": 770,
+    "explanation": "The long-running synthetic contract loaded dc00c8 before the final gate-NaN patch. It imported the categorical-compatible mechanism module later. The NaN patch has a separate missing-class regression and was then rerun on all fixture cell metrics; all defined means are identical. No molecular research results were generated.",
+    "final_gate_csv_sha256": "2606591d879304977003b0dce85bee5dec87588b55cfef1e42bf294995aa9398",
+    "final_gate_function_reexecuted_on_complete_fixture": true,
+    "final_nan_patch_regression_passed": true,
+    "final_reporting_source_sha256": "1457f97362bcfbee8e44c4837a565320bc72931f8286d7f764dd2e3af7d4b469",
+    "full_pipeline_executed_pre_nan_patch": true,
+    "jobs": 960,
+    "loaded_reporting_source_sha256": "dc00c839885b7396ed71c7defa4bb2e8e74e3998244fd4fee213227da6b5020f",
+    "mechanism_source_sha256": "762d56e3465bdfb609ae89b78b01e7c4e8c1afb1e250cc48c54ba4d2f423f9cb",
+    "regression_log_sha256": "05c2d089b442b5e8b116c69b06894a7a7f209cea82dcbaad2459ee66e4a6eef9",
+    "synthetic_fixture_only": true
+  },
+  "test_suites": [
+    {
+      "log": "test_contracts.txt",
+      "passed": 15,
+      "sha256": "830f4fde1701b0f4a46cd0541cb0737a7f69fce2e740950722295790c2dd0e1b",
+      "skipped": 0,
+      "tests_run": 15
+    },
+    {
+      "log": "test_revision_core.txt",
+      "passed": 76,
+      "sha256": "e40e6a33cb8d64a531138fef0af3b2931a9da9de4420034f3c60f95f20590960",
+      "skipped": 1,
+      "tests_run": 77
+    },
+    {
+      "log": "test_full_baselines.txt",
+      "passed": 22,
+      "sha256": "246bc37dc24fe9ea98d735bfbe5ea8c4bbd1a8d09974c32c638c5424a1715693",
+      "skipped": 0,
+      "tests_run": 22
+    },
+    {
+      "log": "test_legacy_unchanged.txt",
+      "passed": 21,
+      "sha256": "8010ac45245c4be45c9c89ecf14b1d1a0881913fda479148f9f6b6ec2ac2f86b",
+      "skipped": 0,
+      "tests_run": 21
+    }
+  ]
 }

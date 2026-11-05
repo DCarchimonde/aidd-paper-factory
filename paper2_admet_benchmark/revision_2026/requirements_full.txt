@@ -1,0 +1,5 @@
+-r requirements.txt
+# CUDA users may install the matching torch 2.5.1 wheel from the official
+# PyTorch index before this command; the project pins the API version.
+torch==2.5.1
+osqp==1.0.4

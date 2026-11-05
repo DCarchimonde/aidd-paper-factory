@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-11-05",
+  "study_status": "new endpoint-family external benchmark under a locked analysis; public labels read for cleaning, not a prospective blind validation",
+  "selection_rule": "include AMES, standard hERG, DILI and CYP2D6_Veith in both split regimes regardless of performance or transport gate outcomes; CYP2D6_Veith was added before its predictive comparison based only on documented sample size, because hERG and DILI calibration counts necessarily fail the frozen 100-sample gate",
+  "metadata_url": "https://tdc.readthedocs.io/en/main/_modules/tdc/metadata.html",
+  "download_implementation_url": "https://tdc.readthedocs.io/en/main/_modules/tdc/utils/load.html",
+  "label_documentation_url": "https://tdcommons.ai/single_pred_tasks/tox/",
+  "adme_label_documentation_url": "https://tdcommons.ai/single_pred_tasks/adme/",
+  "license_note": "TDC toxicity task pages say Dataset License: Not Specified and display a CC BY 4.0 link; this does not establish blanket raw-data redistribution permission. The CYP2D6_Veith ADME page explicitly lists CC BY 4.0. Download locally with source attribution; do not commit or redistribute raw or cleaned molecule tables in this revision.",
+  "chemistry": {
+    "rdkit_version": "2026.03.4",
+    "standardization_id": "racer_c_rdkit_2026_03_4_v1",
+    "implementation": "paper2_admet_benchmark/scripts/racer_c/prepare_classification_endpoint.py",
+    "contract": "paper2_admet_benchmark/protocols/chemical_standardization_contract.yaml"
+  },
+  "split_contract": {
+    "target_fraction": 0.2,
+    "random_outer_seed": 43021,
+    "scaffold_outer_seed": 43022,
+    "fit_seeds": [311, 312, 313, 314, 315],
+    "target_selection": "structure IDs/scaffold IDs only; fixed target across fit seeds; no label stratification",
+    "scaffold_rule": "order scaffold groups by SHA256(seed|scaffold_id), add a whole group only when it strictly reduces absolute deviation from ceil(0.2*n); approximate 80/20 because groups cannot be split",
+    "internal_source_roles": "existing split_internal_roles(y, seed): stratified fit60/router20/cal20"
+  },
+  "sources": {
+    "AMES": {
+      "tdc_name": "ames",
+      "tdc_loader": "Tox(name='AMES')",
+      "dataverse_file_id": 4259564,
+      "url": "https://dataverse.harvard.edu/api/access/datafile/4259564",
+      "sha256": "825c2b4c31c9cec81aa32eb394fd24e6b32ee4959905d4272e56483ecb6f3e16",
+      "bytes": 344128,
+      "raw_rows": 7278,
+      "documented_drugs": 7255,
+      "positive_label": "Ames mutagenic",
+      "negative_label": "Ames non-mutagenic",
+      "family": "bacterial_reverse_mutagenicity",
+      "original_reference": "Xu C et al. In silico prediction of chemical Ames mutagenicity. JCIM 52 (2012), 2840-2847.",
+      "original_doi": "10.1021/ci300400a"
+    },
+    "hERG": {
+      "tdc_name": "herg",
+      "tdc_loader": "Tox(name='hERG')",
+      "dataverse_file_id": 4259588,
+      "url": "https://dataverse.harvard.edu/api/access/datafile/4259588",
+      "sha256": "dfce97b6a89b710d20c93cf211f005fbee0d8445a60ca7df584cac430798a379",
+      "bytes": 50174,
+      "raw_rows": 655,
+      "documented_drugs": 648,
+      "positive_label": "hERG blocker",
+      "negative_label": "hERG non-blocker",
+      "family": "cardiac_ion_channel_blockade",
+      "variant_note": "standard small hERG dataset, not hERG_Central and not hERG_Karim; do not import the Karim-specific 10 micromolar label rule",
+      "original_reference": "Wang S et al. ADMET evaluation in drug discovery. 16. Predicting hERG blockers by combining multiple pharmacophores and machine learning approaches. Molecular Pharmaceutics 13 (2016), 2855-2866.",
+      "original_doi": "10.1021/acs.molpharmaceut.6b00471"
+    },
+    "DILI": {
+      "tdc_name": "dili",
+      "tdc_loader": "Tox(name='DILI')",
+      "dataverse_file_id": 4259585,
+      "url": "https://dataverse.harvard.edu/api/access/datafile/4259585",
+      "sha256": "d3961647ff6df9711b6aa4b9fe59d6cbeb40f9d23dd6e9d51d6656e6e6df5ed8",
+      "bytes": 26677,
+      "raw_rows": 475,
+      "documented_drugs": 475,
+      "positive_label": "drug associated with liver injury in the source benchmark",
+      "negative_label": "drug assigned the non-liver-injury class in the source benchmark",
+      "family": "drug_induced_liver_injury",
+      "original_reference": "Xu Y et al. Deep learning for drug-induced liver injury. JCIM 55 (2015), 2085-2093.",
+      "original_doi": "10.1021/acs.jcim.5b00238"
+    },
+    "CYP2D6_Veith": {
+      "tdc_name": "cyp2d6_veith",
+      "tdc_loader": "ADME(name='CYP2D6_Veith')",
+      "dataverse_file_id": 4259580,
+      "url": "https://dataverse.harvard.edu/api/access/datafile/4259580",
+      "sha256": "1b50a2f02a6d9c02d29fd9e3684d661f64bfe8afb1fea09e5ffb3d54174c411b",
+      "bytes": 799509,
+      "raw_rows": 13130,
+      "documented_drugs": 13130,
+      "positive_label": "CYP2D6 inhibition-positive in the TDC binary benchmark",
+      "negative_label": "CYP2D6 inhibition-negative in the TDC binary benchmark",
+      "family": "cytochrome_P450_metabolic_inhibition",
+      "assay_interpretation": "The source bioluminescent assay can register inhibition from inhibitors or competing substrates; benchmark-positive does not imply clinical toxicity or a uniquely established inhibition mechanism.",
+      "label_documentation_url": "https://tdcommons.ai/single_pred_tasks/adme/#cyp-p450-2d6-inhibition-veith-et-al",
+      "dataset_license": "CC BY 4.0 as stated on the official TDC ADME task page",
+      "selection_reason": "large documented sample size provides a second non-Tox21 family with sufficient calibration support for the unchanged 100-sample transport gate; selected without predictive results, not as a replacement for hERG or DILI",
+      "original_reference": "Veith H et al. Comprehensive characterization of cytochrome P450 isozyme selectivity across chemical libraries. Nature Biotechnology 27 (2009), 1050-1055.",
+      "original_doi": "10.1038/nbt.1581"
+    }
+  }
+}

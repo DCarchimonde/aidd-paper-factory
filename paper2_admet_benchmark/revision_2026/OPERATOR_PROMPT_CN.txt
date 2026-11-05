@@ -1,0 +1,13 @@
+请只承担这篇 CHEMOLAB 稿件的实验运行，不需要补研究设计、实现比较算法或写论文。
+
+仓库：https://github.com/DCarchimonde/aidd-paper-factory
+分支：paper2-chemolab-resubmission-20261104
+入口：paper2_admet_benchmark/revision_2026/START_HERE_CN.md
+
+1. 在独立服务器/新 Python 3.12 环境安装 requirements_full.txt。GPU 可用时用 --device cuda，未指定时 auto 自动选择；先预留至少300GB可用磁盘。
+2. 按入口文件原样执行 execute_revision --pilot，保留日志。pilot完成后执行不带 --pilot 的正式命令。不要把pilot结果放进正式输出目录。
+3. 中断后原命令加 --resume。不要删除收据、改阈值、换划分、删端点或把失败方法换成baseline。失败时保留全部输出，回传完整报错和日志，我们修复并给出继续命令。
+4. 正式程序自动完成固定矩阵、强方法、统计、图表、论文结果与打包。先交回轻量review包、完整日志与最终状态，再交程序产生的完整分卷和校验文件；保留服务器模型与逐行结果。
+5. 不手工编辑CSV、图或论文，不依据表现挑选结果。我们负责复核、解释、全文、逐点回复和投稿。
+
+本次研究计划为160个数据/种子case、960个预测器cell，其中480次神经网络训练；这是正式计划，不是已完成的实验。研究中的EPA比较为回顾性，所有结果按真实输出报告。
