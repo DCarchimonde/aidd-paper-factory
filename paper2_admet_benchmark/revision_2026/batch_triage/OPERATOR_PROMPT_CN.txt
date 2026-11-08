@@ -1,3 +1,7 @@
+2026-11-08结果审阅更新：本轮96条screen已完成，当前无需重跑或扩大实验。请保留输出与分数缓存，暂不启动formal或sensitivity。下一版获取策略完成后另发运行入口。详见同目录SCREEN_REVIEW_20261108.md。
+
+以下为本轮原始运行说明，供复现记录使用：
+
 请在独立目录运行本轮 CHEMOLAB 分子批次双风险测定分配实验。
 
 仓库：https://github.com/DCarchimonde/aidd-paper-factory
