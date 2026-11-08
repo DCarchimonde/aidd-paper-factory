@@ -1,0 +1,33 @@
+{
+  "version": "assay_window_candidate_20261108",
+  "default_protocol": "tox21-ar-mda-kb2-luc-antagonist-p1",
+  "primary_target_threshold_pct": 30.0,
+  "primary_viability_loss_threshold_pct": 20.0,
+  "response_direction": -1,
+  "separation_factor": 3.0,
+  "grid_log10_molar_edges": [
+    -10.0,
+    -9.5,
+    -9.0,
+    -8.5,
+    -8.0,
+    -7.5,
+    -7.0,
+    -6.5,
+    -6.0,
+    -5.5,
+    -5.0,
+    -4.5,
+    -4.0,
+    -3.5,
+    -3.0
+  ],
+  "primary_comparator": "independent_censored",
+  "primary_evaluation": "molecule_weighted_observation_mask_negative_log_likelihood",
+  "secondary_evaluation": "reference_resolved_window_prediction_and_resolution_bounds",
+  "target_interpretation": "within_range_reporter_and_viability_first_onset_separation",
+  "real_molecular_model_results": "pending",
+  "previous_batch_triage": "closed_after_negative_primary_screen",
+  "onset_definition": "first_crossing_of_log_dose_piecewise_linear_observed_curve_reported_as_dose_bracket",
+  "sustained_response_window_claim": false
+}

@@ -1,0 +1,84 @@
+{
+  "protocol": "tox21-ar-mda-kb2-luc-antagonist-p1",
+  "archive_sha256": "0baf460b1c6c70a005af22727ed746a6e5272d48835158d76244ee091de9c7a6",
+  "raw_rows": 70656,
+  "eligibility": "purity A/B; unique sample/protocol/replicate channels; matched concentration vector; no outcome-based pair selection",
+  "retained_pairs": 19724,
+  "retained_samples": 7206,
+  "raw_smiles_groups": 5830,
+  "chemistry_standardization_run": false,
+  "training_performed": false,
+  "thresholds": {
+    "target_pct": 30,
+    "viability_pct": 20,
+    "margin_log10": 0.47712125471966244,
+    "response_direction": -1
+  },
+  "within_range_status_counts": {
+    "definite_no": 18393,
+    "definite_yes": 461,
+    "unresolved": 870
+  },
+  "global_margin_status_counts": {
+    "unresolved": 17544,
+    "definite_no": 1719,
+    "definite_yes": 461
+  },
+  "target_censoring": {
+    "right": 16422,
+    "interval": 3237,
+    "left": 65
+  },
+  "viability_censoring": {
+    "right": 17123,
+    "interval": 2546,
+    "left": 55
+  },
+  "recrossing_counts": {
+    "target_any": 400,
+    "viability_any": 343,
+    "either_any": 664
+  },
+  "recrossing_fraction": {
+    "target_any": 0.020279862096937742,
+    "viability_any": 0.017389981748124114,
+    "either_any": 0.03366457108091665
+  },
+  "sample_replicate_agreement": {
+    "all_same_definite_no": 6410,
+    "contains_both_definite_yes_and_no": 255,
+    "one_definite_class_and_unresolved": 355,
+    "all_same_definite_yes": 50,
+    "all_same_unresolved": 136
+  },
+  "complete_three_replicate_agreement": {
+    "all_three_available": 5741,
+    "all_three_definite_no": 5053,
+    "one_definite_class_and_unresolved": 316,
+    "contains_both_definite_yes_and_no": 247,
+    "all_three_unresolved": 102,
+    "all_three_definite_yes": 23
+  },
+  "sample_status_patterns": {
+    "definite_no|definite_no": 958,
+    "definite_no|definite_no|definite_no": 5053,
+    "definite_no|definite_yes": 8,
+    "definite_no|definite_no|unresolved": 167,
+    "definite_no|unresolved": 32,
+    "definite_yes|unresolved|unresolved": 46,
+    "definite_no|definite_no|definite_yes": 210,
+    "definite_yes|definite_yes": 13,
+    "unresolved|unresolved": 18,
+    "definite_no|unresolved|unresolved": 88,
+    "definite_yes|unresolved": 7,
+    "unresolved|unresolved|unresolved": 102,
+    "definite_yes|definite_yes|definite_yes": 23,
+    "definite_no|definite_yes|unresolved": 23,
+    "definite_no|definite_yes|definite_yes": 14,
+    "definite_yes|definite_yes|unresolved": 15,
+    "definite_no": 399,
+    "unresolved": 16,
+    "definite_yes": 14
+  },
+  "interpretation": "Descriptive data-availability check under prespecified operational crossings. No model fitting, no efficacy/toxicology truth claim, no threshold selection based on these counts."
+}

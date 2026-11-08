@@ -1,0 +1,21 @@
+columnType	columnName	columnDefinition	
+Compound description	PURITY_RATING	Refers to the purity of the test compound. Values are unique per compound, across all protocols.  Values are not case sensitive.	
+Compound description	PURITY_RATING_4M	Refers to the purity of the test compound after being at room temperature for four months. Values are unique per compound, across all protocols. Values are not case sensitive.	
+Protocol description	PROTOCOL_NAME	Name of assay protocol 	
+Protocol description	SAMPLE_DATA_TYPE	A value to indicate the output type of the protocol. The most frequent values are: activity, viability, signal, and control	
+Data	CONC[0-15]	The 16 different molar concentrations of the titrated compound.	
+Results	AC50	In cases when the concentration response curve can be fit to the Hill equation, AC50 is the concentration in uM at half maximal activity per value of SAMPLE_DATA_TYPE.  A missing value indicates there is no significant concentration response and no curve fit.  Values are numerical floats.  The most frequent value is a missing value.	
+Results	EFFICACY	In cases when the concentration response curve can be fit to the Hill equation (and so positive values for AC50), EFFICACY is the output of the equation representing the maximal response.  For aggregated datasets, values for EFFICACY are an average of the values of the replicate curves. A value of zero represents an inactive compound, while negative indicates an antagonist, and positive agonist, relative to a positive control.  Values are numerical floats.	
+Results	CURVE_RANK	A numerical value used to categorize the curve, ranging ( -9 to 9), with negative values indicating antagonist and positive values indicating an agonist and values ranging (-4 to 4) indicating inconclusive results. A value of zero represents an inactive compound. The value for CHANNEL_OUTCOME is assigned based on CURVE_RANK and REPRODUCIBILITY.	
+Results	ASSAY_OUTCOME	A value to describe the outcome of the protocol. The most frequent values are: inactive, inconclusive and a blank value.  This value is depicted in Chapter 12, Figure 2 as "Activity outcome", the final outcome of the procedure.  The values are unique per SAMPLE_ID/PROTOCOL.	
+Results	CHANNEL_OUTCOME	These values are assigned per SAMPLE_DATA_TYPE, based on the curve rank and reproducibility measures for the PROTOCOL/SAMPLE_ID/SAMPLE_DATA_TYPE. Values include: inactive, active agonist, and active antagonist and various values indicating that the outcome was inconclusive The most frequent value is inactive.  In the reference Chapter 12, Figure 2, CHANNEL_OUTCOME corresponds to the penultimate set of 4 boxes that lead in to "Activity outcome".  For mapping of the value of CHANNEL_OUTCOME to the 4 boxes, see description in the file fieldName_fieldValue_definition.txt	
+Results	SAMPLE_DATA_TYPE	Indicates which of four types of CHANNEL_OUTCOME the results refer to.	
+Results	REPRODUCIBILITY	A value per compound/protocol/datatype that represents the consistency of the replicate concentration-response curves after they were characterised using the Hill equation.  The most frequent values are inactive_match and a missing value.  The value for CHANNEL_OUTCOME is assigned based on CURVE_RANK and REPRODUCIBILITY.	
+Sample identification	PUBCHEM_SID	A PubChem Substance identifier, unique value per compound tested	
+Sample identification	SAMPLE_ID	NCATS internal sample identifier, unique value per compound tested	
+Sample identification	TOX21_ID	Tox21 internal sample identifier, unique value per compound tested	
+Sample identification	CAS		CAS identifier for compound. The mapping of CAS to SAMPLE_ID, TOX21_ID and PUBCHEM_SID can be one to many.
+Sample identification	PUBCHEM_CID	PubChem Compound identifier. The mapping of PUBCHEM_CID to SAMPLE_ID, TOX21_ID and PUBCHEM_SID can be one to many.	
+Sample identification	SAMPLE_NAME	Common name for compound. The mapping of SAMPLE_NAME to SAMPLE_ID, TOX21_ID and PUBCHEM_SID can be one to many.	
+Result description	FLAG	Indicates possible assay artifacts, such as compound auto fluorescence. Results with a flag should be considered inconclusive.	
+Deprecated	PURITY		Deprecated --- do not use

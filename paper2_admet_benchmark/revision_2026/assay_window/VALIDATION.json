@@ -1,0 +1,99 @@
+{
+  "date": "2026-11-08",
+  "scope": "new assay_window mechanism candidate; software and data availability, not molecular performance",
+  "tests": {
+    "command": "python -m unittest discover -s paper2_admet_benchmark/revision_2026/assay_window -t . -p 'test_*.py'",
+    "tests_run": 48,
+    "status": "passed",
+    "note": "The integration test deliberately uses a low iteration cap to verify honest nonconvergence reporting; the separate default pilot below fully converged."
+  },
+  "default_synthetic_pilot": {
+    "command": "python -m paper2_admet_benchmark.revision_2026.assay_window.execute --mode pilot --jobs 4 --output .local/assay_window_release_final --resume",
+    "completed_fits": 8,
+    "converged_fits": 8,
+    "zip_crc": "passed",
+    "zip_members": 20,
+    "resume_preserved_run_content_and_mtime": true,
+    "resume_refitted_jobs": 0,
+    "prediction_rows": 288,
+    "optimization_iterations": [
+      {
+        "split": "random",
+        "method": "joint_censored",
+        "iterations": 195
+      },
+      {
+        "split": "random",
+        "method": "independent_censored",
+        "iterations": 181
+      },
+      {
+        "split": "random",
+        "method": "point_imputed",
+        "iterations": 136
+      },
+      {
+        "split": "random",
+        "method": "binary_window",
+        "iterations": 12
+      },
+      {
+        "split": "scaffold",
+        "method": "joint_censored",
+        "iterations": 133
+      },
+      {
+        "split": "scaffold",
+        "method": "independent_censored",
+        "iterations": 148
+      },
+      {
+        "split": "scaffold",
+        "method": "point_imputed",
+        "iterations": 130
+      },
+      {
+        "split": "scaffold",
+        "method": "binary_window",
+        "iterations": 13
+      }
+    ]
+  },
+  "data_availability": {
+    "default_protocol_full_archive_parsed": true,
+    "curve_rows": 70656,
+    "retained_pairs_before_RDKit": 19724,
+    "chemical_standardization_executed_in_release_environment": false,
+    "details": "evidence/real_protocol_window_feasibility.json"
+  },
+  "real_molecular_training_performed": false,
+  "runtime": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "scipy": "1.17.0",
+    "scikit-learn": "1.8.0",
+    "rdkit": "not_installed"
+  },
+  "source_sha256": {
+    "__init__.py": "b0a75c09450660128c9ce5dbdadf3d462103d58b6e3ca9795161623e9824392c",
+    "data.py": "bb7038b815e51c0e1e1591c4c356e800a041ed5964d81bf279fd7eaf0eac67f8",
+    "execute.py": "7fe42594a876a51dd9831c54e6b580f04cbfe321078f565a638b1f53c497da51",
+    "model.py": "2f5423f78c97f16cc27d0d6dd17d959ba9f103e9667a2857f8454b95e39c6d82",
+    "targets.py": "0f1ea77a3fbadef01cba0a693445f63022c565f208388881ea24c3be4be28a4c",
+    "test_data.py": "aab99ee699e9105b361fe7d727662f8d11439cd9ae9e51cbf2bb4a4677cc3de7",
+    "test_execute.py": "b14800100c98e116f997e9dd596a92e9290a84609dd802ef4533f1c3e30cece7",
+    "test_model.py": "d07c78e0376d624b7c6095c727b91b9b9402a936b21b7e98f8a4752cfd913623",
+    "test_targets.py": "46fa696b28df6a12d7464661c2de4c3bbff2936a578818c35c9ad35a94742f83",
+    "sources.json": "f0d42ff293fbb26712d6b136c4393df8f644e6e5e3974648572db872891d166f",
+    "protocol.json": "aecd81c9411881a5224f79c9d129db8f5b47a36e76d574f3179fc444e670110f"
+  },
+  "independent_review": [
+    "onset/censoring endpoint semantics and finite-range event bounds",
+    "analytic gradient check",
+    "no-information training invariance",
+    "parent-group splits and training-only SVD",
+    "joint/independent comparator equality",
+    "resolved-subset molecule weights and per-row metric reconstruction"
+  ],
+  "source_dictionary_copies": "NCATS field dictionary files preserved verbatim including original trailing tabs and CRLF."
+}

@@ -1,0 +1,58 @@
+{
+  "schema": "ncats_paired_curve_sources_v1",
+  "catalog_url": "https://tripod.nih.gov/pubdata/route/data/assays",
+  "download_base": "https://opendata.ncats.nih.gov/public/tox21/assay/data/",
+  "field_dictionary_urls": [
+    "https://tripod.nih.gov/pubdata/fieldCategory_fieldName_definition.txt",
+    "https://tripod.nih.gov/pubdata/fieldName_fieldValue_definition.txt"
+  ],
+  "concentration_unit": "M",
+  "response_unit": "percent",
+  "primary_purity_ratings": [
+    "A",
+    "B"
+  ],
+  "pair_key": [
+    "PROTOCOL_NAME",
+    "SAMPLE_ID",
+    "documented replicate suffix"
+  ],
+  "structure_policy": "RDKit canonical isomeric full structure retained as structure_id; Cleanup, FragmentParent(preferOrganic), Uncharger parent is predictor SMILES and compound/group ID. All salts/replicates of that parent stay together. Murcko scaffold is achiral; acyclic parents use their group ID.",
+  "protocols": {
+    "tox21-ar-mda-kb2-luc-antagonist-p1": {
+      "expected_bytes": 14336243,
+      "etag": "\"62fc07c1-dac0f3\"",
+      "target_type_regex": "antagonist_?([123])",
+      "viability_type_regex": "viability_?([123])",
+      "target_direction": -1,
+      "viability_direction": -1,
+      "target_family": "AR-associated MMTV reporter",
+      "technology": "luciferase",
+      "cell": "MDA-kb2",
+      "specificity_note": "MMTV reporter contains AR and GR response elements; this is a reporter-response window, not confirmed AR target engagement.",
+      "sha256": "0baf460b1c6c70a005af22727ed746a6e5272d48835158d76244ee091de9c7a6"
+    },
+    "tox21-ar-bla-antagonist-p1": {
+      "expected_bytes": 28966095,
+      "etag": "\"62fc0760-1b9fccf\"",
+      "target_type_regex": "ratio_?([123])",
+      "viability_type_regex": "viability_?([123])",
+      "target_direction": -1,
+      "viability_direction": -1,
+      "target_family": "AR reporter",
+      "technology": "beta-lactamase",
+      "cell": "HEK293"
+    },
+    "tox21-er-bla-antagonist-p1": {
+      "expected_bytes": 28843675,
+      "etag": "\"62fc09d9-1b81e9b\"",
+      "target_type_regex": "ratio_?([123])",
+      "viability_type_regex": "viability_?([123])",
+      "target_direction": -1,
+      "viability_direction": -1,
+      "target_family": "ER reporter",
+      "technology": "beta-lactamase",
+      "cell": "HEK293"
+    }
+  }
+}

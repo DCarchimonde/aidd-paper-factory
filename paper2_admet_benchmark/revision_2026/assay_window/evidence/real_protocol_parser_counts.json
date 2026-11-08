@@ -1,0 +1,135 @@
+{
+  "protocol": "tox21-ar-mda-kb2-luc-antagonist-p1",
+  "raw_rows": 70656,
+  "channel_counts": {
+    "antagonist3": 11776,
+    "viability2": 11776,
+    "antagonist2": 11776,
+    "viability3": 11776,
+    "antagonist1": 11776,
+    "viability1": 11776
+  },
+  "row_exclusions": {},
+  "candidate_pairs": 30877,
+  "retained_pairs": 19724,
+  "retained_samples": 7206,
+  "retained_compound_groups": 5830,
+  "excluded_pairs": 11153,
+  "pair_exclusion_reasons": {
+    "purity_not_in_declared_set": 8926,
+    "paired_concentration_mismatch": 1408,
+    "duplicate_target_channel": 1191,
+    "duplicate_viability_channel": 1191
+  },
+  "retained_replicate_counts": {
+    "2": 6777,
+    "3": 6782,
+    "1": 6165
+  },
+  "pairs_per_compound_distribution": {
+    "4": 147,
+    "2": 735,
+    "5": 180,
+    "3": 3710,
+    "7": 31,
+    "6": 689,
+    "9": 50,
+    "11": 4,
+    "8": 67,
+    "10": 3,
+    "12": 1,
+    "1": 213
+  },
+  "purity_filter": [
+    "A",
+    "B"
+  ],
+  "pairing_rule": "protocol + sample ID + documented channel replicate index; concentration grids checked",
+  "concentration_unit": "M",
+  "response_unit": "percent",
+  "structure_policy": "ncats_window_rdkit_parent_v1",
+  "outcome_labels_used_for_selection": false,
+  "raw_archive_sha256": "0baf460b1c6c70a005af22727ed746a6e5272d48835158d76244ee091de9c7a6",
+  "parser_only_raw_smiles_identity": true,
+  "chemistry_standardization_run": false,
+  "exclusion_detail_summary": {
+    "rows": 11153,
+    "first_ten_examples": [
+      {
+        "sample_id": "NCGC00013012-01",
+        "replicate": 1,
+        "reasons": [
+          "purity_not_in_declared_set",
+          "paired_concentration_mismatch"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013012-01",
+        "replicate": 2,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013012-01",
+        "replicate": 3,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013015-01",
+        "replicate": 1,
+        "reasons": [
+          "purity_not_in_declared_set",
+          "paired_concentration_mismatch"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013015-01",
+        "replicate": 2,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013015-01",
+        "replicate": 3,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013034-01",
+        "replicate": 1,
+        "reasons": [
+          "paired_concentration_mismatch"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013037-01",
+        "replicate": 1,
+        "reasons": [
+          "purity_not_in_declared_set",
+          "paired_concentration_mismatch"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013037-01",
+        "replicate": 2,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      },
+      {
+        "sample_id": "NCGC00013037-01",
+        "replicate": 3,
+        "reasons": [
+          "purity_not_in_declared_set"
+        ]
+      }
+    ],
+    "complete_parser_report_sha256": "955f96ff9be5768ae76ca28cf38d6d60ad0ebd9f9841f1be088b9d11d5a49445",
+    "reproduction": "prepare mode exports complete source_diagnostics.json; this repository file stores counts and ten examples"
+  }
+}

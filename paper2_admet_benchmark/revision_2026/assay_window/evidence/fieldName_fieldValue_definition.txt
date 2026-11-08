@@ -1,0 +1,130 @@
+columnCategory	columnHeader	columnDefinition
+FLAG	CO	In the case of raw data, a value of CO indicates possible CARRY OVER by the pin during the assay, and so the assay result may have been compromised.
+PURITY		DEPRECATED
+PURITY_RATING		inconclusive outcome. Not recommended for use.
+PURITY_RATING	A	MW Confirmed, Purity > 90%
+PURITY_RATING 	AC	MW Confirmed, Purity > 90%. CAUTION, Low Concentration. Concentration 5-30% of expected value
+PURITY_RATING	B	MW Confirmed, Purity 75-90%
+PURITY_RATING	BC	MW Confirmed, Purity 75-90%. CAUTION, Low Concentration. Concentration 5-30% of expected value
+PURITY_RATING	C	MW Confirmed, Purity 50-75%
+PURITY_RATING	CC	MW Confirmed, Purity 50-75%. CAUTION, Low Concentration. Concentration 5-30% of expected value. Not recommended for use.
+PURITY_RATING	D	CAUTION, Purity <50%. Not recommended for use.
+PURITY_RATING	F	CAUTION, Incorrect MW. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING	FC	CAUTION, Incorrect MW. Biological Activity Unreliable. CAUTION, Very Low Concentration. Concentration <5% of expected value. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING	FNS	CAUTION, No Sample Detected. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING	I	ISOMERS. Two or more isomers detected
+PURITY_RATING	M	DEFINED MIXTURE. Two or more components. Not recommended for use.
+PURITY_RATING	ND	Not Determined. Analytical analysis is in progress. Not recommended for use.
+PURITY_RATING	W	Sample Withdrawn. Not recommended for use.
+PURITY_RATING	Z	MW Confirmed, No Purity Info
+PURITY_RATING_4M	 	inconclusive outcome, not recommended for use
+PURITY_RATING_4M	A	MW Confirmed, Purity > 90%
+PURITY_RATING_4M 	AC	MW Confirmed, Purity > 90%. CAUTION, Low Concentration. Concentration 5-30% of expected value
+PURITY_RATING_4M	B	MW Confirmed, Purity 75-90%
+PURITY_RATING_4M	BC	MW Confirmed, Purity 75-90%. CAUTION, Low Concentration. Concentration 5-30% of expected value
+PURITY_RATING_4M	C	MW Confirmed, Purity 50-75%
+PURITY_RATING_4M	CC	MW Confirmed, Purity 50-75%. CAUTION, Low Concentration. Concentration 5-30% of expected value. Not recommended for use.
+PURITY_RATING_4M	D	CAUTION, Purity <50%. Not recommended for use.
+PURITY_RATING_4M	F	CAUTION, Incorrect MW. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING_4M	FC	CAUTION, Incorrect MW. Biological Activity Unreliable. CAUTION, Very Low Concentration. Concentration <5% of expected value. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING_4M	FNS	CAUTION, No Sample Detected. Biological Activity Unreliable. Not recommended for use.
+PURITY_RATING_4M	I	ISOMERS. Two or more isomers detected
+PURITY_RATING_4M	M	DEFINED MIXTURE. Two or more components. Not recommended for use.
+PURITY_RATING_4M	ND	Not Determined. Analytical analysis is in progress. Not recommended for use.
+PURITY_RATING_4M	W	Sample Withdrawn. Not recommended for use.
+PURITY_RATING_4M	Z	MW Confirmed, No Purity Info
+SAMPLE_DATA_TYPE	control	In Chapter 12, Figure 2, corresponds to the box of "Autofluorescence outcome"
+SAMPLE_DATA_TYPE	signal	In Chapter 12, Figure 2, corresponds to the box of "Signal channel outcome"
+SAMPLE_DATA_TYPE	activity	Values of 'activity' and 'ratio' for SAMPLE_DATA_TYPE indicate that the data represents the activity of the compound relative to a control.  See Chapter 12, Figure 2, the box of "Ratio outcome"
+SAMPLE_DATA_TYPE	ratio	Equivalent to a SAMPLE_DATA_TYPE of 'activity'. 
+SAMPLE_DATA_TYPE	viability	Values of 'viability' for SAMPLE_DATA_TYPE indicate that the data represents the viability of the cells when exposed to the compound.  See Chapter 12, Figure 2 - the box of "Cell viability outcome"
+SAMPLE_DATA_TYPE	glo 0 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo 8 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo 16 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo 24 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo 32 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo 40 hr	A value of 'glo' with an hour indicates use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for the indicate hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	flor 0 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor 8 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor 16 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor 24 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor 32 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor 40 hr	A value of 'flor' with an hour indicates use of the assay CellTox Green Cytotoxicity Assay after incubation for the indicate hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	agonist	For the protocols tox21-err-p1 and tox21-pgc-err-p1. CLARIFICATION PENDING.
+SAMPLE_DATA_TYPE	antagonist	For the protocols tox21-err-p1 and tox21-pgc-err-p1. CLARIFICATION PENDING.
+SAMPLE_DATA_TYPE	100	Equivalent to a SAMPLE_DATA_TYPE of 'activity'. For the protocol tox-dt40-p1, a SAMPLE_DATA_TYPE value of 100 refers to the viability of cells of the protocol when done using the Rad54/Ku70 knockout (double knockout) cell line.
+SAMPLE_DATA_TYPE	653	Equivalent to a SAMPLE_DATA_TYPE of 'viability'. For the protocol tox-dt40-p1, a SAMPLE_DATA_TYPE value of 653 refers to the viability of cells of the protocol when done using the wild type cell line.  Cell 653 serves as the viability counter screen for 100 and 657. This value is blank for all compounds of this cell line/protocol combination.
+SAMPLE_DATA_TYPE	657	Equivalent to a SAMPLE_DATA_TYPE of 'activity'. For the protocol tox-dt40-p1, a SAMPLE_DATA_TYPE value of 657 refers to the viability of cells of the protocol when done using the Rev3 cell line.
+SAMPLE_DATA_TYPE	100_1	For primary data, the first replicate for SAMPLE_DATA_TYPE 100
+SAMPLE_DATA_TYPE	100_2	For primary data, the second replicate for SAMPLE_DATA_TYPE 100
+SAMPLE_DATA_TYPE	100_3	For primary data, the third replicate for SAMPLE_DATA_TYPE 100
+SAMPLE_DATA_TYPE	653_1	For primary data, the first replicate for SAMPLE_DATA_TYPE 653
+SAMPLE_DATA_TYPE	653_2	For primary data, the second replicate for SAMPLE_DATA_TYPE 653
+SAMPLE_DATA_TYPE	653_3	For primary data, the third replicate for SAMPLE_DATA_TYPE 653
+SAMPLE_DATA_TYPE	657_1	For primary data, the first replicate for SAMPLE_DATA_TYPE 657
+SAMPLE_DATA_TYPE	657_2	For primary data, the second replicate for SAMPLE_DATA_TYPE 657
+SAMPLE_DATA_TYPE	657_3	For primary data, the third replicate for SAMPLE_DATA_TYPE 657
+SAMPLE_DATA_TYPE	FITC	For primary data, the control readout of the mitochondrial toxicity assay.
+SAMPLE_DATA_TYPE	agonist1	For primary data, the first replicate for SAMPLE_DATA_TYPE agonist.
+SAMPLE_DATA_TYPE	agonist2	For primary data, the second replicate for SAMPLE_DATA_TYPE agonist.
+SAMPLE_DATA_TYPE	agonist3	For primary data, the third replicate for SAMPLE_DATA_TYPE agonist.
+SAMPLE_DATA_TYPE	antagonist1	For primary data, the first replicate for SAMPLE_DATA_TYPE antagonist.
+SAMPLE_DATA_TYPE	antagonist2	For primary data, the second replicate for SAMPLE_DATA_TYPE antagonist.
+SAMPLE_DATA_TYPE	antagonist3	For primary data, the third replicate for SAMPLE_DATA_TYPE antagonist.
+SAMPLE_DATA_TYPE	ch1	For primary data, the control readout.
+SAMPLE_DATA_TYPE	ch1_1	For primary data, the first replicate for SAMPLE_DATA_TYPE ch1.
+SAMPLE_DATA_TYPE	ch1_2	For primary data, the second replicate for SAMPLE_DATA_TYPE ch1.
+SAMPLE_DATA_TYPE	ch1_3	For primary data, the third replicate for SAMPLE_DATA_TYPE ch1.
+SAMPLE_DATA_TYPE	ch2	For primary data, the signal readout.
+SAMPLE_DATA_TYPE	ch2_1	For primary data, the first replicate for SAMPLE_DATA_TYPE ch2.
+SAMPLE_DATA_TYPE	ch2_2	For primary data, the second replicate for SAMPLE_DATA_TYPE ch2.
+SAMPLE_DATA_TYPE	ch2_3	For primary data, the third replicate for SAMPLE_DATA_TYPE ch2.
+SAMPLE_DATA_TYPE	flor_0h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 0 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor_16h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 16 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor_24h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 24 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor_32h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 32 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor_40h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 40 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	flor_8h_n	For primary data, use of the assay CellTox Green Cytotoxicity Assay after incubation for 8 hours, for use in fluorescence assays.
+SAMPLE_DATA_TYPE	glo_0h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 0 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo_16h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 16 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo_24h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 24 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo_32h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 32 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo_40h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 40 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	glo_8h_n	For primary data, use of the assay qHTS RealTime-Glo MT Cell Viability Assay, after incubation for 8 hours, for use in luminescence assays.
+SAMPLE_DATA_TYPE	ratio	For primary data, the ratio of signal/control, the primary readout of an assay with multiple channel readouts.
+SAMPLE_DATA_TYPE	ratio_1	For primary data, the first replicate for SAMPLE_DATA_TYPE ratio.
+SAMPLE_DATA_TYPE	ratio_2	For primary data, the second replicate for SAMPLE_DATA_TYPE ratio.
+SAMPLE_DATA_TYPE	ratio_3	For primary data, the third replicate for SAMPLE_DATA_TYPE ratio.
+SAMPLE_DATA_TYPE	rhodamine	For primary data, the signal readout of the mitochondrial toxicity assay.
+SAMPLE_DATA_TYPE	set1	For primary data, the first replicate of an assay with a single channel readout.
+SAMPLE_DATA_TYPE	set2	For primary data, the second replicate of an assay with a single channel readout.
+SAMPLE_DATA_TYPE	set3	For primary data, the third replicate of an assay with a single channel readout.
+SAMPLE_DATA_TYPE	viability	For primary data, the cell viability counter screen of an assay.
+SAMPLE_DATA_TYPE	viability1	For primary data, the first replicate for SAMPLE_DATA_TYPE viability.
+SAMPLE_DATA_TYPE	viability2	For primary data, the second replicate for SAMPLE_DATA_TYPE viability.
+SAMPLE_DATA_TYPE	viability3	For primary data, the third replicate for SAMPLE_DATA_TYPE viability.
+SAMPLE_DATA_TYPE	viability_1	For primary data, the first replicate for SAMPLE_DATA_TYPE viability.
+SAMPLE_DATA_TYPE	viability_2	For primary data, the second replicate for SAMPLE_DATA_TYPE viability.
+SAMPLE_DATA_TYPE	viability_3	For primary data, the third replicate for SAMPLE_DATA_TYPE viability.
+CHANNEL_OUTCOME	active agonist
+CHANNEL_OUTCOME	active antagonist
+CHANNEL_OUTCOME	inactive
+CHANNEL_OUTCOME	inconclusive
+CHANNEL_OUTCOME	inconclusive agonist
+CHANNEL_OUTCOME	inconclusive antagonist
+ASSAY_OUTCOME	active agonist
+ASSAY_OUTCOME	active antagonist
+ASSAY_OUTCOME	inactive
+ASSAY_OUTCOME	inconclusive
+ASSAY_OUTCOME	inconclusive agonist
+ASSAY_OUTCOME	inconclusive antagonist
+ASSAY_OUTCOME	inconclusive agonist (cytotoxic)
+ASSAY_OUTCOME	inconclusive antagonist (cytotoxic)
+REPRODUCIBILITY		Missing value for REPRODUCIBILITY indicates that the assay was not run using replicates, and so the reproducibility could not be assessed.
+REPRODUCIBILITY	active_match	A value assigned per sample/protocol/SAMPLE_DATA_TYPE indicating consistency in the curve fitting of the replicates, and a minimum of curves being classified as 'inactive'.  See chapter12.pdf for details.
+REPRODUCIBILITY	inactive_match	A value assigned per sample/protocol/SAMPLE_DATA_TYPE indicating consistency in the curve fitting of the replicates, but includes more than 50% of curves being classified as 'inactive'.  See chapter12.pdf for details.
+REPRODUCIBILITY	mismatch	A values assigned per sample/protocol/SAMPLE_DATA indicating inconsistency in the curve fitting of the replicates.  See chapter12.pdf for details.
+REPRODUCIBILITY	possible_mismatch	A values assigned per sample/protocol/SAMPLE_DATA indicating inconsistency in the curve fitting of the replicates.  A value of possible_mismatch is the same as that of a mismatch, except with a threshold of average score > 2, rather than 2.5.  See chapter12.pdf describing 'mismatch' for details.
+REPRODUCIBILITY	inconclusive	A value assigned per sample/protocol/SAMPLE_DATA_TYPE. All other cases that don't fall into one of the above reproducibility categories.
+CURVE_RANK	numerical	Numerical value representing the curve.  The sign of the number represents the nature of the curve with agonist being a positive value and antagonist being negative. The numerical value represents the quality of the response curve, with higher values indicating a higher quality of curve.
+AC50		A missing value indicates there is no significant concentration response and no curve fit.

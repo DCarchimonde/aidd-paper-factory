@@ -1,0 +1,210 @@
+{
+  "source": "https://tripod.nih.gov/pubdata/",
+  "catalog_url": "https://tripod.nih.gov/pubdata/route/data/assays",
+  "catalog_count": 86,
+  "download_url": "https://opendata.ncats.nih.gov/public/tox21/assay/data/tox21-ar-mda-kb2-luc-antagonist-p1.zip",
+  "archive_content_length": 14336243,
+  "raw_member": "tox21-ar-mda-kb2-luc-antagonist-p1.txt",
+  "raw_format": "TSV; header 55 columns; data rows have one trailing empty field",
+  "observed_columns": [
+    "SAMPLE_ID",
+    "SAMPLE_DATA_ID",
+    "PROTOCOL_NAME",
+    "SAMPLE_DATA_TYPE",
+    "ASSAY_OUTCOME",
+    "CURVE_CLASS2",
+    "AC50",
+    "EFFICACY",
+    "ZERO_ACTIVITY",
+    "INF_ACTIVITY",
+    "HILL_COEF",
+    "R2",
+    "P_HILL",
+    "CHANNEL_OUTCOME",
+    "DATA0",
+    "DATA1",
+    "DATA2",
+    "DATA3",
+    "DATA4",
+    "DATA5",
+    "DATA6",
+    "DATA7",
+    "DATA8",
+    "DATA9",
+    "DATA10",
+    "DATA11",
+    "DATA12",
+    "DATA13",
+    "DATA14",
+    "DATA15",
+    "CONC0",
+    "CONC1",
+    "CONC2",
+    "CONC3",
+    "CONC4",
+    "CONC5",
+    "CONC6",
+    "CONC7",
+    "CONC8",
+    "CONC9",
+    "CONC10",
+    "CONC11",
+    "CONC12",
+    "CONC13",
+    "CONC14",
+    "CONC15",
+    "CAS",
+    "PUBCHEM_CID",
+    "PUBCHEM_SID",
+    "PURITY_RATING",
+    "PURITY_RATING_4M",
+    "SAMPLE_NAME",
+    "SMILES",
+    "TOX21_ID",
+    "PURITY"
+  ],
+  "concentration_columns": [
+    "CONC0",
+    "CONC1",
+    "CONC2",
+    "CONC3",
+    "CONC4",
+    "CONC5",
+    "CONC6",
+    "CONC7",
+    "CONC8",
+    "CONC9",
+    "CONC10",
+    "CONC11",
+    "CONC12",
+    "CONC13",
+    "CONC14",
+    "CONC15"
+  ],
+  "response_columns": [
+    "DATA0",
+    "DATA1",
+    "DATA2",
+    "DATA3",
+    "DATA4",
+    "DATA5",
+    "DATA6",
+    "DATA7",
+    "DATA8",
+    "DATA9",
+    "DATA10",
+    "DATA11",
+    "DATA12",
+    "DATA13",
+    "DATA14",
+    "DATA15"
+  ],
+  "concentration_unit": "M, explicitly documented in fieldCategory_fieldName_definition.txt",
+  "response_unit": "percent; official curve SVG y axis Response(%)",
+  "observed_sample_data_types": [
+    "antagonist1",
+    "antagonist2",
+    "antagonist3",
+    "viability1",
+    "viability2",
+    "viability3"
+  ],
+  "pairing_evidence": "Official per-assay description says viability tested in the same wells; official dictionary defines matching replicate suffixes; two paired raw samples in prefix have identical CONC vectors. No plate/well/run-date/batch columns exposed.",
+  "observed_absent_metadata": [
+    "plate_id",
+    "well_id",
+    "run_date",
+    "batch_id"
+  ],
+  "partial_raw_complete_rows": 342,
+  "partial_raw_is_random_or_representative": false,
+  "missing_values": "empty string; DATA15 and CONC15 empty in inspected examples; retain missingness",
+  "raw_point_schema": {
+    "chemical_sample": "SAMPLE_ID",
+    "chemical_tox21_id": "TOX21_ID",
+    "curve_id": "SAMPLE_DATA_ID",
+    "protocol": "PROTOCOL_NAME",
+    "readout_and_replicate": "SAMPLE_DATA_TYPE",
+    "dose_index": "0..15 paired DATAj/CONCj",
+    "concentration_molar": "CONCj",
+    "normalized_response_percent": "DATAj"
+  },
+  "not_labels_for_training": [
+    "ASSAY_OUTCOME",
+    "CHANNEL_OUTCOME",
+    "CURVE_CLASS2",
+    "AC50",
+    "EFFICACY"
+  ],
+  "warnings": [
+    "Summary AC50 remains nonempty for an inactive curve: do not treat numeric AC50 as observed response onset.",
+    "Numeric replicate suffix by itself is not physical batch identity.",
+    "MDA-kb2 MMTV reporter contains AR and GR response elements per official description; readout specificity is not guaranteed.",
+    "Standalone search JSON endpoint returned HTTP500; single-sample download CSV succeeded.",
+    "Do not estimate dataset prevalence/counts from the prefix.",
+    "Zinc pyrithione sample has PURITY_RATING=F, documented incorrect molecular weight / unreliable biological activity; use as schema evidence only, not biological evidence."
+  ],
+  "files": [
+    {
+      "file": "assay_catalog.json",
+      "bytes": 3712,
+      "sha256": "80a34db0303f575f608f5dffba0018bae314bf90f4d8b9f6ee35fd8cef3e5f02"
+    },
+    {
+      "file": "tox21-ar-mda-kb2-luc-antagonist-p1_zip_members.json",
+      "bytes": 801,
+      "sha256": "f6c0b784f911a89da46f7fb84c857fc6ba52ffbe61ade7c7c4c9627a6c97c05e"
+    },
+    {
+      "file": "tox21-ar-mda-kb2-luc-antagonist-p1.slp.docx",
+      "bytes": 20545,
+      "sha256": "49f3c9b86dfad95af48b803764d2cde5473dbc33c4eeb97c22c2ffb550b928e1"
+    },
+    {
+      "file": "tox21-ar-mda-kb2-luc-antagonist-p1.description.txt",
+      "bytes": 4920,
+      "sha256": "e2c708839922b8615dfcc6d5313ca492c2a65f0271e1ecdb560a319b8390ad3a"
+    },
+    {
+      "file": "tox21-ar-mda-kb2-luc-antagonist-p1.txt.prefix",
+      "bytes": 206813,
+      "sha256": "e5e94f6549671c06fc69c8d94e8c81dcb0895ad58b473a54f10d749538d141cc"
+    },
+    {
+      "file": "one_sample_download.bin",
+      "bytes": 2158,
+      "sha256": "e86eafee720af9e0f96b76186999fecac94ece29b528ba8f2b55e99ff342dc46"
+    },
+    {
+      "file": "verified_paired_raw_example.json",
+      "bytes": 3864,
+      "sha256": "42b7894734a5a60a03c09a2a83d7dc4e80b1d52dcc0c8a80a448348a427ecd7a"
+    },
+    {
+      "file": "zinc_pyrithione_paired_curves.html",
+      "bytes": 22562,
+      "sha256": "62261ffacab6cbc79f4ab625b763380c312943ec5df1748c120b187dcbdb46df"
+    },
+    {
+      "file": "fieldCategory_fieldName_definition.txt",
+      "bytes": 4187,
+      "sha256": "bb6451030d38032df69e53b9d754957dee0a4e76c8880d3d406b920556fe3d8f"
+    },
+    {
+      "file": "fieldName_fieldValue_definition.txt",
+      "bytes": 14954,
+      "sha256": "3d107be47cc5cf18d9619a6c96efc0bc01afe735d485255829210927cd9ec6f8"
+    }
+  ],
+  "field_dictionary_urls": [
+    "https://tripod.nih.gov/pubdata/fieldCategory_fieldName_definition.txt",
+    "https://tripod.nih.gov/pubdata/fieldName_fieldValue_definition.txt"
+  ],
+  "ac50_unit": "uM, explicitly documented in fieldCategory_fieldName_definition.txt",
+  "replicate_mapping_source": "fieldName_fieldValue_definition.txt explicitly defines antagonist1/2/3 and viability1/2/3 as first/second/third replicates",
+  "pair_key": [
+    "PROTOCOL_NAME",
+    "SAMPLE_ID",
+    "documented replicate index"
+  ]
+}
