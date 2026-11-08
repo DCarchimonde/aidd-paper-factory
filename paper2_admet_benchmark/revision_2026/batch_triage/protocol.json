@@ -1,0 +1,32 @@
+{
+  "version": "batch_triage_prototype_20261108",
+  "status": "post_v3_research_candidate_molecular_results_pending",
+  "delta": 0.05,
+  "eps_fn": 0.1,
+  "eps_fp": 0.1,
+  "score_bins": 4,
+  "support_bins": 2,
+  "count_prior": "edge_mixture",
+  "edge_mixture_weights": [0.4, 0.4, 0.2],
+  "edge_mixture_continuous_beta": [0.5, 0.5],
+  "query_block": 4,
+  "audit_fractions": [0.0, 0.05, 0.1, 0.2, 0.4],
+  "total_assay_budget_fractions": [0.2, 0.4, 0.6, 0.8],
+  "fit_seed": 311,
+  "screen_audit_seeds": [81001, 81002, 81003],
+  "formal_audit_seed_range_inclusive": [81001, 81020],
+  "primary_predictor": "stack",
+  "primary_audit_fraction": 0.2,
+  "primary_metric": "saved_fraction_of_original_finite_batch_after_all_query_costs",
+  "primary_comparator": "joint_uniform",
+  "method_contribution_requires": [
+    "query_value_beyond_uniform_entropy_and_neyman_with_same_certificate",
+    "value_of_joint_atom_policy_beyond_nested_thresholds",
+    "net_savings_including_audited_and_remaining_deferred_assays",
+    "conditional_finite_batch_risk_not_only_average_error"
+  ],
+  "data_interpretation": "existing_public_tasks_retrospective_development_not_new_blind_confirmation",
+  "assay_oracle": "one_recorded_binary_outcome_per_query_no_measurement_noise_model",
+  "certificate_scope": "single_fixed_batch_simultaneously_all_looks_and_atom_union_policies",
+  "audit_budget_is_not_total_assay_budget": true
+}

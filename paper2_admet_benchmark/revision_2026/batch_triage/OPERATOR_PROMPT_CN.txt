@@ -1,0 +1,11 @@
+请在独立目录运行本轮 CHEMOLAB 分子批次双风险测定分配实验。
+
+仓库：https://github.com/DCarchimonde/aidd-paper-factory
+分支：paper2-batch-triage-20261108
+入口：paper2_admet_benchmark/revision_2026/batch_triage/README.md
+
+按入口安装依赖，先运行 --mode pilot，再运行 --mode screen。当前只安排screen的96条分配轨迹；暂不启动formal或sensitivity。完整算法、数据处理、对照和报告已经写好，你只需执行命令、保存输出。
+
+无需重新训练此前480个神经网络。本轮每个数据划分只拟合一次共享经典预测器，再复用分数模拟不同测定分配。需要CPU，不依赖GPU。中断按原命令添加 --resume。
+
+完成后交回 .local/batch_screen_review.zip。若失败，保留目录并发完整错误和运行命令，不自行修改算法、阈值、划分或删除结果。我们负责修复、统计、图表解释、论文和回复；不用你另做分析。此前v3目录及模型继续保留。
