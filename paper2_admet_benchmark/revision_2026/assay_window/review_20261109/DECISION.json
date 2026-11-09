@@ -1,0 +1,43 @@
+{
+  "date": "2026-11-09",
+  "scientific_code_commit": "e223c20cbad7f6238b22feab3cddd6e48339de62",
+  "screen_status": "completed_and_reviewed",
+  "current_association_model_decision": "stop_expansion_no_screening_advantage",
+  "operator_next_training_jobs": 0,
+  "review_model_refits": 0,
+  "input_archives": [
+    {
+      "filename": "assay_window_prepare_review.zip",
+      "bytes": 12446829,
+      "sha256": "daaa236e3e94c30fbfd33eb13387edb8c17d9db04e763996f3d4bd062f0d78ee"
+    },
+    {
+      "filename": "assay_window_screen_review.zip",
+      "bytes": 17882931,
+      "sha256": "7fb43315a197b00cfcffe75d1362c182eed0dd50896e679f40fb5cffb13c11e2"
+    }
+  ],
+  "converged_fits": 8,
+  "recomputed_prediction_rows": 53668,
+  "retained_paired_rows": 19179,
+  "parent_groups": 5387,
+  "complete_three_repeat_samples": 5589,
+  "three_repeat_definite_yes_samples": 22,
+  "actual_test_group_fraction": {
+    "random": 0.2500464080193057,
+    "scaffold": 0.43567848524224984
+  },
+  "scope": "Current linear association candidate only; not a claim that every paired or censored model fails.",
+  "next_scientific_question": "Distinguish a single-measurement separation event from reproducibly stable separation and cross-condition separation before selecting the next mechanism.",
+  "reproduction_scripts_sha256": {
+    "recompute_metrics.py": "4b0020fd74f3764fa1d0f9e9a32052e285323446748f0851fb4a36b5956e26fc",
+    "review_mechanism.py": "d26dd6ca6f18698ab08aa80419257b300fa76774308c299f05191047335edf15",
+    "verify_integrity.py": "9aab442557aa629f029013c2c5dab116f999a23b3a0aa5b09f6371dee0cdf03c"
+  },
+  "review_script_validation": {
+    "scripts_run_from_repository_location": 3,
+    "all_exit_codes": 0,
+    "regenerated_JSON_matches_archived_reports": true,
+    "real_model_refits": 0
+  }
+}

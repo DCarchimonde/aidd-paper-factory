@@ -1,0 +1,265 @@
+{
+  "real_model_fits_performed": false,
+  "reference_commit": "e223c20cbad7f6238b22feab3cddd6e48339de62",
+  "source_code_hashes": {
+    "__init__.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "b0a75c09450660128c9ce5dbdadf3d462103d58b6e3ca9795161623e9824392c",
+      "local_file_sha256": "b0a75c09450660128c9ce5dbdadf3d462103d58b6e3ca9795161623e9824392c",
+      "reference_file_sha256": "b0a75c09450660128c9ce5dbdadf3d462103d58b6e3ca9795161623e9824392c",
+      "local_matches_reference": true
+    },
+    "data.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "bb7038b815e51c0e1e1591c4c356e800a041ed5964d81bf279fd7eaf0eac67f8",
+      "local_file_sha256": "bb7038b815e51c0e1e1591c4c356e800a041ed5964d81bf279fd7eaf0eac67f8",
+      "reference_file_sha256": "bb7038b815e51c0e1e1591c4c356e800a041ed5964d81bf279fd7eaf0eac67f8",
+      "local_matches_reference": true
+    },
+    "execute.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "7fe42594a876a51dd9831c54e6b580f04cbfe321078f565a638b1f53c497da51",
+      "local_file_sha256": "7fe42594a876a51dd9831c54e6b580f04cbfe321078f565a638b1f53c497da51",
+      "reference_file_sha256": "7fe42594a876a51dd9831c54e6b580f04cbfe321078f565a638b1f53c497da51",
+      "local_matches_reference": true
+    },
+    "model.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "2f5423f78c97f16cc27d0d6dd17d959ba9f103e9667a2857f8454b95e39c6d82",
+      "local_file_sha256": "2f5423f78c97f16cc27d0d6dd17d959ba9f103e9667a2857f8454b95e39c6d82",
+      "reference_file_sha256": "2f5423f78c97f16cc27d0d6dd17d959ba9f103e9667a2857f8454b95e39c6d82",
+      "local_matches_reference": true
+    },
+    "targets.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "0f1ea77a3fbadef01cba0a693445f63022c565f208388881ea24c3be4be28a4c",
+      "local_file_sha256": "0f1ea77a3fbadef01cba0a693445f63022c565f208388881ea24c3be4be28a4c",
+      "reference_file_sha256": "0f1ea77a3fbadef01cba0a693445f63022c565f208388881ea24c3be4be28a4c",
+      "local_matches_reference": true
+    },
+    "test_data.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "aab99ee699e9105b361fe7d727662f8d11439cd9ae9e51cbf2bb4a4677cc3de7",
+      "local_file_sha256": "aab99ee699e9105b361fe7d727662f8d11439cd9ae9e51cbf2bb4a4677cc3de7",
+      "reference_file_sha256": "aab99ee699e9105b361fe7d727662f8d11439cd9ae9e51cbf2bb4a4677cc3de7",
+      "local_matches_reference": true
+    },
+    "test_execute.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "b14800100c98e116f997e9dd596a92e9290a84609dd802ef4533f1c3e30cece7",
+      "local_file_sha256": "b14800100c98e116f997e9dd596a92e9290a84609dd802ef4533f1c3e30cece7",
+      "reference_file_sha256": "b14800100c98e116f997e9dd596a92e9290a84609dd802ef4533f1c3e30cece7",
+      "local_matches_reference": true
+    },
+    "test_model.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "d07c78e0376d624b7c6095c727b91b9b9402a936b21b7e98f8a4752cfd913623",
+      "local_file_sha256": "d07c78e0376d624b7c6095c727b91b9b9402a936b21b7e98f8a4752cfd913623",
+      "reference_file_sha256": "d07c78e0376d624b7c6095c727b91b9b9402a936b21b7e98f8a4752cfd913623",
+      "local_matches_reference": true
+    },
+    "test_targets.py": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "46fa696b28df6a12d7464661c2de4c3bbff2936a578818c35c9ad35a94742f83",
+      "local_file_sha256": "46fa696b28df6a12d7464661c2de4c3bbff2936a578818c35c9ad35a94742f83",
+      "reference_file_sha256": "46fa696b28df6a12d7464661c2de4c3bbff2936a578818c35c9ad35a94742f83",
+      "local_matches_reference": true
+    },
+    "sources.json": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "f0d42ff293fbb26712d6b136c4393df8f644e6e5e3974648572db872891d166f",
+      "local_file_sha256": "f0d42ff293fbb26712d6b136c4393df8f644e6e5e3974648572db872891d166f",
+      "reference_file_sha256": "f0d42ff293fbb26712d6b136c4393df8f644e6e5e3974648572db872891d166f",
+      "local_matches_reference": true
+    },
+    "protocol.json": {
+      "matches": [
+        "git_bytes",
+        "LF"
+      ],
+      "returned_sha256": "aecd81c9411881a5224f79c9d129db8f5b47a36e76d574f3179fc444e670110f",
+      "local_file_sha256": "aecd81c9411881a5224f79c9d129db8f5b47a36e76d574f3179fc444e670110f",
+      "reference_file_sha256": "aecd81c9411881a5224f79c9d129db8f5b47a36e76d574f3179fc444e670110f",
+      "local_matches_reference": true
+    }
+  },
+  "imported_module_sources": "execute, data, model, targets paths and byte hashes match the reference checkout",
+  "prepare_screen_shared_artifacts": {
+    "paired_records.json.gz": {
+      "byte_identical": true,
+      "sha256": "be93807830e5699461f7bb290713b47687a3c32dcc37a917fd1362d4b0137ab5"
+    },
+    "derived_records.json.gz": {
+      "byte_identical": true,
+      "sha256": "edc5a6168c5a7ae906100e9e3e54523366c092824fa47af3a9d227cd8e0bae96"
+    },
+    "data_profile.json": {
+      "byte_identical": true,
+      "sha256": "d04d58e09a3b987ecf9e090efeeefd0dc6557d49e8f5434c5d168454d23f6a94"
+    },
+    "source_diagnostics.json": {
+      "byte_identical": true,
+      "sha256": "80e7b46854edf1b655c8e9484a9330d5cdd75fb240e0ca65459663efaaf45d9c"
+    }
+  },
+  "configuration_and_record_identity": "matched for both modes",
+  "rederived_target_and_profile": {
+    "all_records_match": true,
+    "rows": 19179,
+    "all_uninformative_masks": 0
+  },
+  "supplied_structure_id_hashes": "all consistent; RDKit transformations not independently rerun locally",
+  "raw_source_replay": {
+    "archive_sha256": "0baf460b1c6c70a005af22727ed746a6e5272d48835158d76244ee091de9c7a6",
+    "all_paired_records_match_raw_curves": true,
+    "all_parser_diagnostics_match": true,
+    "chemistry_validation": "Uses supplied standardized structure metadata, not independent RDKit re-standardization."
+  },
+  "difference_from_pre_RDKit_read": {
+    "before_pairs": 19724,
+    "after_pairs": 19179,
+    "removed_pairs": 545,
+    "reason": "invalid_structure:ValueError",
+    "affected_samples": 201,
+    "before_raw_SMILES_groups": 5830,
+    "after_retained_raw_SMILES_groups": 5666,
+    "after_parent_structure_groups": 5387,
+    "before_samples": 7206,
+    "after_samples": 7005
+  },
+  "splits": {
+    "random": {
+      "replayed_split_exact_match": true,
+      "train_groups": 4040,
+      "test_groups": 1347,
+      "test_group_fraction": 0.2500464080193057,
+      "train_rows": 14327,
+      "test_rows": 4852,
+      "test_row_fraction": 0.2529850357161479,
+      "parent_overlap": 0,
+      "sample_overlap": 0,
+      "curve_overlap": 0,
+      "scaffold_overlap": 221,
+      "unique_train_scaffolds": 2122,
+      "unique_test_scaffolds": 783
+    },
+    "scaffold": {
+      "replayed_split_exact_match": true,
+      "train_groups": 3040,
+      "test_groups": 2347,
+      "test_group_fraction": 0.43567848524224984,
+      "train_rows": 10614,
+      "test_rows": 8565,
+      "test_row_fraction": 0.446582199280463,
+      "parent_overlap": 0,
+      "sample_overlap": 0,
+      "curve_overlap": 0,
+      "scaffold_overlap": 0,
+      "unique_train_scaffolds": 1949,
+      "unique_test_scaffolds": 735,
+      "fraction_overshoot": {
+        "target_groups": 1347,
+        "selected_scaffold_buckets": 735,
+        "last_bucket": {
+          "scaffold": "c1ccccc1",
+          "groups": 1144,
+          "cumulative_before": 1203,
+          "cumulative_after": 2347
+        },
+        "largest_buckets": [
+          {
+            "scaffold": "c1ccccc1",
+            "groups": 1144,
+            "in_test": true
+          },
+          {
+            "scaffold": "c1ccc(Cc2ccccc2)cc1",
+            "groups": 72,
+            "in_test": true
+          },
+          {
+            "scaffold": "c1ccncc1",
+            "groups": 63,
+            "in_test": false
+          },
+          {
+            "scaffold": "c1ccc2ccccc2c1",
+            "groups": 57,
+            "in_test": true
+          },
+          {
+            "scaffold": "C1CCCCC1",
+            "groups": 46,
+            "in_test": false
+          },
+          {
+            "scaffold": "c1ccc(Oc2ccccc2)cc1",
+            "groups": 38,
+            "in_test": false
+          },
+          {
+            "scaffold": "O=C1C=CC2C(=C1)CCC1C3CCCC3CCC21",
+            "groups": 37,
+            "in_test": false
+          },
+          {
+            "scaffold": "O=C1C=C2CCC3C4CCCC4CCC3C2CC1",
+            "groups": 35,
+            "in_test": true
+          },
+          {
+            "scaffold": "O=C(c1ccccc1)c1ccccc1",
+            "groups": 34,
+            "in_test": false
+          },
+          {
+            "scaffold": "c1ccc(-c2ccccc2)cc1",
+            "groups": 31,
+            "in_test": false
+          }
+        ],
+        "explanation": "Hash-order whole scaffold buckets are appended until at least 25% of groups is reached; the crossing bucket is kept intact."
+      }
+    }
+  },
+  "run_integrity": {
+    "runs": 8,
+    "all_converged": true,
+    "all_test_record_keys_exactly_matched": true
+  },
+  "material_findings": [
+    "The scaffold holdout is 43.57% of parent groups, not a 25% holdout. The deterministic whole-bucket rule is followed exactly; no scaffold leakage. Report actual split sizes rather than 75/25.",
+    "545 fewer pairs than the initial parser-only count are all marked invalid_structure:ValueError. This audit replays curve content and pairing exactly, but cannot independently validate RDKit transformations without that runtime.",
+    "No source revision, data-pairing, derived-target, or split mismatch found."
+  ]
+}

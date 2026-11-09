@@ -1,0 +1,696 @@
+{
+  "interpretation": "Post-hoc diagnostic on supplied fixed test partitions. No retraining. Bootstrap intervals condition on these fitted models and splits; they are not independent external validation or across-split training uncertainty. q_lower/q_upper AP values are sensitivity scores, not AP confidence bounds. Optimistic Brier uses the outcome to choose a point inside each q interval and is not an available predictor.",
+  "source_predictions_sha256": "3c16a72545cfd0a1aacc8162708f80f8fa96160300eab06c7c5289d8fef28dc1",
+  "row_count": 53668,
+  "recomputed": [
+    {
+      "split": "random",
+      "method": "joint_censored",
+      "masked_nll": 0.538048427592679,
+      "all_repeats": {
+        "rows": 4852,
+        "groups": 1347,
+        "resolved_rows": 4652,
+        "positive_rows": 111,
+        "resolved_groups": 1333,
+        "resolved_weighted_prevalence": 0.028563390847711926,
+        "brier": 0.03249947857066268,
+        "average_precision": 0.05709082364926381,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.02851155665138877,
+        "all_reference_brier_upper": 0.057311535279395205,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.060217808697774364,
+          "AP_using_q_upper": 0.0698609534586204,
+          "optimistic_label_aware_Brier_within_q_interval": 0.02715863677575938,
+          "pessimistic_Brier_within_q_interval": 0.04479535956918332,
+          "mean_width_all_rows": 0.030407768621289636
+        },
+        "positive_probability_mean": 0.0904283298249082,
+        "negative_probability_mean": 0.06528168341084382
+      },
+      "repeat3_reference": {
+        "rows": 1665,
+        "groups": 1300,
+        "resolved_rows": 1603,
+        "positive_rows": 22,
+        "resolved_groups": 1263,
+        "resolved_weighted_prevalence": 0.013855898653998416,
+        "brier": 0.020244729542683228,
+        "average_precision": 0.02888805165884495,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.01910314384586359,
+        "all_reference_brier_upper": 0.04557088371795753,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.0582035420233928,
+          "AP_using_q_upper": 0.029559577091392432,
+          "optimistic_label_aware_Brier_within_q_interval": 0.015062841713734848,
+          "pessimistic_Brier_within_q_interval": 0.0323223982599144,
+          "mean_width_all_rows": 0.031137210239061085
+        },
+        "positive_probability_mean": 0.09485598392974191,
+        "negative_probability_mean": 0.06551336991709805
+      }
+    },
+    {
+      "split": "random",
+      "method": "independent_censored",
+      "masked_nll": 0.555374065405698,
+      "all_repeats": {
+        "rows": 4852,
+        "groups": 1347,
+        "resolved_rows": 4652,
+        "positive_rows": 111,
+        "resolved_groups": 1333,
+        "resolved_weighted_prevalence": 0.028563390847711926,
+        "brier": 0.0337401302077202,
+        "average_precision": 0.04915775507573879,
+        "balanced_accuracy_at_0_5": 0.49884163175473484,
+        "all_reference_brier_lower": 0.0298175329821194,
+        "all_reference_brier_upper": 0.05819962574886755,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.05809742638513054,
+          "AP_using_q_upper": 0.05642410009249591,
+          "optimistic_label_aware_Brier_within_q_interval": 0.027872365976453147,
+          "pessimistic_Brier_within_q_interval": 0.047475781618907684,
+          "mean_width_all_rows": 0.02971332098571059
+        },
+        "positive_probability_mean": 0.09578833108842125,
+        "negative_probability_mean": 0.07100852237967108
+      },
+      "repeat3_reference": {
+        "rows": 1665,
+        "groups": 1300,
+        "resolved_rows": 1603,
+        "positive_rows": 22,
+        "resolved_groups": 1263,
+        "resolved_weighted_prevalence": 0.013855898653998416,
+        "brier": 0.021624593188712196,
+        "average_precision": 0.028341887395707734,
+        "balanced_accuracy_at_0_5": 0.4987956643918105,
+        "all_reference_brier_lower": 0.020536831580653104,
+        "all_reference_brier_upper": 0.04657164311672893,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.05607305475208242,
+          "AP_using_q_upper": 0.029041103258821498,
+          "optimistic_label_aware_Brier_within_q_interval": 0.015882462407795932,
+          "pessimistic_Brier_within_q_interval": 0.035179099698345484,
+          "mean_width_all_rows": 0.030442247239505983
+        },
+        "positive_probability_mean": 0.10100802145162012,
+        "negative_probability_mean": 0.07119308609605968
+      }
+    },
+    {
+      "split": "random",
+      "method": "point_imputed",
+      "masked_nll": 0.8336204237165356,
+      "all_repeats": {
+        "rows": 4852,
+        "groups": 1347,
+        "resolved_rows": 4652,
+        "positive_rows": 111,
+        "resolved_groups": 1333,
+        "resolved_weighted_prevalence": 0.028563390847711926,
+        "brier": 0.02938920703785806,
+        "average_precision": 0.051950184993840555,
+        "balanced_accuracy_at_0_5": 0.4996138772515783,
+        "all_reference_brier_lower": 0.025073939075436265,
+        "all_reference_brier_upper": 0.05438682584552147,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.054021026435994185,
+          "AP_using_q_upper": 0.051509081170661976,
+          "optimistic_label_aware_Brier_within_q_interval": 0.02657724716376878,
+          "pessimistic_Brier_within_q_interval": 0.033256201176541766,
+          "mean_width_all_rows": 0.025257125706297935
+        },
+        "positive_probability_mean": 0.07575121973348446,
+        "negative_probability_mean": 0.056334579347638886
+      },
+      "repeat3_reference": {
+        "rows": 1665,
+        "groups": 1300,
+        "resolved_rows": 1603,
+        "positive_rows": 22,
+        "resolved_groups": 1263,
+        "resolved_weighted_prevalence": 0.013855898653998416,
+        "brier": 0.016549632014888682,
+        "average_precision": 0.04414515145201789,
+        "balanced_accuracy_at_0_5": 0.49959855479727017,
+        "all_reference_brier_lower": 0.015442858407318585,
+        "all_reference_brier_upper": 0.04234543854261097,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.05145433818334944,
+          "AP_using_q_upper": 0.04156795668453368,
+          "optimistic_label_aware_Brier_within_q_interval": 0.014054737300437024,
+          "pessimistic_Brier_within_q_interval": 0.020142302423158953,
+          "mean_width_all_rows": 0.025835555067148668
+        },
+        "positive_probability_mean": 0.08843587900658528,
+        "negative_probability_mean": 0.05661213143025981
+      }
+    },
+    {
+      "split": "random",
+      "method": "binary_window",
+      "masked_nll": null,
+      "all_repeats": {
+        "rows": 4852,
+        "groups": 1347,
+        "resolved_rows": 4652,
+        "positive_rows": 111,
+        "resolved_groups": 1333,
+        "resolved_weighted_prevalence": 0.028563390847711926,
+        "brier": 0.02736520800692061,
+        "average_precision": 0.07334762388650318,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.022374954754622343,
+        "all_reference_brier_upper": 0.05588814518989576,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.07334762388650318,
+          "AP_using_q_upper": 0.07334762388650318,
+          "optimistic_label_aware_Brier_within_q_interval": 0.02736520800692061,
+          "pessimistic_Brier_within_q_interval": 0.02736520800692061,
+          "mean_width_all_rows": 0.0
+        },
+        "positive_probability_mean": 0.038153973501979105,
+        "negative_probability_mean": 0.022618451179536123
+      },
+      "repeat3_reference": {
+        "rows": 1665,
+        "groups": 1300,
+        "resolved_rows": 1603,
+        "positive_rows": 22,
+        "resolved_groups": 1263,
+        "resolved_weighted_prevalence": 0.013855898653998416,
+        "brier": 0.013578945852992765,
+        "average_precision": 0.05887214311102801,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.012210777263318706,
+        "all_reference_brier_upper": 0.042706155336069515,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.05887214311102801,
+          "AP_using_q_upper": 0.05887214311102801,
+          "optimistic_label_aware_Brier_within_q_interval": 0.013578945852992765,
+          "pessimistic_Brier_within_q_interval": 0.013578945852992765,
+          "mean_width_all_rows": 0.0
+        },
+        "positive_probability_mean": 0.04533449409760935,
+        "negative_probability_mean": 0.022704181309165235
+      }
+    },
+    {
+      "split": "scaffold",
+      "method": "joint_censored",
+      "masked_nll": 0.5978067732415623,
+      "all_repeats": {
+        "rows": 8565,
+        "groups": 2347,
+        "resolved_rows": 8144,
+        "positive_rows": 212,
+        "resolved_groups": 2318,
+        "resolved_weighted_prevalence": 0.03333272118863145,
+        "brier": 0.038087212813562324,
+        "average_precision": 0.05418096584214119,
+        "balanced_accuracy_at_0_5": 0.49933057672334014,
+        "all_reference_brier_lower": 0.03176632364342354,
+        "all_reference_brier_upper": 0.06562205832100865,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.09674584542862054,
+          "AP_using_q_upper": 0.05151037221224239,
+          "optimistic_label_aware_Brier_within_q_interval": 0.030532881562174517,
+          "pessimistic_Brier_within_q_interval": 0.056310425440120306,
+          "mean_width_all_rows": 0.03707816784686789
+        },
+        "positive_probability_mean": 0.09379985396345963,
+        "negative_probability_mean": 0.06782914025841355
+      },
+      "repeat3_reference": {
+        "rows": 2904,
+        "groups": 2248,
+        "resolved_rows": 2782,
+        "positive_rows": 35,
+        "resolved_groups": 2188,
+        "resolved_weighted_prevalence": 0.01340645947592931,
+        "brier": 0.021628188089341603,
+        "average_precision": 0.031196404868162927,
+        "balanced_accuracy_at_0_5": 0.4993051266213712,
+        "all_reference_brier_lower": 0.020399689680621252,
+        "all_reference_brier_upper": 0.04745079317260442,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.11943995249221975,
+          "AP_using_q_upper": 0.029191640166349106,
+          "optimistic_label_aware_Brier_within_q_interval": 0.01401675384754362,
+          "pessimistic_Brier_within_q_interval": 0.040293357535929074,
+          "mean_width_all_rows": 0.03852217548208233
+        },
+        "positive_probability_mean": 0.11675339818243154,
+        "negative_probability_mean": 0.06910587806404256
+      }
+    },
+    {
+      "split": "scaffold",
+      "method": "independent_censored",
+      "masked_nll": 0.6066784775944094,
+      "all_repeats": {
+        "rows": 8565,
+        "groups": 2347,
+        "resolved_rows": 8144,
+        "positive_rows": 212,
+        "resolved_groups": 2318,
+        "resolved_weighted_prevalence": 0.03333272118863145,
+        "brier": 0.03889318263832362,
+        "average_precision": 0.05501225251998523,
+        "balanced_accuracy_at_0_5": 0.49933057672334014,
+        "all_reference_brier_lower": 0.03251248350945244,
+        "all_reference_brier_upper": 0.06623466090483493,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.07881973475313106,
+          "AP_using_q_upper": 0.05227363306575128,
+          "optimistic_label_aware_Brier_within_q_interval": 0.031062094936892763,
+          "pessimistic_Brier_within_q_interval": 0.05792460643207587,
+          "mean_width_all_rows": 0.03566261958192221
+        },
+        "positive_probability_mean": 0.09135454038157667,
+        "negative_probability_mean": 0.07121041680286574
+      },
+      "repeat3_reference": {
+        "rows": 2904,
+        "groups": 2248,
+        "resolved_rows": 2782,
+        "positive_rows": 35,
+        "resolved_groups": 2188,
+        "resolved_weighted_prevalence": 0.01340645947592931,
+        "brier": 0.022636704675282684,
+        "average_precision": 0.030785035833778417,
+        "balanced_accuracy_at_0_5": 0.4993051266213712,
+        "all_reference_brier_lower": 0.021385524515006322,
+        "all_reference_brier_upper": 0.04834110118410993,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.06545994435138615,
+          "AP_using_q_upper": 0.029218987754766876,
+          "optimistic_label_aware_Brier_within_q_interval": 0.014677027985944868,
+          "pessimistic_Brier_within_q_interval": 0.042200418734112455,
+          "mean_width_all_rows": 0.03714081131994856
+        },
+        "positive_probability_mean": 0.10292541650991377,
+        "negative_probability_mean": 0.07234448596897347
+      }
+    },
+    {
+      "split": "scaffold",
+      "method": "point_imputed",
+      "masked_nll": 0.9212033401740346,
+      "all_repeats": {
+        "rows": 8565,
+        "groups": 2347,
+        "resolved_rows": 8144,
+        "positive_rows": 212,
+        "resolved_groups": 2318,
+        "resolved_weighted_prevalence": 0.03333272118863145,
+        "brier": 0.03284387111767322,
+        "average_precision": 0.0721315008899236,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.0261352963117819,
+        "all_reference_brier_upper": 0.060616582131703275,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.08668282641996394,
+          "AP_using_q_upper": 0.0591782847706218,
+          "optimistic_label_aware_Brier_within_q_interval": 0.029787758265236698,
+          "pessimistic_Brier_within_q_interval": 0.03702880376323559,
+          "mean_width_all_rows": 0.027119595758316982
+        },
+        "positive_probability_mean": 0.08048196720046302,
+        "negative_probability_mean": 0.05620714266578166
+      },
+      "repeat3_reference": {
+        "rows": 2904,
+        "groups": 2248,
+        "resolved_rows": 2782,
+        "positive_rows": 35,
+        "resolved_groups": 2188,
+        "resolved_weighted_prevalence": 0.01340645947592931,
+        "brier": 0.015512245234977561,
+        "average_precision": 0.08455037576249967,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.01430806933240764,
+        "all_reference_brier_upper": 0.041987791180555865,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.11971144012525567,
+          "AP_using_q_upper": 0.04699366389911287,
+          "optimistic_label_aware_Brier_within_q_interval": 0.012853712807821906,
+          "pessimistic_Brier_within_q_interval": 0.01935898858001881,
+          "mean_width_all_rows": 0.027920506978838237
+        },
+        "positive_probability_mean": 0.10712255796402974,
+        "negative_probability_mean": 0.0569511296437806
+      }
+    },
+    {
+      "split": "scaffold",
+      "method": "binary_window",
+      "masked_nll": null,
+      "all_repeats": {
+        "rows": 8565,
+        "groups": 2347,
+        "resolved_rows": 8144,
+        "positive_rows": 212,
+        "resolved_groups": 2318,
+        "resolved_weighted_prevalence": 0.03333272118863145,
+        "brier": 0.031712412298585624,
+        "average_precision": 0.10618797418140136,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.024265844536199396,
+        "all_reference_brier_upper": 0.061954129769357075,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.10618797418140136,
+          "AP_using_q_upper": 0.10618797418140136,
+          "optimistic_label_aware_Brier_within_q_interval": 0.031712412298585624,
+          "pessimistic_Brier_within_q_interval": 0.031712412298585624,
+          "mean_width_all_rows": 0.0
+        },
+        "positive_probability_mean": 0.03654703784538502,
+        "negative_probability_mean": 0.022377241376030598
+      },
+      "repeat3_reference": {
+        "rows": 2904,
+        "groups": 2248,
+        "resolved_rows": 2782,
+        "positive_rows": 35,
+        "resolved_groups": 2188,
+        "resolved_weighted_prevalence": 0.01340645947592931,
+        "brier": 0.012804232755387593,
+        "average_precision": 0.1602946723854888,
+        "balanced_accuracy_at_0_5": 0.5,
+        "all_reference_brier_lower": 0.011519188232613144,
+        "all_reference_brier_upper": 0.04179704236767765,
+        "resolution_diagnostic": {
+          "AP_using_q_lower": 0.1602946723854888,
+          "AP_using_q_upper": 0.1602946723854888,
+          "optimistic_label_aware_Brier_within_q_interval": 0.012804232755387593,
+          "pessimistic_Brier_within_q_interval": 0.012804232755387593,
+          "mean_width_all_rows": 0.0
+        },
+        "positive_probability_mean": 0.05319485727016252,
+        "negative_probability_mean": 0.022493777701055807
+      }
+    }
+  ],
+  "main_comparison": {
+    "random": {
+      "difference_direction": "joint minus independent; negative is better for joint",
+      "overall": {
+        "mean": -0.017325637813018997,
+        "percentile_95_ci": [
+          -0.02629200147497055,
+          -0.00834315206460907
+        ],
+        "groups": 1347,
+        "bootstrap_repetitions": 2000,
+        "seed": 20261109
+      },
+      "relative_NLL_reduction_percent": 3.1196339354382174,
+      "by_reference_status": {
+        "definite_yes": {
+          "rows": 111,
+          "within_status_equal_molecule_delta": {
+            "mean": 0.24680894225452707,
+            "percentile_95_ci": [
+              0.13092227534998307,
+              0.3620451987219486
+            ],
+            "groups": 80,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261110
+          },
+          "additive_contribution_to_overall_delta": 0.0028406279407199734,
+          "overall_weight_fraction": 0.023090406665016914
+        },
+        "definite_no": {
+          "rows": 4541,
+          "within_status_equal_molecule_delta": {
+            "mean": -0.01787045166768619,
+            "percentile_95_ci": [
+              -0.02600825370937886,
+              -0.010432945552937842
+            ],
+            "groups": 1313,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261111
+          },
+          "additive_contribution_to_overall_delta": -0.013278846951651407,
+          "overall_weight_fraction": 0.9409584497000978
+        },
+        "unresolved": {
+          "rows": 200,
+          "within_status_equal_molecule_delta": {
+            "mean": -0.19638747845101776,
+            "percentile_95_ci": [
+              -0.30523865762767544,
+              -0.09387581907869604
+            ],
+            "groups": 91,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261112
+          },
+          "additive_contribution_to_overall_delta": -0.0068874188020875615,
+          "overall_weight_fraction": 0.03595114363488529
+        }
+      }
+    },
+    "scaffold": {
+      "difference_direction": "joint minus independent; negative is better for joint",
+      "overall": {
+        "mean": -0.00887170435284727,
+        "percentile_95_ci": [
+          -0.017123996288168023,
+          0.0001832155226457444
+        ],
+        "groups": 2347,
+        "bootstrap_repetitions": 2000,
+        "seed": 20261119
+      },
+      "relative_NLL_reduction_percent": 1.4623403797057697,
+      "by_reference_status": {
+        "definite_yes": {
+          "rows": 212,
+          "within_status_equal_molecule_delta": {
+            "mean": 0.2936120490669419,
+            "percentile_95_ci": [
+              0.21521282816836673,
+              0.379024186388999
+            ],
+            "groups": 159,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261120
+          },
+          "additive_contribution_to_overall_delta": 0.005616113289137257,
+          "overall_weight_fraction": 0.025396205445204163
+        },
+        "definite_no": {
+          "rows": 7932,
+          "within_status_equal_molecule_delta": {
+            "mean": -0.01013534125780873,
+            "percentile_95_ci": [
+              -0.017822092579742013,
+              -0.0014691328329247406
+            ],
+            "groups": 2276,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261121
+          },
+          "additive_contribution_to_overall_delta": -0.0064458405897106705,
+          "overall_weight_fraction": 0.9350942213745792
+        },
+        "unresolved": {
+          "rows": 421,
+          "within_status_equal_molecule_delta": {
+            "mean": -0.16869182117683873,
+            "percentile_95_ci": [
+              -0.24562853352224032,
+              -0.10031568268176214
+            ],
+            "groups": 165,
+            "bootstrap_repetitions": 2000,
+            "seed": 20261122
+          },
+          "additive_contribution_to_overall_delta": -0.008041977052273854,
+          "overall_weight_fraction": 0.03950957318021655
+        }
+      }
+    }
+  },
+  "scaffold_cluster_diagnostic": {
+    "all": {
+      "mean": -0.008871704352847268,
+      "percentile_95_ci": [
+        -0.024983732898550902,
+        -0.0013614191706985686
+      ],
+      "scaffold_clusters": 735,
+      "molecular_groups": 2347,
+      "largest_scaffold_molecular_groups": 1144,
+      "largest_scaffold_group_fraction": 0.4874307626757563,
+      "bootstrap_repetitions": 2000,
+      "seed": 20261209,
+      "largest_five_clusters": [
+        {
+          "scaffold_id": "c1ccccc1",
+          "molecular_groups": 1144,
+          "mean_delta": -0.0038396234473743636
+        },
+        {
+          "scaffold_id": "c1ccc(Cc2ccccc2)cc1",
+          "molecular_groups": 72,
+          "mean_delta": -0.013227879605985303
+        },
+        {
+          "scaffold_id": "c1ccc2ccccc2c1",
+          "molecular_groups": 57,
+          "mean_delta": 0.0045601111180245514
+        },
+        {
+          "scaffold_id": "O=C1C=C2CCC3C4CCCC4CCC3C2CC1",
+          "molecular_groups": 35,
+          "mean_delta": 0.07284684735759042
+        },
+        {
+          "scaffold_id": "C1=CCCCC1",
+          "molecular_groups": 18,
+          "mean_delta": 0.023527846784707877
+        }
+      ],
+      "resampling_unit": "whole represented test scaffold cluster; ratio-of-sums retains equal molecule weight; fixed fitted model diagnostic"
+    },
+    "definite_yes": {
+      "mean": 0.2936120490669419,
+      "percentile_95_ci": [
+        0.1518044105408491,
+        0.3806610803650764
+      ],
+      "scaffold_clusters": 84,
+      "molecular_groups": 159,
+      "largest_scaffold_molecular_groups": 53,
+      "largest_scaffold_group_fraction": 0.3333333333333333,
+      "bootstrap_repetitions": 2000,
+      "seed": 20261210,
+      "largest_five_clusters": [
+        {
+          "scaffold_id": "c1ccccc1",
+          "molecular_groups": 53,
+          "mean_delta": 0.42762797004284336
+        },
+        {
+          "scaffold_id": "c1c[nH+]c[nH]1",
+          "molecular_groups": 6,
+          "mean_delta": 0.07589410481836456
+        },
+        {
+          "scaffold_id": "c1ccc2ccccc2c1",
+          "molecular_groups": 6,
+          "mean_delta": 0.30881617447522497
+        },
+        {
+          "scaffold_id": "O=C1c2ccccc2C(=O)c2cc3c(cc21)CCCC3OC1CCCCO1",
+          "molecular_groups": 5,
+          "mean_delta": -0.3547398898487587
+        },
+        {
+          "scaffold_id": "c1ccc(Cc2ccccc2)cc1",
+          "molecular_groups": 4,
+          "mean_delta": 0.128225657677297
+        }
+      ],
+      "resampling_unit": "whole represented test scaffold cluster; ratio-of-sums retains equal molecule weight; fixed fitted model diagnostic"
+    },
+    "definite_no": {
+      "mean": -0.010135341257808728,
+      "percentile_95_ci": [
+        -0.02422042179647248,
+        -0.0009285557512657761
+      ],
+      "scaffold_clusters": 704,
+      "molecular_groups": 2276,
+      "largest_scaffold_molecular_groups": 1128,
+      "largest_scaffold_group_fraction": 0.4956063268892794,
+      "bootstrap_repetitions": 2000,
+      "seed": 20261211,
+      "largest_five_clusters": [
+        {
+          "scaffold_id": "c1ccccc1",
+          "molecular_groups": 1128,
+          "mean_delta": -0.007670965251903347
+        },
+        {
+          "scaffold_id": "c1ccc(Cc2ccccc2)cc1",
+          "molecular_groups": 71,
+          "mean_delta": -0.011863670057965634
+        },
+        {
+          "scaffold_id": "c1ccc2ccccc2c1",
+          "molecular_groups": 56,
+          "mean_delta": -0.0039251178625642905
+        },
+        {
+          "scaffold_id": "O=C1C=C2CCC3C4CCCC4CCC3C2CC1",
+          "molecular_groups": 34,
+          "mean_delta": 0.07276154605461539
+        },
+        {
+          "scaffold_id": "C1=CCCCC1",
+          "molecular_groups": 18,
+          "mean_delta": 0.003323933189775854
+        }
+      ],
+      "resampling_unit": "whole represented test scaffold cluster; ratio-of-sums retains equal molecule weight; fixed fitted model diagnostic"
+    },
+    "unresolved": {
+      "mean": -0.16869182117683873,
+      "percentile_95_ci": [
+        -0.2329776827308048,
+        -0.0918088254518085
+      ],
+      "scaffold_clusters": 83,
+      "molecular_groups": 165,
+      "largest_scaffold_molecular_groups": 53,
+      "largest_scaffold_group_fraction": 0.3212121212121212,
+      "bootstrap_repetitions": 2000,
+      "seed": 20261212,
+      "largest_five_clusters": [
+        {
+          "scaffold_id": "c1ccccc1",
+          "molecular_groups": 53,
+          "mean_delta": -0.19646234923034084
+        },
+        {
+          "scaffold_id": "c1ccc(Cc2ccccc2)cc1",
+          "molecular_groups": 13,
+          "mean_delta": -0.039662480274097384
+        },
+        {
+          "scaffold_id": "c1c[nH+]c[nH]1",
+          "molecular_groups": 8,
+          "mean_delta": -0.5421124224227841
+        },
+        {
+          "scaffold_id": "c1cc[nH+]cc1",
+          "molecular_groups": 3,
+          "mean_delta": -0.2675431467362839
+        },
+        {
+          "scaffold_id": "c1ccc2ccccc2c1",
+          "molecular_groups": 3,
+          "mean_delta": -0.03111807117383547
+        }
+      ],
+      "resampling_unit": "whole represented test scaffold cluster; ratio-of-sums retains equal molecule weight; fixed fitted model diagnostic"
+    }
+  },
+  "validation": {
+    "all_exported_weights_recomputed": true,
+    "CSV_matches_all_eight_run_prediction_arrays": true,
+    "all_reported_Brier_AP_BA_all_reference_Brier_bounds_recomputed": true,
+    "all_reported_overall_and_status_NLL_recomputed": true,
+    "fit_calls": 0
+  }
+}
