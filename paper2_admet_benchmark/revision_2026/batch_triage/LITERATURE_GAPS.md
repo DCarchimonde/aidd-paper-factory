@@ -1,4 +1,6 @@
-# CHEMOLAB 技术候选与近期工作核查（2026-11-08）
+# CHEMOLAB 技术候选与近期工作核查
+
+更新：2026-11-09。以下保留2026-11-08的候选定义与公式；实际结果已经返回。当前四步获取规则停止扩跑，联合决策方向的研究资格保留。逐篇差异、下界范围及更正见 [完整复核](../literature_reaudit_20261109/README_CN.md) 和 [联合决策比较](../literature_reaudit_20261109/AUDIT_COMPARISON.md)。
 
 ## 研究选择
 
@@ -8,7 +10,7 @@
 
 技术候选集中在**多区域双向联合决策 + 面向净免测收益的信息获取**。有限总体置信序列、主动获取标签、后验选择决策、成本敏感自动标注都有直接先例。下面据此区分已有方法和需要实验检验的增量。
 
-当前已实现八方法的诊断矩阵、共享预测器、逐次标签接口、成本统计及自动报告；真实分子结果待执行。具体版本以 [RESEARCH_PLAN_CN.md](RESEARCH_PLAN_CN.md) 和 [THEORY_AND_POSITIONING.md](THEORY_AND_POSITIONING.md) 为准。
+当前已完成96条诊断轨迹，20%预算下四步前瞻未稳定优于均匀分配；见 [实际结果复核](SCREEN_REVIEW_20261108.md)。八方法的实现、共享预测器、逐次标签接口与成本统计保留用于机制分析。具体版本以 [RESEARCH_PLAN_CN.md](RESEARCH_PLAN_CN.md) 和 [THEORY_AND_POSITIONING.md](THEORY_AND_POSITIONING.md) 为准。
 
 ## 最近邻与具体差异
 
@@ -54,7 +56,7 @@
 
 [Conformal Risk Control, ICLR 2024](https://proceedings.iclr.cc/paper_files/paper/2024/hash/f3549ef9b5ff520a7e41ff3cc306ab2b-Abstract-Conference.html) 及 [Data-Adaptive Tradeoffs among Multiple Risks](https://arxiv.org/abs/2403.19605) 已涵盖多风险与可调权衡。新问题应利用同一次测定揭示多个标签的结构，而非简单增加阈值数量。
 
-Tox21可作为候选，但其标签缺失决定了哪些面板可被回放。需要先定义每次动作真实可揭示的标签集合；成本缺少实测依据时采用明确的规范化场景。这一方向留在单终点机制得到实证支持之后。
+Tox21可作为候选，但其标签缺失决定了哪些面板可被回放。需要先定义每次动作真实可揭示的标签集合；成本缺少实测依据时采用明确的规范化场景。它是独立的研究候选，不以当前单终点四步获取成功为前提。先解释真实共享动作或信息更新如何改变决策；逐终点风险、成本与行动均可分时，仅相关性并不自动带来增量。QComp等最近邻的逐项比较见 [面板复核](../literature_reaudit_20261109/PANEL_COMPARISON.md)。
 
 ## 候选4：预测辅助或双重稳健校准（效率组件）
 
@@ -64,7 +66,7 @@ Tox21可作为候选，但其标签缺失决定了哪些面板可被回放。需
 
 ## 从诊断矩阵到论文级比较
 
-当前96条分子轨迹检验机制是否产生值得继续研究的增益，完整1280条矩阵继续检验四任务两划分上的表现。现有八种方法包含强的同证书对照及机制消融；论文级比较还需加入最近邻原方法或明确命名的类风险改编。
+96条分子轨迹已完成，当前获取策略未形成稳定增益；不启动原计划1280条扩展矩阵。任何新机制先完成与最近邻的具体比较及轻量验证，再决定所需实验。现有八种方法包含强的同证书对照及机制消融；论文级比较还需加入最近邻原方法或明确命名的类风险改编。
 
 PAC Labels优先级最高。其官方代码固定版本为 [b415b58756b14b384529ac9cf146bd5d4c8139aa](https://github.com/tijana-zrnic/pac-labels/tree/b415b58756b14b384529ac9cf146bd5d4c8139aa)，入口 `pac_labeling(Y,Yhat,loss,epsilon,alpha,uncertainty,pi,num_draws,asymptotic=True)`。非渐近比较需选 `asymptotic=False`。
 

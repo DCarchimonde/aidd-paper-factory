@@ -1,0 +1,508 @@
+{
+  "review_date": "2026-11-09",
+  "scope": "Targeted comparison of prior exclusion reasons and nearest primary methods; 27 works including a poster, with 29 source records because QComp has separate final, preprint and code records. Access level is stated per entry.",
+  "sources": [
+    {
+      "id": "huang2022",
+      "title": "A Quantitative High-Throughput Screening Data Analysis Pipeline for Activity Profiling",
+      "doi": "10.1007/978-1-0716-2213-1_13",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9540341/",
+      "access": "full-text methods sections checked",
+      "locators": [
+        "2.1–2.4",
+        "Tables 3–4",
+        "Figure 2"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "escher2020",
+      "title": "Cytotoxicity Burst? Differentiating Specific from Nonspecific Effects in Tox21 in Vitro Reporter Gene Assays",
+      "doi": "10.1289/EHP6664",
+      "url": "https://ehp.niehs.nih.gov/doi/pdf/10.1289/EHP6664",
+      "access": "full publisher PDF text checked",
+      "locators": [
+        "pp 077007-3–4",
+        "Eqs 2–10",
+        "Table 1",
+        "Figure 1"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "borrel2024",
+      "title": "Machine Learning-based Development of Cytotoxicity Flags Within the Tox21/ToxCast Assays",
+      "url": "https://ntp.niehs.nih.gov/sites/default/files/2024-03/SOT2024-Borrel-poster.pdf",
+      "type": "conference poster P168 abstract 4383",
+      "access": "entire official one-page poster",
+      "locators": [
+        "Figures 3–6",
+        "Tables 2–5"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "li2026",
+      "title": "Tox21mer, A transformer foundation model for Tox21 high-throughput concentration–response curves data",
+      "doi": "10.64898/2026.06.15.732308",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13308148/",
+      "type": "bioRxiv version 1 preprint",
+      "access": "full methods and discussion checked",
+      "locators": [
+        "Dataset",
+        "Tox21mer Overview",
+        "Discussion"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "msemakweli2026",
+      "title": "A library-wide cytotoxicity filter is not uniform: Bound provenance, testability and coverage in ToxCast invitrodb v4.3",
+      "doi": "10.1016/j.comtox.2026.100456",
+      "url": "https://www.sciencedirect.com/science/article/pii/S2468111326000575",
+      "access": "publisher abstract and partial indexed article text only; paywalled full text not read",
+      "locators": [
+        "Abstract",
+        "Discussion indexed excerpt",
+        "Conclusions indexed excerpt"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "hsieh2015",
+      "title": "A Data Analysis Pipeline Accounting for Artifacts in Tox21 Quantitative High-Throughput Screening Assays",
+      "doi": "10.1177/1087057115581317",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC4568956/",
+      "access": "full methods/results checked",
+      "locators": [
+        "Methods/Signal quantification",
+        "Assay interference identification",
+        "Data Collapsing",
+        "Figure 3"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "ampl2020",
+      "title": "AMPL: A Data-Driven Modeling Pipeline for Drug Discovery",
+      "doi": "10.1021/acs.jcim.9b01053",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7189366/",
+      "access": "primary full-text indexed Data Curation and official author documentation checked; full results not exhaustively inspected",
+      "locators": [
+        "Methods/Data Curation",
+        "mle_censored_mean",
+        "aggregate_assay_data"
+      ],
+      "author_documentation": "https://ampl.readthedocs.io/en/stable/utils.html",
+      "comparison_group": "assay"
+    },
+    {
+      "id": "cellcount2026",
+      "title": "Counting cells can accurately predict small-molecule bioactivity benchmarks",
+      "doi": "10.1038/s41467-026-68725-5",
+      "url": "https://www.nature.com/articles/s41467-026-68725-5",
+      "access": "primary indexed Methods and Results read; direct page open redirected with error",
+      "locators": [
+        "Results/Cell count matches the performance…",
+        "Methods/Predicting compound activity from phenotypic profiles",
+        "Benchmarking Cell Painting for curated Protein-Target data"
+      ],
+      "comparison_group": "assay"
+    },
+    {
+      "id": "pacl",
+      "title": "Probably Approximately Correct Labels",
+      "authors": [
+        "Emmanuel J. Candès",
+        "Andrew Ilyas",
+        "Tijana Zrnic"
+      ],
+      "version": "ICML 2026 final, PMLR 306:10984–11001",
+      "primary_url": "https://proceedings.mlr.press/v306/candes26a.html",
+      "pdf_url": "https://raw.githubusercontent.com/mlresearch/v306/main/assets/candes26a/candes26a.pdf",
+      "sha256": "972635f199188fbba46e628f2e2d2f90c77dadb4cd4c1ac302dc68bfb741641a",
+      "verification": "Official proceedings identity and complete final PDF read",
+      "locators": [
+        "p.2 Eq.(1): finite dataset mean loss",
+        "p.3 Eq.(2), Theorem 2.1, Algorithm 1",
+        "p.4 Uncertainty calibration",
+        "Section 3 pp.4–5: PAC router"
+      ],
+      "boundary": "Group multicalibration is not a published true-class-denominator FNR/FPR joint certificate. Fixed-pool audit and net expert cost are already central.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "active_rcps",
+      "title": "Active, Anytime-Valid Risk Controlling Prediction Sets",
+      "authors": [
+        "Ziyu Xu",
+        "Nikos Karampatziakis",
+        "Paul Mineiro"
+      ],
+      "version": "NeurIPS 2024 identity verified; method locators use author arXiv 2406.10490v2",
+      "primary_url": "https://papers.nips.cc/paper_files/paper/2024/hash/6eb05d8bc6bd7bb6868c64b5802125bd-Abstract-Conference.html",
+      "pdf_url": "https://arxiv.org/pdf/2406.10490v2",
+      "sha256": "b97bfcd633c592ab0b766c80378b1edefd12c0d5c145fa750c767a7df4ce180b",
+      "verification": "Official conference identity verified; official PDF retrieval returned 503; complete primary author arXiv v2 read instead",
+      "locators": [
+        "Section 2 pp.6–9: Assumption 1 and Eq.(3)/(6)/(8)",
+        "Section 3 pp.10–11: expected-query budget and log-wealth objective"
+      ],
+      "boundary": "i.i.d. stream and expected population risk; certification-aware active querying already exists. Not directly a finite-pool, without-replacement, multiregion dual-class cost optimizer.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "exact_finite_release",
+      "title": "Exact Finite-Population Sequential Auditing for Selective Release from Model-Proposed Candidate Sets",
+      "authors": [
+        "Yusheng Hu",
+        "Zhiyuan Zhou",
+        "Yongfeng Zhu",
+        "Kewei Liang"
+      ],
+      "version": "Mathematics 2026, 14(18), 3427; published 2026-09-21",
+      "primary_url": "https://www.mdpi.com/2227-7390/14/18/3427",
+      "pdf_url": "https://www.mdpi.com/2227-7390/14/18/3427/pdf",
+      "doi": "10.3390/math14183427",
+      "sha256": "5680357240c3c27956833a7a710b5b8321c2f9f53e1e12f92d517002445bf7fa",
+      "verification": "Publisher identity and complete PDF read",
+      "locators": [
+        "Section 3.1 p.5: frozen candidate and whole-population defect denominator",
+        "Section 3.2.1 pp.6–7 Eqs.(6)–(9), Lemma 2",
+        "Section 3.2.4 pp.9–10 Eqs.(11)–(17), Proposition 1, Theorem 1",
+        "Section 3.5 p.13: target-specific pre-audit plan",
+        "Section 6.4 p.22: Scope and Limitations"
+      ],
+      "boundary": "Single frozen candidate, single adverse-release risk, outside-candidate labels known. Shared numerator/denominator coupling and full fallback cost already present; multiregion bidirectional adaptive audit not directly provided.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "cared",
+      "title": "Conformal Annotation with Randomized Expert Review: Application to Online Cell-Type Labeling",
+      "authors": [
+        "Xuhe Zhang",
+        "Zhi Huang",
+        "Ying Jin"
+      ],
+      "version": "arXiv:2610.40252v1, 2026-10-29",
+      "primary_url": "https://arxiv.org/abs/2610.40252",
+      "pdf_url": "https://arxiv.org/pdf/2610.40252",
+      "sha256": "d8dbd5ff5595aaf6244b41a294e3d584822d049d8c601930631ca6cb46f71f0a",
+      "verification": "arXiv identity, primary HTML and complete PDF read",
+      "locators": [
+        "Section 3.1–3.3 pp.8–11, Algorithm 1",
+        "p.10 Assumption 3.1 and Theorem 3.3",
+        "p.11 Corollary 3.4 and Proposition 3.5",
+        "Discussion p.17"
+      ],
+      "boundary": "Long-run almost-sure classwise annotation error, including unaudited stream; not finite-sample high-probability realized errors of a single closed batch.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "score",
+      "title": "Conformal Selective Prediction with General Risk Control",
+      "authors": [
+        "Tian Bai",
+        "Ying Jin"
+      ],
+      "version": "arXiv:2603.24704v1, 2026-03-25",
+      "primary_url": "https://arxiv.org/abs/2603.24704",
+      "pdf_url": "https://arxiv.org/pdf/2603.24704",
+      "sha256": "9a5a1460cb963a0d2402e15800f7456ec44e39c5cb199445b9831de5673d1ac6",
+      "verification": "arXiv identity, primary HTML and complete PDF read",
+      "locators": [
+        "Section 2.1 p.4 Eqs.(2.1)–(2.3)",
+        "Section 6 pp.15–17",
+        "Section 7.1 pp.18–19: molecular screening"
+      ],
+      "boundary": "Expected total deployment risk or expected selected-set risk under exchangeability/weighted covariate shift; not paid sequential target-pool realized dual true-class audit.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "joint_certificate",
+      "title": "A Joint Finite-Sample Certificate for Adaptive Selective Conformal Risk Control",
+      "authors": [
+        "Xiaoli Yu",
+        "Jiamiao Liu"
+      ],
+      "version": "arXiv:2606.08517v1, 2026-06-07; SCoRC, distinct from SCoRE",
+      "primary_url": "https://arxiv.org/abs/2606.08517",
+      "pdf_url": "https://arxiv.org/pdf/2606.08517",
+      "sha256": "154886ef919296f5bfafb29abe7caa2b710ce0ec56e2df1f15390f19176b36d0",
+      "verification": "Primary arXiv search identity and complete PDF read; direct webpage open unavailable",
+      "locators": [
+        "Section 2.7 p.5",
+        "Section 3 pp.5–6",
+        "Section 4 Theorem 1"
+      ],
+      "boundary": "Joint selected-risk, acceptance and utility certificate for finite threshold-grid choice; i.i.d. calibration; no shift-robust finite-sample theorem or finite-pool active dual-class action optimizer.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "han_classconditional",
+      "title": "The Label Complexity of Useful Class-Conditional Prediction Sets under Distribution Shift",
+      "authors": [
+        "Weijia Han",
+        "Lisha Qu",
+        "Tianxin Zhou",
+        "Zhenda Li",
+        "Liying Liang"
+      ],
+      "version": "arXiv:2607.18088v3, 2026-10-05; updates earlier title and two-author citation",
+      "primary_url": "https://arxiv.org/abs/2607.18088",
+      "pdf_url": "https://arxiv.org/pdf/2607.18088",
+      "sha256": "25bdc6319a60823d859586956978576a3607aa795aa99fdcf4e3845ce3722940",
+      "verification": "Canonical arXiv PDF directly retrieved and read; current identity/version from PDF, not secondary search output",
+      "locators": [
+        "Related work p.4",
+        "Section 3 pp.5–6",
+        "Section 4 Proposition 2 pp.6–7",
+        "Theorem 3 pp.8–9, especially part (d)",
+        "Corollary 6 p.9"
+      ],
+      "boundary": "Fixed-score calibration, unrestricted target conditional labels; lower bound in fixed nonadaptive class-stratified samples, plus mixed i.i.d. stream result. Does not rule out structure-dependent or assumption-restricted improvements; no-label universal arbitrary-shift usefulness remains impossible.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "finite_audit_lowerbound",
+      "title": "Finite-Sample Coverage Audits for High-Recall Candidate Generation: Certification and Learning-Theoretic Design",
+      "authors": [
+        "Martin Anthony",
+        "Kaveh Salehzadeh Nobari"
+      ],
+      "version": "arXiv:2607.21480v1, 2026-07-23",
+      "primary_url": "https://arxiv.org/abs/2607.21480",
+      "pdf_url": "https://arxiv.org/pdf/2607.21480",
+      "sha256": "d3ab1d5c19c332b3bd967c0ac5f1639518f842a90a17ed0752a4f15a48918647",
+      "verification": "arXiv identity, primary HTML and complete PDF read",
+      "locators": [
+        "Section 2: frozen candidate generator",
+        "Section 4.2–4.3: excluded/pool audits",
+        "Section 4.5 Theorem 13 pp.18–20; Remark 14",
+        "Section 4.7: nested candidate family",
+        "Section 9 p.38: stratified audits"
+      ],
+      "boundary": "Worst-case all-labeling certification lower bound permits adaptive queries; does not exclude instance-dependent gains from observable strata, explicitly discussed by authors. Chemical features cannot universally evade arbitrary-label minimax bounds without restrictions.",
+      "comparison_group": "audit",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "qcomp_vor",
+      "title": "QComp: A QSAR-Based Imputation Framework for Drug Discovery",
+      "year": 2025,
+      "doi": "10.1021/acs.jcim.5c00059",
+      "url": "https://pubs.acs.org/doi/10.1021/acs.jcim.5c00059",
+      "access": "official bibliographic record and abstract verified; full text 403; not used as full-text evidence",
+      "comparison_group": "panel"
+    },
+    {
+      "id": "qcomp_v1",
+      "title": "QComp: A QSAR-Based Data Completion Framework for Drug Discovery",
+      "year": 2024,
+      "url": "https://arxiv.org/html/2405.11703v1",
+      "version": "v1 2024-05-20; only version shown on arXiv history",
+      "access": "HTML full methods and relevant experiments read; PDF downloaded and text extracted",
+      "locators": [
+        "§3.1–3.3 pp3–4 Eqs1–8",
+        "§4.3 p7 common-experiment missingness",
+        "§4.6 pp8–9 GOC acquisition",
+        "§5 p9 shared covariance and cost limitation"
+      ],
+      "pdf_sha256": "7a21cbae689d4b84cb0387db86a21c0fe68f715d7ff8d8de968c7945cf611f07",
+      "comparison_group": "panel",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "qcomp_official_code",
+      "url": "https://github.com/MSDLLCpapers/QComp",
+      "access": "README, recursive tree, model.py read directly from author repository; no accepted manuscript found in tree",
+      "model_blob_sha": "96243f8d767173de739303952e20f0cd55639362",
+      "model_sha256": "944c336d143237e0b03b4df45b4d8e00494fb8c50ca07718985e1bd15476161c",
+      "difference": "2024v1 treats B,b as trainable; current model.py fixes qsar_trans_M=I and qsar_trans_b=0.",
+      "comparison_group": "panel"
+    },
+    {
+      "id": "ibc",
+      "title": "Evaluation of categorical matrix completion algorithms: toward improved active learning for drug discovery",
+      "authors": [
+        "Huangqingbo Sun",
+        "Robert F Murphy"
+      ],
+      "year": 2021,
+      "doi": "10.1093/bioinformatics/btab322",
+      "url": "https://academic.oup.com/bioinformatics/article/37/20/3538/6275258",
+      "access": "OUP full-text response and PMC indexed source text, key methods and experiments verified; publisher access intermittently 500/403",
+      "locators": [
+        "§2.1 experimental unit",
+        "§2.2.1 Algorithms1–2",
+        "§2.3 Eqs8–9 querying",
+        "§3 Figs4/6 evaluation"
+      ],
+      "comparison_group": "panel"
+    },
+    {
+      "id": "alcatras",
+      "title": "Multi-Task Active Learning with Efficient Resource Allocation",
+      "authors": [
+        "Hanwen Ye",
+        "Jiuchen Zhang",
+        "Annie Qu"
+      ],
+      "year": 2026,
+      "url": "https://arxiv.org/abs/2610.07045",
+      "pdf_url": "https://arxiv.org/pdf/2610.07045",
+      "version": "v1 2026-10-05, preprint",
+      "access": "arXiv search metadata plus downloaded full PDF; relevant methods/theory read",
+      "locators": [
+        "§2.1 pp5–7 Eqs3–5",
+        "§3.1 pp9–11 Eqs6–9",
+        "§4.1 pp17–18 Theorem1"
+      ],
+      "pdf_sha256": "ff02305448240d278d13a913e7a6dc1f86e8ceb185a08061331c88435d2e756f",
+      "comparison_group": "panel",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "multiple_risks",
+      "title": "Data-Adaptive Tradeoffs among Multiple Risks in Distribution-Free Prediction",
+      "authors": [
+        "Drew T. Nguyen",
+        "Reese Pathak",
+        "Anastasios N. Angelopoulos",
+        "Stephen Bates",
+        "Michael I. Jordan"
+      ],
+      "year": 2024,
+      "url": "https://arxiv.org/html/2403.19605v1",
+      "version": "v1",
+      "access": "HTML methods/theorems read",
+      "locators": [
+        "§2.1 iid setting",
+        "§2.2 Theorem1/Corollary2.1",
+        "§2.4–2.5 extensions"
+      ],
+      "comparison_group": "panel"
+    },
+    {
+      "id": "aca_acanet",
+      "title": "Activity-cliff awareness enables robust graph learning for molecular property prediction",
+      "venue": "Nature Communications",
+      "year": 2026,
+      "doi": "10.1038/s41467-026-75713-2",
+      "url": "https://www.nature.com/articles/s41467-026-75713-2",
+      "secondary_primary_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13534492/",
+      "locators": [
+        "Fig. 1",
+        "Methods: Activity cliff awareness loss function",
+        "Discussion; Supplementary Note 1 referenced but not directly read"
+      ],
+      "access": "Final-version HTML relevant methods/results/discussion read through primary-source indexed text; PDF and supplementary full text not retrieved",
+      "sha256": null,
+      "comparison_group": "training"
+    },
+    {
+      "id": "lac",
+      "title": "Curriculum-aware Training for Discriminating Molecular Property Prediction Models",
+      "authors": [
+        "Hansi Yang",
+        "Quanming Yao",
+        "James Kwok"
+      ],
+      "venue": "ICLR",
+      "year": 2025,
+      "url": "https://proceedings.iclr.cc/paper_files/paper/2025/file/285cf10c8c6153d66b8cd6a3ab0d69ce-Paper-Conference.pdf",
+      "locators": [
+        "Section 3, Definitions 3.1-3.2",
+        "Sections 4.1-4.4, pp.5-7, Eqs.(1)-(4), Proposition 4.1, Algorithm 1",
+        "Sections 5.1-5.3"
+      ],
+      "access": "Full official PDF parsed through web retrieval; methods and main experiments examined; appendix proofs not independently checked",
+      "sha256": null,
+      "comparison_group": "training"
+    },
+    {
+      "id": "conftr",
+      "title": "Learning Optimal Conformal Classifiers",
+      "venue": "ICLR",
+      "year": 2022,
+      "version": "arXiv:2110.09192v3 (2022-05-06)",
+      "url": "https://arxiv.org/abs/2110.09192v3",
+      "locators": [
+        "Section 2.2",
+        "Sections 3.1-3.3, pp.4-6, Eqs.(3)-(8)",
+        "Section 4.2, Fig.5, Appendix O"
+      ],
+      "access": "Full v3 PDF downloaded; methods and minority-class experiments examined; full HTML also accessible",
+      "sha256": "686cd96bc7fa00575277c2f8487f619434841b75eab22666bd8d16bd1defc4df",
+      "comparison_group": "training",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "csct",
+      "title": "Cost-Sensitive Conformal Training with Provably Controllable Learning Bounds",
+      "venue": "AAAI",
+      "year": 2026,
+      "version": "Full text examined: arXiv:2511.17861v1 (2025-11-22)",
+      "url": "https://ojs.aaai.org/index.php/AAAI/article/view/39384",
+      "fulltext_url": "https://arxiv.org/abs/2511.17861v1",
+      "locators": [
+        "Section 4.1, Eqs.(4)-(5), Algorithm 1",
+        "Section 4.2, Theorems 1-2, Corollary 1",
+        "Section 5.1"
+      ],
+      "access": "Official publication identity verified from primary index; v1 PDF downloaded; final article not byte-compared",
+      "sha256": "1ee818d0d26133ea3b02a854ce0905a412fe08dec5e1649b13d46a3fc4b45c7d",
+      "comparison_group": "training",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "drugood",
+      "title": "DrugOOD: Out-of-Distribution (OOD) Dataset Curator and Benchmark for AI-aided Drug Discovery – A Focus on Affinity Prediction Problems with Noise Annotations",
+      "venue": "AAAI",
+      "year": 2023,
+      "version": "Full text examined: arXiv:2201.09637v1 (2022-01-24), extended preprint",
+      "doi": "10.1609/aaai.v37i7.25970",
+      "url": "https://arxiv.org/abs/2201.09637v1",
+      "project_url": "https://drug.ai.tencent.com/drugood/",
+      "locators": [
+        "Extended preprint Sections 3.2-3.4, pp.14-15",
+        "Section 4.2 and Table 5, pp.19-20"
+      ],
+      "access": "Full v1 extended PDF downloaded; cited pages belong to preprint, not short AAAI article",
+      "sha256": "9d12f58974919e92fc6ec724b8b2636e41869af03bed47b0c56e82b7addaef24",
+      "comparison_group": "training",
+      "downloaded_fulltext_included_in_repository": false
+    },
+    {
+      "id": "codrug",
+      "title": "CoDrug: Conformal Drug Property Prediction with Density Estimation under Covariate Shift",
+      "version": "NeurIPS 2023 final",
+      "url": "https://proceedings.neurips.cc/paper_files/paper/2023/file/7691484a7a35d5e2742279c1d926b778-Paper-Conference.pdf",
+      "access": "Official full PDF methods read; original implementation record retained separately",
+      "locators": [
+        "Sections 2–4"
+      ],
+      "comparison_group": "conformal"
+    },
+    {
+      "id": "kmm_cp",
+      "title": "KMM-CP: Practical Conformal Prediction under Covariate Shift via Selective Kernel Mean Matching",
+      "version": "UAI 2026 final bibliographic identity; current method re-read uses arXiv:2603.26415v1",
+      "url": "https://proceedings.mlr.press/v337/laghuvarapu26a.html",
+      "fulltext_url": "https://arxiv.org/html/2603.26415v1",
+      "access": "Official final record verified; full v1 methods read in this re-audit; earlier final-PDF check documented in ../LITERATURE_AND_COMPARATORS.md",
+      "locators": [
+        "Sections 2.2, 3.2–3.3, 4",
+        "Appendices D and E.5"
+      ],
+      "comparison_group": "conformal"
+    }
+  ]
+}
