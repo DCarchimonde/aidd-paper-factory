@@ -1,0 +1,10 @@
+{
+  "reviewed_pdf_pages": {
+    "manuscript": 12,
+    "supplementary": 8,
+    "response": 3,
+    "cover_letter": 1
+  },
+  "visual_review": "All pages inspected from rendered contact sheets; final float placement, expanded supplementary table typography and references checked after recompilation.",
+  "status": "PASS"
+}

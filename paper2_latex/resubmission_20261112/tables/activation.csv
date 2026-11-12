@@ -1,0 +1,11 @@
+setting,cells,gate_pass,added,method_only,reference_only,rescued,reference_rescued
+"EPA, historical six",30,30,0,0,0,0,0
+"EPA, all twelve",60,60,21,7,7,0,0
+AMES / random,5,5,0,0,0,0,0
+CYP2D6 / random,5,5,0,0,0,0,0
+DILI / random,5,0,0,0,0,0,0
+hERG / random,5,0,0,0,0,0,0
+AMES / scaffold,5,5,0,0,0,0,0
+CYP2D6 / scaffold,5,5,19,0,0,1,1
+DILI / scaffold,5,0,0,0,0,0,0
+hERG / scaffold,5,0,0,0,0,0,0

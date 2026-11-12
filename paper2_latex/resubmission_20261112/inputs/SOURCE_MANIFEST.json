@@ -1,0 +1,144 @@
+{
+  "files": [
+    {
+      "source": "report/all_cell_metrics.csv",
+      "output": "evidence/all_cell_metrics.csv.gz",
+      "source_sha256": "814c98027232583631a7c4a88a7bb5ed2e55b0d0b2ed1a5c480ef56f0d8e67ee",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/all_panel_metrics.csv",
+      "output": "evidence/all_panel_metrics.csv.gz",
+      "source_sha256": "2ddf7eeba43b14bba4d5e81a88714eb0e7c3bef498360895e9cae3a173e364c5",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/all_paired_contrasts.csv",
+      "output": "evidence/all_paired_contrasts.csv.gz",
+      "source_sha256": "66b1a4313383e86e861d0c460c7e7dfd069b5fa832b4ccfaf5fe73bb84f4b12c",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/gate_stratified_own_budget.csv",
+      "output": "evidence/gate_stratified_own_budget.csv.gz",
+      "source_sha256": "ec80d5adf7d79dd4d228a0c1fb3871247ad9f02c9f2da5b0830355cd08211ffe",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/synthetic_mechanism_means.csv",
+      "output": "evidence/synthetic_mechanism_means.csv.gz",
+      "source_sha256": "9b1007d2ab774652882071a82b57c34766e283264cb92bf24a474d267fbfd656",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/all_paired_contrasts.csv",
+      "output": "inputs/all_paired_contrasts.csv.gz",
+      "source_sha256": "66b1a4313383e86e861d0c460c7e7dfd069b5fa832b4ccfaf5fe73bb84f4b12c",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/gate_stratified_own_budget.csv",
+      "output": "inputs/gate_stratified_own_budget.csv.gz",
+      "source_sha256": "ec80d5adf7d79dd4d228a0c1fb3871247ad9f02c9f2da5b0830355cd08211ffe",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "report/synthetic_mechanism_means.csv",
+      "output": "inputs/synthetic_mechanism_means.csv.gz",
+      "source_sha256": "9b1007d2ab774652882071a82b57c34766e283264cb92bf24a474d267fbfd656",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "BUNDLE_SCOPE.json",
+      "output": "inputs/BUNDLE_SCOPE.json",
+      "source_sha256": "2ceba6e6585b708df27fb706295fb8fb4e41542332f3ecde4f3b5bd65b4392ea",
+      "compression": "none"
+    },
+    {
+      "source": "protocol_snapshot.json",
+      "output": "inputs/protocol_snapshot.json",
+      "source_sha256": "26b4bba5837c456d1822f18c0f20d941ed8e830e69b69f34566457bda7e732c1",
+      "compression": "none"
+    },
+    {
+      "source": "provenance.json",
+      "output": "inputs/provenance.json",
+      "source_sha256": "78e05ce94ec360be2f0dfd882365ce91492c1e840fe0539641f823445f0f6163",
+      "compression": "none"
+    },
+    {
+      "source": "provenance.pre_scaffold_fix.json",
+      "output": "inputs/provenance.pre_scaffold_fix.json",
+      "source_sha256": "f036120c9fe267241741b88465d461421c2cddb737a7fd424b0fd2135d0a8f26",
+      "compression": "none"
+    },
+    {
+      "source": "experiment_complete.json",
+      "output": "inputs/execution_summary.json",
+      "source_sha256": "a08ce2e824566fe5bfc26415a6a1ab7cfa0b07fa179ad975bc985c8150b369a5",
+      "compression": "none"
+    },
+    {
+      "source": "synthetic_mechanisms/replicate_metrics.csv",
+      "output": "inputs/synthetic_replicate_metrics.csv.gz",
+      "source_sha256": "b8af5fb041bcd2e8c7dd4453beacad7e162ed5d6354090bc8d9bcb00f96a3315",
+      "compression": "gzip; lossless original bytes"
+    },
+    {
+      "source": "synthetic_mechanisms/report.json",
+      "output": "inputs/synthetic_report.json",
+      "source_sha256": "011280059d3ff757358bdded5bb6f04e5bb0e220be2c20703cbb4cd0a8063d2f",
+      "compression": "none"
+    },
+    {
+      "source": "report/mechanism/development/cell_counts.csv",
+      "output": "inputs/mechanism/development.csv",
+      "source_sha256": "68e98f432df26911e9316052a80df9cf8b5f16143b175840f90afb92b9a2a9ee",
+      "compression": "none"
+    },
+    {
+      "source": "report/mechanism/retrospective_epa/cell_counts.csv",
+      "output": "inputs/mechanism/retrospective_epa.csv",
+      "source_sha256": "e2632c26c086f82843d1fe8a105f239f811421fa1715fd671f398c055c2b6f27",
+      "compression": "none"
+    },
+    {
+      "source": "report/mechanism/independent_random/cell_counts.csv",
+      "output": "inputs/mechanism/independent_random.csv",
+      "source_sha256": "68efb375db691b12c0fcf834b84d38e0c8f407250b8c1d94217872ad90e1ed8c",
+      "compression": "none"
+    },
+    {
+      "source": "report/mechanism/independent_scaffold/cell_counts.csv",
+      "output": "inputs/mechanism/independent_scaffold.csv",
+      "source_sha256": "58bf95659c936c39c8a7308e2e7a00fd70ea6de0ecd7d3f543d0f5cb8c7c5f76",
+      "compression": "none"
+    }
+  ],
+  "compact_panel_columns": [
+    "phase",
+    "model",
+    "alpha",
+    "method",
+    "population",
+    "panel",
+    "cells",
+    "endpoints",
+    "seeds",
+    "class_0_coverage",
+    "class_1_coverage",
+    "minimum_class_coverage",
+    "macro_csy",
+    "active_false_clearance",
+    "inactive_false_discard",
+    "operational_defer_rate"
+  ],
+  "core_methods": [
+    "mondrian_lac_empty_to_full",
+    "tame_label0_historical",
+    "tame_label1_active",
+    "matched_label0_historical_omitted_label_probability",
+    "matched_label1_active_omitted_label_probability"
+  ],
+  "raw_archive_sha256": "b4b30da53a8ea1a89d681d737571e1f971d7a51dfbd301075febbe70897d6083"
+}

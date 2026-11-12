@@ -1,0 +1,6 @@
+{
+  "source_path": "paper2_admet_benchmark/scripts/racer_c4/racer_c4_core.py",
+  "source_commit": "db485b3ac7721d191576801286a4b046ae9a982b",
+  "source_file_sha256": "7914bc2cfa456713fc4802efdcccfd193a1f342a5722e3f911e7dfaefb0d0a8e",
+  "transformation": "Function extracted verbatim with minimal imports; no behavior changed."
+}

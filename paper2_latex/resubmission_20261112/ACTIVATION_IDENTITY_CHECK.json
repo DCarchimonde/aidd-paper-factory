@@ -1,0 +1,6 @@
+{
+  "weighted_membership_checks": 80000,
+  "strict_boundary_check": true,
+  "constant_query_rank_checks": 100,
+  "status": "PASS"
+}

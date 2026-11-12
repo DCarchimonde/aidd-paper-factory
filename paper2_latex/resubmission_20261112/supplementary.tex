@@ -1,0 +1,100 @@
+\input{preamble}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\theequation}{S\arabic{equation}}
+\title{Supporting information\\\large\papertitle}
+\author{Siyuan Tong and Yuechen Wang}
+\date{}
+\begin{document}\maketitle
+\section{Activation, ranking, and error--yield identities}
+\subsection{Exact weighted inclusion condition}
+Let a candidate label have finite calibration scores $s_i$ with positive weights $w_i$, total $W=\sum_iw_i$, and query mass $w>0$ placed at infinity. Let $q$ be the lower $(1-\alpha)$ quantile of this discrete distribution, with $0<\alpha<1$. For a finite candidate score $s$, define $B(s)=\sum_{i:s_i<s}w_i$. Then
+\begin{equation}
+s\le q\quad\Longleftrightarrow\quad B(s)<(1-\alpha)(W+w).
+\end{equation}
+To see this, write $t=(1-\alpha)(W+w)$. The weighted quantile is the first ordered calibration score at which cumulative weight reaches $t$, or infinity when $t>W$. If the cumulative mass strictly below $s$ reaches $t$, this first score lies below $s$, so the label is excluded. If that mass is less than $t$, no score below $s$ can be the quantile, so $q\ge s$. The same argument includes tied scores. For an empty calibration class, $B=W=0<t$, giving inclusion and an infinite threshold.
+
+The query-weight boundary is therefore $w>B(s)/(1-\alpha)-W$. Equality is excluded: replacing the strict sign with a weak inequality changes the decision when the cumulative mass below $s$ is exactly $t$. For example, calibration scores 0.2 and 0.5 with weights 2 and 1, $\alpha=0.5$, and query weight 1 give $t=2$ and $q=0.2$. The candidate score 0.5 is excluded even though $B(0.5)=t$.
+
+For the two-view TAME intersection, both views must be eligible, the candidate label must be protected and absent from the repaired baseline, and this inequality must hold in each view. Membership of a label already in the baseline does not constitute a new intervention. An intervention rescues a wrong decision only if the observed outcome equals the added label.
+
+\subsection{Constant-query-weight ranking identity}
+For a fixed calibration sample with positive weights, if the query weight in each view is constant across targets, each class-specific threshold is constant. Under binary LAC, inclusion of label $y$ is $p_y(x)\ge1-q_{y,v}$. The intersection across views is an upper level set at the largest such cutoff; the union is an upper level set at the smallest. Restricting to the baseline singletons omitting $y$ preserves that ordering. Ranking $p_y(x)$ and selecting the same number of members returns exactly the same subset. A threshold includes a complete boundary tie, so matching the number selected does not split that tie. If too few views are eligible, both the reference expansion and its matched comparator have zero budget.
+
+This identity holds for any fixed positive source weights and does not assume a correct density-ratio model. Its scope is the ranking induced by LAC with fixed active views and constant query weights. It does not apply directly to query-dependent thresholds or arbitrary score functions.
+
+\subsection{Comparing two rules with incomplete outcomes}
+Consider original singleton class $c$, with omitted label $y=1-c$. For rule $j\in\{A,P\}$, let $R_j$ count expanded labeled decisions whose true class is $y$, let $L_j$ count those with true class $c$, and let $m_j^{\mathrm{obs}}=R_j+L_j$. Write $\delta R=R_A-R_P$ and $\delta m=m_A^{\mathrm{obs}}-m_P^{\mathrm{obs}}$. Then
+\begin{align}
+ E_y(A)-E_y(P)&=-\delta R/N_y,\\
+ \mathrm{CSY}_c(A)-\mathrm{CSY}_c(P)&=(\delta R-\delta m)/N_c.
+\end{align}
+At equal labeled budgets, greater error recovery implies less loss of correct singletons. Equal operational budgets do not ensure equal labeled budgets when missing outcomes occur in different selected subsets; the $\delta m$ term is required. The mechanism tables preserve both counts. For minimum-class coverage, the exact effect is obtained after calculating both class coverages within the cell: averaging class minima cannot be replaced by taking the minimum of panel-averaged coverages.
+
+\subsection{Executable checks}
+\texttt{check\_activation\_identity.py} compares the strict inequality with the executable weighted-quantile rule using empty and nonempty calibration classes, positive unequal weights, repeated score ties, and four alpha levels. It also checks the exact equality boundary and constant-query ranking. These checks validate the algebraic description; no scientific prediction is recomputed or changed by the manuscript rebuild.
+
+\section{Data, roles, and gates}
+Source preparation uses the versioned chemical-standardization contract and RDKit 2026.03.4. Tox21 missing labels are omitted only for the corresponding assay's labeled metric. Structure identity determines overlap exclusions and the shared molecular unit for inference. The five fitted repetitions may yield endpoint-specific eligible counts, while the fixed additional-family target lists do not change between fits. Table \ref{tab:counts} gives the recorded target and calibration counts.
+\begin{table}[htbp]\centering\footnotesize
+\caption{Target and calibration counts by assay and phase. Ranges span the five fit seeds. $N_0,N_1$ count observed target labels; calibration counts refer to the classical shared-predictor analysis.}\label{tab:counts}
+\input{tables/counts}
+\end{table}
+
+For the additional families, duplicate standardization leaves AMES with 3,304 negative and 3,951 positive structures; hERG with 193 negative and 414 positive; DILI with 238 negative and 236 positive; and CYP2D6 with 10,583 negative and 2,500 positive. The fixed random and scaffold target sizes are identical within each family. Scaffold groups remain intact. All four families are retained in the analysis, including those below the fixed gate thresholds.
+
+\begin{table}[htbp]\centering\small
+\caption{Fixed transport-gate settings and prespecified one-at-a-time sensitivity values. Each view must pass all applicable checks.}\label{tab:gates}
+\begin{tabular}{lll}\toprule
+Quantity & Default & Sensitivities\\\midrule
+Calibration sample size & $\ge100$ & 50, 200\\
+Eligible target sample size & $\ge100$ & 50, 200\\
+Calibration count in each class & $\ge20$ & 10, 40\\
+Overall effective sample size & $\ge0.25n$ & 0.10, 0.50 fractions\\
+Within-class effective sample size & $\ge\max(2,0.25n_y)$ & 0.10, 0.50 fractions\\
+Maximum of lower/upper clip fractions & $\le0.30$ & 0.10, 0.50\\
+Domain-classifier AUC & $\le0.99$ & 0.95, 1.00\\
+Weighted/unweighted mean-gap allowance & $\le1.05$ & 1.00, 1.20\\
+Density-ratio clipping & $[0.05,20]$ & fixed\\\bottomrule
+\end{tabular}
+\end{table}
+
+The mean-gap condition compares the weighted gap with $\max(10^{-12},1.05\times\hbox{unweighted gap})$. Class and overall effective sample size use the same fraction in each sensitivity, producing fourteen one-factor configurations across the seven adjustable settings. These are inherited operating settings, not fitted thresholds chosen from the revision outcomes. The physicochemical view comprises molecular weight, logP, topological polar surface area, hydrogen-bond donors and acceptors, rotatable bonds, ring count, fraction of sp$^3$ carbons, and heavy-atom count. Descriptor normalization is fitted on the source role. The score view uses component and stack logits; ratios are estimated from unlabeled domain membership.
+
+\section{Reference systems and predictor sensitivity}
+\subsection{Shared-predictor comparisons}
+The shared-predictor experiment uses the same eligible compounds, source roles, probabilities, and calibration labels within each assay/seed/model. Table \ref{tab:predictors} reports the absolute baseline trade-offs before transport expansion. The full numerical supplement includes all levels, methods, and assay panels.
+\begin{table}[htbp]\centering\small
+\caption{Ordinary Mondrian LAC with empty-set repair, historical six-assay EPA panel at $\alpha=0.10$. All entries are percentages.}\label{tab:predictors}
+\input{tables/predictors}
+\end{table}
+\subsection{Recorded neural-reference configurations}
+The experiment uses independent paper-based implementations of CoDrug \citep{codrug2023} and KMM-CP \citep{kmm2026}. The configurations below describe recorded run settings and named variants; the original authors' training code was not used.
+\input{reference_settings}
+\begin{table}[htbp]\centering\small
+\caption{All ten neural reference configurations on the historical six-assay EPA panel at $\alpha=0.10$. Values are percentages. $E_1$ and $E_0$ are false-inactive and false-active exposure, respectively. Each system uses its own predictor and native deferral budget. Candidate uses candidate-label thresholds; predicted uses the paper's predicted-group interpretation. The CoDrug candidate-class variants extend its global construction.}\label{tab:reference}
+\input{tables/full_references}
+\end{table}
+
+The numerical supplement also retains selected-target metrics for selective KMM, alongside full-eligible-target metrics. In the latter, unselected targets are assigned full sets and count toward operational deferral. Outcomes use the observed-label denominator in the corresponding population. Consequently, accepted-only coverage and full-cohort coverage should not be interchanged.
+
+\section{Sensitivity analyses and molecular inference}
+For every single-view, union, ungated, and gate-sensitivity expansion, the comparison matches its own two class-specific budgets. The reported intervals use 2,000 shared-structure bootstrap draws, retaining all seed-specific predictions and recomputing each cell metric before the equal-weight panel mean. The primary contrast uses the historical six endpoints, stack, LAC, and $\alpha=0.10$. The all-twelve panel and other predictors are separate analyses.
+
+The probability range from zero to one is partitioned into five bins of width 0.2. Each bin includes its lower boundary; the final bin also includes one. Each of five query-weight controls permutes query weights within these bins, using the same permutation across views. Calibration weights, fitted target densities, and joint-view weight relationships remain fixed. The gated and ungated versions each have their own probability comparator. Across the declared 280 ablation/alignment contrasts, no pointwise error interval excludes zero. Within the primary stack panel, the ten alignment controls have no added deferrals. The nonzero primary physicochemical-only and union contrasts have a mean error difference of $-0.0952$ percentage points (95\% interval, $-0.3030$ to $0.0000$).
+
+The 24 additional-family active-label comparisons combine four endpoints, two split regimes, and three predictors. Their false-negative differences are zero except for the CYP2D6 random split with the equal-logit predictor, at $-0.0418$ percentage points (95\% interval, $-0.1330$ to $0.0000$). This is a secondary comparison and does not replace the fixed primary test. The machine-readable contrasts retain all endpoint-specific estimates and denominators.
+
+\section{Controlled shift mechanisms}
+The fixed source posterior is $p_1(x)=\operatorname{logit}^{-1}(2x_1+0.5x_2-1)$ and is not refitted using target outcomes. Thirty replicates, seeds beginning at 73000, use 400 calibration and 800 target observations each at $\alpha=0.10$. The two transport views are the raw two-dimensional covariates and those covariates augmented with their elementwise squares.
+
+The no-shift condition uses standard Gaussian covariates. An overlapping covariate shift moves the first target coordinate's mean by one while retaining the source outcome law. Its known marginal density ratio is $\exp(x_1-1/2)$. The support-loss condition places half the targets beyond bounded calibration support. Finally, the changed-conditional condition reuses the no-shift calibration data, target covariates, predictions, and diagnostics, but changes the target posterior to $1-p_1(x)$. The paired observable inputs match in all thirty replicates. For TAME, mean class-1 coverage is 90.36\% under no shift and 39.74\% under the changed conditional, at identical deferral. The archived synthetic replicate table also reports minimum-class coverage, MacroCSY, and deferral for all included rules.
+
+\section{Rebuilding and numerical files}
+\texttt{build\_results.py} reads the frozen aggregate inputs, rebuilds every manuscript table and figure, and checks thirty EPA predictor/method/panel combinations against the underlying assay--seed metrics for seven numerical outcomes. \texttt{rebuild.py} then checks the activation identity and compiles the main text, supporting information, response, and cover letter twice each. No training or endpoint selection occurs during this process.
+
+The complete numerical supplement includes \texttt{all\_cell\_metrics.csv.gz} (343,680 rows), \texttt{all\_panel\_metrics.csv.gz} (77,328 rows), and \texttt{all\_paired\_contrasts.csv.gz} (7,700 metric rows, covering 770 comparison specifications). Compression preserves the returned CSV bytes. The source manifest records hashes and transformations. The compact repository inputs preserve the columns required for manuscript rebuilding, all paired contrasts, every shared-predictor gate record, and mechanism-count tables.
+
+The returned review archive contains aggregates and execution records; its scope record excludes model weights and row-level predictions. Rebuilding a table or carrying through an archived interval is therefore distinct from rerunning training or the molecule-cluster bootstrap. Those operations use the full experiment exports on the execution machine. Missing outcomes are never converted to negative labels during either aggregation or inference.
+\begingroup\small\input{references}\endgroup
+\end{document}

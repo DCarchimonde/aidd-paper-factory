@@ -1,0 +1,6 @@
+{
+  "kind": "review_bundle",
+  "contains_model_weights": false,
+  "contains_row_level_predictions": false,
+  "review_receipts_reference_full_run_artifacts_not_in_this_lightweight_bundle": true
+}

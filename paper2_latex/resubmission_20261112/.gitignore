@@ -1,0 +1,7 @@
+evidence/
+*.aux
+*.log
+*.out
+*.toc
+__pycache__/
+qa/

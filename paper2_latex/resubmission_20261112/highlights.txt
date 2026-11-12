@@ -1,0 +1,5 @@
+Class-budget matching separates coverage gains from additional error targeting.
+A strict weighted-rank condition identifies when expansion adds a new label.
+Constant query weights make LAC expansion reduce to probability ranking.
+Matched probability ranking reproduces the historical 1.36-point coverage gain.
+Gate passage, label addition, and error recovery separate in molecular assays.

@@ -1,0 +1,93 @@
+\input{preamble}
+\title{\papertitle}
+\author{\begin{minipage}{0.96\textwidth}\centering
+Siyuan Tong$^{1,*}$ and Yuechen Wang$^2$\\[0.3em]
+\small $^1$Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia\\
+\small $^2$Faculty of Data Science, City University of Macau, Macau SAR, China\\
+\small $^*$Corresponding author: \texttt{25064241@siswa.um.edu.my}
+\end{minipage}}
+\date{}
+\begin{document}
+\maketitle
+\begin{abstract}
+Expanding molecular prediction sets can improve coverage by deferring more compounds, without improving the selection of errors for deferral. We develop a class-budget comparison that separates these effects and an exact activation condition for weighted set expansion. The comparison holds the molecular predictor, eligible targets, and numbers of expanded baseline singletons in each predicted class fixed. We apply it to a two-view transport envelope across twelve Tox21 assays, three classical predictors, and fixed random and scaffold holdouts from four additional assay families; the complete experiment contains 960 predictor units. On the historical six-assay EPA panel, inactive-label protection increased mean minimum-class coverage from 83.74\% to 85.10\%, while operational deferral increased from 42.01\% to 44.02\% and macro correct-singleton yield decreased from 48.18\% to 46.57\%. Ranking the omitted label's probability reproduced the coverage gain at the same class-specific budget; the coverage difference was 0.000 percentage points (molecule-cluster bootstrap 95\% interval, $-0.028$ to $0.029$). Active-label protection passed both transport gates in all 30 primary cells but produced no additional deferrals. Across all twelve assays it added 21 compound--fit deferrals without recovering an erroneous inactive decision. The activation condition explains why gate passage need not change a prediction set, while a constant-query-weight result identifies when expansion reduces to probability ranking. These results provide a practical evaluation framework for distinguishing coverage purchased through deferral from additional error-targeting information under molecular distribution shift.
+\end{abstract}
+\noindent\textbf{Keywords:} molecular prediction; conformal prediction; distribution shift; selective prediction; deferral; class-specific coverage
+
+\section{Introduction}
+Molecular property prediction supports decisions about which compounds to advance, discard, or measure again. A binary prediction set makes the distinction explicit: a singleton selects one outcome, while a two-label set leaves the decision unresolved. Expanding singletons into two-label sets can protect measured outcomes that would otherwise be excluded. It also increases the number of compounds requiring further evidence. Evaluating this trade-off requires asking both how often a system covers the measured outcome and which decisions it withholds.
+
+Conformal prediction constructs sets with coverage guarantees under specified sampling assumptions. Marginal coverage and class-conditional coverage answer different questions; Mondrian calibration addresses the latter under within-class exchangeability \citep{vovk2012}. Molecular collections often differ in composition and support, motivating methods that use unlabeled target compounds to estimate distribution shift. Weighted conformal prediction formalizes likelihood-ratio adjustment under covariate shift \citep{tibshirani2019}. CoDrug combines representation learning with density estimation \citep{codrug2023}, while KMM-CP uses kernel mean matching and selective support overlap \citep{kmm2026}. Their ability to restore coverage is a different question from their ability to make informative decisions at a given workload.
+
+Selective classification has long studied the relation between error and abstention \citep{elyaniv2010}. For a prediction-set expansion, however, matching only total abstention can leave a further imbalance: methods may defer different proportions of original class-0 and class-1 decisions. This matters in molecular assays with uneven class frequencies and unequal costs of false-positive and false-negative decisions. Moreover, a Mondrian singleton need not be the probability argmax. Ranking uncertainty around probability 0.5 may therefore differ from ranking the probability of the particular label omitted by that singleton.
+
+We use the transport-audited multi-view envelope (TAME) as a concrete case study. TAME adds a protected label when two weighted views agree, subject to transport diagnostics. Its historical label-0 version improved minimum-class coverage relative to a stacked Mondrian baseline. The interpretation depends on whether the selected deferrals contain more errors than an equally costly simple rule. We examine this directly by matching the expansion count within each original singleton class and ranking the probability of the omitted label.
+
+The study makes three connected contributions. First, it provides a comparison design and an error--yield decomposition that separate expansion volume, predicted-class allocation, and error targeting. Second, an exact weighted-rank condition separates gate passage from actual label addition and identifies a setting in which expansion reduces to probability ranking. Third, a complete molecular experiment applies these diagnostics to the historical coverage gain, a prespecified active-label comparison, alternative predictors and scores, and four additional assay families. The contribution is the resulting explanation of when apparent coverage gains represent additional decision information.
+
+\section{Methods}
+\subsection{Molecular cohorts and experimental roles}
+The Tox21 challenge supplies twelve nuclear-receptor and stress-response assays \citep{huang2016}. The source collection supplies model-fitting, stack-fitting, and calibration roles. The public leaderboard contains 296 structures and the final EPA collection 647 before structure standardization and overlap exclusions. The historical primary panel comprises NR-AhR, NR-ER, SR-ARE, SR-ATAD5, SR-MMP, and SR-p53, selected in the original development analysis by at least twenty positive labels. We retain this panel and report all twelve assays separately. EPA labels had been accessed in the earlier study, so the present EPA comparisons are retrospective.
+
+The additional assay families are AMES mutagenicity, the standard hERG blockade dataset, drug-induced liver injury (DILI), and CYP2D6 inhibition from the Veith collection \citep{ames2012,herg2016,dili2015,veith2009}. Labels retain these endpoint-specific meanings. Tox21 activity is not a general toxicity diagnosis, and the CYP assay signal does not by itself resolve inhibition from substrate competition. Standardization uses RDKit 2026.03.4. Same-label duplicate structures are collapsed, and structures with conflicting binary labels are removed. The resulting AMES, hERG, DILI, and CYP2D6 source tables contain 7,255, 607, 474, and 13,083 structures, respectively.
+
+Each additional dataset has a fixed random target split and a fixed scaffold target split, each approximately 20\% of the source table. Target counts are 1,451, 122, 95, and 2,617, respectively. Outer seeds are 43021 and 43022. Target selection uses structure or scaffold identity without outcome stratification. Five fits, seeds 311--315, reuse each fixed target cohort. These are within-dataset holdouts across additional endpoints. Supplementary Table S1 reports target, labeled-class, and calibration counts; acquisition and exclusion rules are specified in the archived data adapters.
+
+\subsection{Predictors and prediction sets}
+The shared-predictor comparison uses 2048-bit radius-two Morgan fingerprints. The historical source allocation is 60\% model fitting, 20\% stack fitting, and 20\% conformal calibration. The three predictors are logistic regression, a logistic stack over logistic regression/random forest/extra trees/Bernoulli naive Bayes, and an equal-logit combination. All uncertainty rules within a predictor use the same probabilities and eligible rows. Development fits use seeds 101--105 and EPA fits 211--215.
+
+For candidate label $y\in\{0,1\}$ and fitted probability $p_y(x)$, the least-ambiguous-classification score is $s(x,y)=1-p_y(x)$. For $n_y$ observed class-$y$ calibration scores, the ordinary Mondrian threshold is order statistic $k_y=\lceil(n_y+1)(1-\alpha_y)\rceil$, or $+\infty$ when $k_y>n_y$. An empty calibration class also receives an infinite threshold. The candidate label selects the threshold. The set contains $y$ if $s(x,y)\le q_y$. The primary level is $\alpha_0=\alpha_1=0.10$; levels 0.05 and 0.20 and deterministic adaptive-prediction-set scores are sensitivities \citep{romano2020}.
+
+We map $\{0\}$ to a negative/inactive decision, $\{1\}$ to a positive/active decision, and $\{0,1\}$ to deferral. Empty sets are repaired to the full set for all operational expansion comparisons; their raw frequency is retained separately. Let $S_0(x)$ denote this repaired baseline.
+
+\subsection{Transport expansion and its activation condition}
+TAME estimates target-to-calibration density ratios in two views: nine physicochemical descriptors and component/stack logits. Logistic domain-classifier odds are adjusted for domain sample sizes and clipped to $[0.05,20]$. A third fingerprint view is retained as a diagnostic comparator. Sample sizes, effective sample sizes, clipping, domain discrimination, and weighted mean discrepancy determine view eligibility. The fixed gates and their one-at-a-time sensitivities are in Supplementary Table S2.
+
+For a given view $v$, positive calibration weights $w_{iv}$ and query weight $w_v(x)$ define the class distribution
+\begin{equation}
+ F_{v,x,y}=\frac{\sum_{i:Y_i=y} w_{iv}\delta_{s(X_i,y)}+w_v(x)\delta_{+\infty}}{W_{v,y}+w_v(x)},
+ \qquad W_{v,y}=\sum_{i:Y_i=y}w_{iv}.
+\end{equation}
+Its $(1-\alpha_y)$ quantile gives the weighted threshold. A protected label omitted by $S_0(x)$ is added if both required views pass the gates and contain that label. Otherwise the baseline is retained. We distinguish historical protection of label 0 from the prespecified label-1 objective of reducing erroneous inactive decisions for active compounds.
+
+Define the strict lower-score mass
+\begin{equation}
+ B_{v,y}(s)=\sum_{i:Y_i=y}w_{iv}\ind\{s(X_i,y)<s\}.
+\end{equation}
+The weighted set contains a finite candidate score $s=s(x,y)$ exactly when
+\begin{equation}
+ B_{v,y}(s)<(1-\alpha_y)\{W_{v,y}+w_v(x)\}. \label{eq:activation}
+\end{equation}
+Equivalently, the query weight must exceed $B_{v,y}(s)/(1-\alpha_y)-W_{v,y}$. The strict inequality accounts for ties at a quantile boundary. With no class-$y$ calibration observations it holds for every positive query weight, consistently with an infinite threshold. Supplementary Section S1 proves the condition and tests its boundary behavior against the executable quantile.
+
+Equation \ref{eq:activation} yields three distinct checks: are the views eligible, do they add a label that the baseline omitted, and does that addition recover an erroneous decision? Gate passage alone does not imply either later event. This is an algebraic characterization of the expansion rule; coverage guarantees still require the relevant conformal assumptions.
+
+If each view's query weight is constant across the target batch, its candidate threshold is constant. Under binary LAC, adding label 1 then selects an upper level set of $p_1(x)$ within baseline $\{0\}$ decisions. The two-view intersection uses the larger probability cutoff, and the union the smaller. At the resulting expansion count, ranking the omitted-label probability selects exactly the same set. Label-0 protection has the analogous result for $p_0(x)$ within baseline $\{1\}$. Query-varying weights are therefore necessary for a different ranking within this setting, although they need not improve error targeting.
+
+\subsection{Matching budgets and decomposing gains}
+For an expansion $S$ of $S_0$, define
+\begin{equation}
+ m_c=\sum_{i\in\mathcal E}\ind\{S_0(x_i)=\{c\},\,|S(x_i)|=2\},\qquad c\in\{0,1\},
+\end{equation}
+where $\mathcal E$ includes every eligible target, including those without an observed assay outcome. Each comparator expands exactly $m_0$ and $m_1$ decisions, ranked within their original singleton classes. The primary comparator ranks $p_{1-c}(x)$, the probability of the omitted label. Secondary rankings use uncertainty around 0.5, lower maximum training-set Tanimoto similarity, and fixed seeded random priorities. Stable molecule identifiers resolve ranking ties. Target outcomes are absent from ranking and budget selection.
+
+Within one baseline class-$c$ pool, let $R$ count expanded labeled decisions whose true class is $1-c$, and $L$ count those whose true class is $c$. For the fixed labeled-class denominators $N_y$,
+\begin{equation}
+ \Delta C_{1-c}=R/N_{1-c},\qquad
+ \Delta\mathrm{CSY}_c=-L/N_c,\qquad R+L=m_c^{\mathrm{obs}}.
+\end{equation}
+Here $C_y$ is class coverage and $\mathrm{CSY}_y$ is correct-singleton yield. The observed-label expansion count $m_c^{\mathrm{obs}}$ may differ from the operational count $m_c$ when outcomes are missing. At equal observed-label budgets, greater error recovery necessarily preserves more correct singletons in the original class. At equal operational budgets, the observed-budget difference must also be included. Supplementary Section S1 gives this correction for two competing rules.
+
+We report minimum-class coverage $C_{\min}=\min(C_0,C_1)$, macro correct-singleton yield $\mathrm{MacroCSY}=(\mathrm{CSY}_0+\mathrm{CSY}_1)/2$, false-inactive exposure $E_1=\Pr\{S=\{0\}\mid Y=1\}$, false-active exposure $E_0=\Pr\{S=\{1\}\mid Y=0\}$, and decision yield. Operational deferral uses all eligible targets; coverage and errors use observed labels. Empty denominators remain undefined.
+
+\subsection{Comparisons and inference}
+The fixed primary contrast compares active-label TAME with its omitted-label-probability comparator for $E_1$, using the stack, LAC, $\alpha=0.10$, and the historical six assays. The historical label-0 comparison explains the earlier coverage gain. The full matrix includes the three classical predictors, marginal/Mondrian LAC and APS, weighted variants, protected-label variants, single-view and union rules, ungated rules, fourteen gate sensitivities, and five gated plus five ungated query-weight permutations. Each expansion variant receives its own class-budget-matched probability comparator. Fixed workload curves use fractions 0, 0.10, 0.25, 0.50, 0.75, and 1 of the baseline singleton pool.
+
+The end-to-end reference systems are independent paper-based CoDrug and KMM-CP implementations with AttentiveFP predictors. CoDrug includes its energy penalty, auxiliary molecular pool, and logit-space density estimates. Both printed and prespecified swapped energy-margin settings are retained. KMM-CP includes ordinary and selective kernel mean matching, bandwidth selection, and refitting after target selection. Candidate-label and literal predicted-group threshold interpretations are reported separately. Unselected targets defer in the full-cohort comparison. These systems use their own predictors and native workloads; their recorded settings and all ten configurations appear in Supplementary Section S3 and Table S4.
+
+The complete experiment completed 960 predictor units: 360 development, 360 EPA, 120 random holdout, and 120 scaffold holdout. Of these, 480 use classical predictors and 480 use neural reference systems. Alpha levels and post-prediction variants reuse a unit's probabilities. Metrics are computed within assay--seed cells and then averaged equally over the declared panel. Bootstrap intervals resample molecular/structure identities jointly across assays and methods while retaining every seed prediction, using 2,000 replicates and seed 44021. The interval estimand is the fixed-panel mean; training seeds do not add independent molecules. Secondary intervals are pointwise exploratory.
+
+Synthetic mechanisms with thirty replicates each examine no shift, overlapping covariate shift, support loss, and changed $Y\mid X$ with identical observable covariates. These analyses are reported separately in Supplementary Section S5.
+\input{results_discussion}
+\input{references}
+\end{document}

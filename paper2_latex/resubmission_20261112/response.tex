@@ -1,0 +1,58 @@
+\input{preamble}
+\title{Response to the review of CHEMOLAB-D-26-01118}
+\author{Siyuan Tong and Yuechen Wang}
+\date{}
+\begin{document}\maketitle
+We submit a substantially revised study, now entitled \emph{\papertitle}. The revision changes the central question from the size of a coverage gain to the additional error-targeting information available at the same deferral cost. It includes a completed 960-unit experimental matrix, class-budget-matched simple rules, an activation analysis, additional assay families, and full reference systems. Below, the review points are summarized by topic, followed by the corresponding changes and evidence.
+
+\section*{1. Established coverage properties and the earlier Stage I examples}
+\noindent\textbf{Review point (summary).} The distinction between marginal and class-conditional coverage is known; the ClinTox example does not establish a new principle.
+
+\textbf{Response.} The introduction now treats marginal versus class-conditional coverage as established background. The new contribution is a decision-level comparison that matches expansion counts within both original singleton classes, together with an exact condition describing when weighted expansion activates. The completed molecular study uses twelve Tox21 assays and four additional endpoint families.
+
+During the revision, we identified that the old Stage I implementation truncated the finite-sample order-statistic rank at $n$. The revised implementation uses an infinite threshold whenever $\lceil(n+1)(1-\alpha)\rceil>n$, including empty class groups. The old Stage I row-level outputs were not recoverable, so its numerical examples and figures have been removed from the revised evidence. The current conclusion relies only on the newly executed experiment with the specified rank behavior.
+
+\textbf{Locations.} Main text, Introduction and Sections 2.1--2.2; Supporting Information, Sections S1--S2 and Table S1.
+
+\section*{2. Set expansion, validity, and the role of transport gates}
+\noindent\textbf{Review point (summary).} TAME is a conservative wrapper around Mondrian prediction; audit gates do not establish conditional validity under general shift.
+
+\textbf{Response.} The methods now separate the set-inclusion benefit from error targeting. A matched comparator expands exactly the same numbers of original class-0 and class-1 singletons. The primary simple rule ranks the probability of the omitted label, which is the candidate label that could repair the decision. This differs from generic uncertainty when a Mondrian singleton differs from the probability argmax.
+
+The historical label-0 expansion increases mean minimum-class coverage from 83.74\% to 85.10\%, with deferral rising from 42.01\% to 44.02\%. The omitted-label rule reproduces the mean gain at this budget; the TAME-minus-comparator coverage difference is 0.000 percentage points, with a molecule-cluster bootstrap 95\% interval of $[-0.0279,0.0287]$. We therefore interpret the historical gain as an attainable error--deferral trade-off, not evidence of extra transport-based ranking ability.
+
+The revised paper also distinguishes view eligibility, actual label addition, and recovered errors. In the fixed active-label primary comparison, both views pass in all 30 cells but no label is added to a baseline singleton. Across all twelve EPA assays, the stacked rule adds 21 compound--fit deferrals without recovering a false-inactive decision. The new weighted-rank condition explains this nonactivation explicitly, including the strict boundary inequality. A separate result identifies when constant query weights reduce the rule exactly to probability ranking. These are structural descriptions of the rule, not new coverage guarantees.
+
+\textbf{Locations.} Main text, Sections 2.3--2.4, 3.1--3.2, Tables 1--2; Supporting Information, Section S1.
+
+\section*{3. Chemical decision objective and protected label}
+\noindent\textbf{Review point (summary).} The motivation emphasized rare positive toxicity outcomes, whereas the original TAME protected label 0.
+
+\textbf{Response.} We now state the measured assay meaning and decision objective separately. Historical label-0 protection addresses inactive compounds assigned an erroneous active singleton. The prespecified active-label comparison addresses active compounds assigned an erroneous inactive singleton. Tox21 labels describe assay activity rather than a general clinical toxicity state. AMES, hERG, DILI, and CYP2D6 retain their respective endpoint definitions.
+
+Both error directions, both class coverages, correct-singleton yield, and operational deferral are reported. The error--yield decomposition accounts for the observed-label expansion count, which need not equal the operational count when outcomes are missing. The new primary comparison is reported as a zero-intervention result rather than a demonstration of two active methods' equivalence.
+
+\textbf{Locations.} Main text, Sections 2.1, 2.3--2.5 and 3.2--3.3; Supporting Information, Sections S1--S2.
+
+\section*{4. The 1.36-point gain, comparator strength, and robustness}
+\noindent\textbf{Review point (summary).} The original coverage gain was small and protocol-dependent, with insufficient comparison against strong methods under a common design.
+
+\textbf{Response.} The new matrix has 960 completed predictor units, including 480 classical units and 480 neural reference units. Within each classical predictor, all uncertainty layers share probabilities, calibration roles, eligible target rows, and alpha levels. We include logistic, stacked, and equal-logit predictors; LAC and deterministic APS; weighted Mondrian; active, inactive, and both-label expansion; and matched probability, uncertainty, similarity, and random rules. Fourteen gate sensitivities, single-view/union/ungated rules, and query-weight controls receive their own matched probability comparators.
+
+The end-to-end suite includes paper-based CoDrug with both printed and prespecified swapped energy margins and ordinary/selective KMM-CP with explicit threshold interpretations. Their native-workload results are presented jointly with both error directions and correct-singleton yield. For example, the swapped-margin CoDrug candidate-class variant has 10.93\% false-inactive exposure at 36.58\% deferral, while selective candidate-label KMM has 7.67\% at 52.79\%. All ten configurations are retained in Table S4. These comparisons involve each system's own predictor; they are reported separately from shared-predictor, same-budget effects.
+
+The historical coverage gain is reproduced, but the class-budget-matched probability rule reproduces it as well. Simple comparator selection matters: at identical cost, generic probability uncertainty has 84.75\% minimum-class coverage and 44.61\% MacroCSY, whereas omitted-label ranking has 85.10\% and 46.57\%. We highlight this finding because it explains how a nominally equal-cost comparison can still use an unnecessarily weak ranking rule.
+
+Additional families distinguish small-sample fallback in hERG/DILI from eligible but mostly inactive expansion in AMES/CYP2D6. For stacked scaffold CYP2D6, both TAME and matched probability choose the same 19 compound--fit deferrals and recover the same one error. Paired inference resamples structure identities jointly across assays and methods and retains all fitted seeds. EPA analyses are identified as retrospective because its labels had already been accessed.
+
+\textbf{Locations.} Main text, Sections 2.5 and 3.1--3.5, Figures 1--2; Supporting Information, Tables S3--S4 and Sections S3--S5; complete numerical supplement.
+
+\section*{5. Presentation, stage differences, and gate transferability}
+\noindent\textbf{Review point (summary).} The algorithm was obscured by integrity-audit terminology; stage differences and the rationale for gate settings were unclear.
+
+\textbf{Response.} The main methods now proceed from cohorts and predictions to set construction, activation, matched budgets, decision metrics, and inference. Hashes and execution records are located in the reproducibility materials. The historical two classification stages both used LAC; the relevant differences were their endpoint collections and prediction construction. The revised shared-predictor comparison holds these quantities fixed across uncertainty rules, with separate score and predictor sensitivities.
+
+Table S2 lists every default gate and its sensitivity. The results show directly that passing the two views need not produce intervention. A single activation table replaces repeated zero-difference graphics and distinguishes fallback, nonactivation, discordant additions, and error recovery. Across the declared own-budget ablations and query-weight controls, no pointwise error interval excludes zero. The discussion is now organized around these observed findings and the constant-query-weight ranking result.
+
+\textbf{Locations.} Main text, Methods and Discussion, Table 2; Supporting Information, Table S2 and Section S4.
+\end{document}

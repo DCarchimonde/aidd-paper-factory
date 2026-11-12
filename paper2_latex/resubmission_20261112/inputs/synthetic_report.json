@@ -1,0 +1,26 @@
+{
+  "status": "synthetic_mechanism_checks_completed_not_molecular_evidence",
+  "replicates": 30,
+  "first_seed": 73000,
+  "n_calibration": 400,
+  "n_target": 800,
+  "alpha": 0.1,
+  "scenario_names": [
+    "no_shift",
+    "gaussian_covariate_shift",
+    "support_loss",
+    "same_x_concept_shift"
+  ],
+  "classifier": "frozen_known_source_posterior",
+  "views": [
+    "raw_two_dimensional_x",
+    "raw_x_and_elementwise_squared_x"
+  ],
+  "gates": "unchanged_racer_c4_core_defaults",
+  "same_x_concept_shift_prediction_and_audit_identity": true,
+  "oracle_definition": "exact_unclipped_p_target_x_over_p_source_x",
+  "support_loss_oracle": "unavailable_due_to_absolute_continuity_failure",
+  "concept_shift_oracle": "x_ratio_known_but_cannot_correct_changed_P_Y_given_X",
+  "interpretation": "Descriptive repeated simulations; no portability or new coverage theorem. A passing audit cannot certify conditional invariance.",
+  "implementation_sha256": "a6586596618ba976fb2b71f13b746ef913793412613a3948ec2c614f7d7d2bbc"
+}

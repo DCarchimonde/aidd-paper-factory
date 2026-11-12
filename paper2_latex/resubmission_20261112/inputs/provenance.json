@@ -1,0 +1,99 @@
+{
+  "epa_is_new_blinded_validation": false,
+  "git_head_at_start": "ae9c3927f0e34f86f58005c4ccea9d50ff5a7376",
+  "identity": {
+    "protocol_sha256": "f0c37bec1a882cc636a1c573e2a2390cdc5fd99d11f5e05308ad155d2dc74f49",
+    "code": {
+      "paper2_admet_benchmark\\protocols\\chemical_standardization_contract.yaml": "4e4728cc95b655e372baf2925e40bcecbc16727c549acbf54fdaea3663fb3e45",
+      "paper2_admet_benchmark\\revision_2026\\__init__.py": "5cf9a5a75ee3b419b8b0b08556ec681ca5074351e2045c80861f6df96b622871",
+      "paper2_admet_benchmark\\revision_2026\\audit_legacy_quantiles.py": "5e89b68bc6979d5bf28cbf3e1493013d84685a99730bea7c6fc43086591eb7d7",
+      "paper2_admet_benchmark\\revision_2026\\build_handoff_pdf.py": "05dc284240601489b3612bd44d915e20028052dd58500f0993e813beccad1972",
+      "paper2_admet_benchmark\\revision_2026\\core.py": "be11f153bfec07b930ecf4780a816606e0ff12fd32b4b00bbee45d9e2337a773",
+      "paper2_admet_benchmark\\revision_2026\\density_baselines.py": "8ae27a9657b802316cfe0fe94e3cce2eb7cf0d6b06e9173ea58b84fd6154b942",
+      "paper2_admet_benchmark\\revision_2026\\execute_revision.py": "6bfcefc383f038e813b3b03b95d530d32ab8b202104bd9cfc584fdb27ff15ead",
+      "paper2_admet_benchmark\\revision_2026\\external_adapter.py": "1aa0b69945babb97d3db32b885287907850c5220b99951dcb601834012151b66",
+      "paper2_admet_benchmark\\revision_2026\\full_baselines\\codrug.py": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44",
+      "paper2_admet_benchmark\\revision_2026\\full_baselines\\kmm_cp.py": "e57042e1121be80b49d3d26d63714af2b12cb6a720d69feb0d46c058f1fb7637",
+      "paper2_admet_benchmark\\revision_2026\\independent_data.py": "685f6f49cc36c79969190cae4a2f040f96c67083513e77cae6d66425edd91770",
+      "paper2_admet_benchmark\\revision_2026\\mechanism_diagnostics.py": "437c745309e332aee526e889a779b6d2705ec1f7f9d11e21c5304193e322cf4f",
+      "paper2_admet_benchmark\\revision_2026\\reporting.py": "35a82e4477ea66a2d865612a0ccefe3190dc08fa15c3129ea86dd61f819ad858",
+      "paper2_admet_benchmark\\revision_2026\\runner.py": "2cfb9b27ad81a59e519257ee3209a3e31a58a4f4306acb52bee483bba1e402dd",
+      "paper2_admet_benchmark\\revision_2026\\score_external.py": "583651925f405db029159178b99b2818e686a7d47f7aec4a7df1916f884fab21",
+      "paper2_admet_benchmark\\revision_2026\\summarize.py": "74b00fe74f7c8e9a976b72ad4742f1ec20db130649137f704f0d2d28c98847a3",
+      "paper2_admet_benchmark\\revision_2026\\synthetic_mechanisms.py": "a6586596618ba976fb2b71f13b746ef913793412613a3948ec2c614f7d7d2bbc",
+      "paper2_admet_benchmark\\revision_2026\\target_null.py": "d6f793271b27c5868ac38fd37871943beb3b6a361e7f8cf2ab56c6c40fbbd985",
+      "paper2_admet_benchmark\\scripts\\racer_c\\prepare_classification_endpoint.py": "7f66d9ee37814d938bbdfe152151c4755d132e7db101fa679a186090da75d7ee",
+      "paper2_admet_benchmark\\scripts\\racer_c\\prepare_tox21_challenge.py": "9095512719309446af635a339596eec83fb9aa5fa64c3befa06de271784ff966",
+      "paper2_admet_benchmark\\scripts\\racer_c4\\__init__.py": "67f2df62f797dbacc060376d5101fd165fc93e67c7eb87bbc5a9c3db5a670cbf",
+      "paper2_admet_benchmark\\scripts\\racer_c4\\racer_c4_core.py": "d6d10b371f45aac61fd826961e16043999616e86a924993c35070f9af1d984e5",
+      "paper2_admet_benchmark\\scripts\\racer_c4\\racer_c4_io.py": "bd9ba3ce17fc02966f01cfa814a5fc251e0378bf2f4db2c5369617fdc7fd73e6",
+      "paper2_admet_benchmark\\scripts\\racer_c4\\recompute_racer_c4_inference.py": "412c8176909e89ba64a2454effe8051e14bdf62e3ff85e0cabe8923269f2d525",
+      "paper2_admet_benchmark\\scripts\\racer_c4\\run_prospective_racer_c4.py": "394e119c3460c37c85b2be28b646d9a9ad454806ba34e862fdb8b710ed0ed63c"
+    },
+    "configs": {
+      "paper2_admet_benchmark\\revision_2026\\protocol.json": "f0c37bec1a882cc636a1c573e2a2390cdc5fd99d11f5e05308ad155d2dc74f49",
+      "paper2_admet_benchmark\\revision_2026\\independent_sources.json": "ed02aaa95077f4fb5ece511d436214a8125bd36283976225824d8491e2a820e0"
+    },
+    "device": "cuda",
+    "jobs": 4,
+    "python": "3.12.10",
+    "packages": {
+      "numpy": "2.3.5",
+      "scipy": "1.17.0",
+      "scikit-learn": "1.8.0",
+      "rdkit": "2026.3.4",
+      "PyYAML": "6.0.3",
+      "threadpoolctl": "3.6.0",
+      "pandas": "2.2.3",
+      "torch": "2.7.1+cu128",
+      "matplotlib": "3.10.8",
+      "osqp": "1.0.4"
+    },
+    "hardware": {
+      "device": "cuda",
+      "platform": "Windows-11-10.0.26200-SP0",
+      "cpu": "Intel64 Family 6 Model 198 Stepping 2, GenuineIntel",
+      "logical_cpu_count": 24,
+      "torch": "2.7.1+cu128",
+      "torch_cuda_runtime": "12.8",
+      "cudnn_version": 90701,
+      "torch_compiled_cuda_architectures": [
+        "sm_50",
+        "sm_60",
+        "sm_61",
+        "sm_70",
+        "sm_75",
+        "sm_80",
+        "sm_86",
+        "sm_90",
+        "sm_100",
+        "sm_120"
+      ],
+      "cuda_tiny_forward_backward_preflight_passed": true,
+      "cuda_device_name": "NVIDIA GeForce RTX 5080 Laptop GPU",
+      "cuda_total_memory_bytes": 17066360832,
+      "cuda_compute_capability": [
+        12,
+        0
+      ]
+    },
+    "execution_kind": "formal_declared_matrix",
+    "scheduled_jobs_sha256": "221e1744a665608f29c128b99e7f67d1e161d43b8b4a4fd0b4c4fbfc1c832419"
+  },
+  "reference_methods_required_before_superiority_claim": [
+    "full_CoDrug_and_KMM_CP_are_run_by_execute_revision_not_this_shared_predictor_subcommand"
+  ],
+  "code_migration": {
+    "timestamp_utc": "2026-11-07T02:53:29Z",
+    "reason": "scaffold fallback for four AMES source structures whose conjugated stereo triggers an RDKit Murcko MolToSmiles precondition failure",
+    "changed_code_hashes": {
+      "/code/paper2_admet_benchmark\\revision_2026\\full_baselines\\codrug.py": {
+        "old": "4f902c30f23548021f7c3ded5ba8c802bbf1164f6b68c26f9b1944d23eca7760",
+        "new": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44"
+      }
+    },
+    "completed_cells_before_fix": 120,
+    "completed_cells_effect": "none; the fallback only triggers on the four AMES structures that failed before training, and no completed cell contains a scaffold failure",
+    "original_provenance": "provenance.pre_scaffold_fix.json"
+  }
+}

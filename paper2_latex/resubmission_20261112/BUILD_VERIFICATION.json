@@ -1,0 +1,15 @@
+{
+  "documents": [
+    "manuscript",
+    "supplementary",
+    "response",
+    "cover_letter"
+  ],
+  "warnings": {
+    "manuscript": [],
+    "supplementary": [],
+    "response": [],
+    "cover_letter": []
+  },
+  "scientific_training_performed": false
+}

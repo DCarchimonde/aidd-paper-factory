@@ -1,0 +1,329 @@
+{
+  "historical": {
+    "baseline_minimum_coverage": 0.8373899505912198,
+    "tame_minimum_coverage": 0.8510386785905371,
+    "coverage_gain_pp": 1.3648727999317267,
+    "extra_deferral_pp": 2.0164309368772395,
+    "macro_csy_change_pp": -1.6066860641328673,
+    "matched_difference_pp": 0.0,
+    "matched_ci_pp": [
+      -0.02792442886285,
+      0.02873813222612
+    ]
+  },
+  "activation": [
+    {
+      "setting": "EPA, historical six",
+      "cells": 30,
+      "gate_pass": 30,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "EPA, all twelve",
+      "cells": 60,
+      "gate_pass": 60,
+      "added": 21,
+      "method_only": 7,
+      "reference_only": 7,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "AMES / random",
+      "cells": 5,
+      "gate_pass": 5,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "CYP2D6 / random",
+      "cells": 5,
+      "gate_pass": 5,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "DILI / random",
+      "cells": 5,
+      "gate_pass": 0,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "hERG / random",
+      "cells": 5,
+      "gate_pass": 0,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "AMES / scaffold",
+      "cells": 5,
+      "gate_pass": 5,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "CYP2D6 / scaffold",
+      "cells": 5,
+      "gate_pass": 5,
+      "added": 19,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 1,
+      "reference_rescued": 1
+    },
+    {
+      "setting": "DILI / scaffold",
+      "cells": 5,
+      "gate_pass": 0,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    },
+    {
+      "setting": "hERG / scaffold",
+      "cells": 5,
+      "gate_pass": 0,
+      "added": 0,
+      "method_only": 0,
+      "reference_only": 0,
+      "rescued": 0,
+      "reference_rescued": 0
+    }
+  ],
+  "cell_to_panel_checks": [
+    {
+      "panel": "primary_six",
+      "model": "logistic",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 30,
+      "max_abs_error": 2.220446049250313e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "logistic",
+      "method": "tame_label0_historical",
+      "cells": 30,
+      "max_abs_error": 2.220446049250313e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "logistic",
+      "method": "tame_label1_active",
+      "cells": 30,
+      "max_abs_error": 2.220446049250313e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "logistic",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 2.220446049250313e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "logistic",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 2.220446049250313e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "stack",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "stack",
+      "method": "tame_label0_historical",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "stack",
+      "method": "tame_label1_active",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "stack",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "stack",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "equal_logit",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "equal_logit",
+      "method": "tame_label0_historical",
+      "cells": 30,
+      "max_abs_error": 2.7755575615628914e-17
+    },
+    {
+      "panel": "primary_six",
+      "model": "equal_logit",
+      "method": "tame_label1_active",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "primary_six",
+      "model": "equal_logit",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 2.7755575615628914e-17
+    },
+    {
+      "panel": "primary_six",
+      "model": "equal_logit",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 30,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "all_assays",
+      "model": "logistic",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 60,
+      "max_abs_error": 5.551115123125783e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "logistic",
+      "method": "tame_label0_historical",
+      "cells": 60,
+      "max_abs_error": 5.551115123125783e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "logistic",
+      "method": "tame_label1_active",
+      "cells": 60,
+      "max_abs_error": 5.551115123125783e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "logistic",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 5.551115123125783e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "logistic",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 5.551115123125783e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "stack",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 60,
+      "max_abs_error": 8.326672684688674e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "stack",
+      "method": "tame_label0_historical",
+      "cells": 60,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "all_assays",
+      "model": "stack",
+      "method": "tame_label1_active",
+      "cells": 60,
+      "max_abs_error": 8.326672684688674e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "stack",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "all_assays",
+      "model": "stack",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 8.326672684688674e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "equal_logit",
+      "method": "mondrian_lac_empty_to_full",
+      "cells": 60,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "all_assays",
+      "model": "equal_logit",
+      "method": "tame_label0_historical",
+      "cells": 60,
+      "max_abs_error": 2.7755575615628914e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "equal_logit",
+      "method": "tame_label1_active",
+      "cells": 60,
+      "max_abs_error": 1.1102230246251565e-16
+    },
+    {
+      "panel": "all_assays",
+      "model": "equal_logit",
+      "method": "matched_label0_historical_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 2.7755575615628914e-17
+    },
+    {
+      "panel": "all_assays",
+      "model": "equal_logit",
+      "method": "matched_label1_active_omitted_label_probability",
+      "cells": 60,
+      "max_abs_error": 1.1102230246251565e-16
+    }
+  ],
+  "bootstrap": "Archived paired intervals retained; molecule-level bootstrap was not rerun from aggregates."
+}
