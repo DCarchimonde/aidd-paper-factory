@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "sources": {
+    "codrug.py": {
+      "sha256": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44",
+      "matches_formal_provenance": true,
+      "active_repository_copy_identical": true,
+      "changed_functions": [
+        "_scaffold_string",
+        "_train"
+      ]
+    },
+    "kmm_cp.py": {
+      "sha256": "e57042e1121be80b49d3d26d63714af2b12cb6a720d69feb0d46c058f1fb7637",
+      "matches_formal_provenance": true,
+      "active_repository_copy_identical": true,
+      "changed_functions": [
+        "_solve_qp"
+      ]
+    }
+  },
+  "pre_scaffold_codrug": {
+    "sha256": "4f902c30f23548021f7c3ded5ba8c802bbf1164f6b68c26f9b1944d23eca7760",
+    "matches_recorded_pre_fix_provenance": true,
+    "origin": "Reconstructed from supplied reference source plus the observed CUDA RNG restoration change; converted to the recorded CRLF byte encoding."
+  },
+  "reference_commit": "ae9c3927f0e34f86f58005c4ccea9d50ff5a7376",
+  "tests": {
+    "run": 21,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "validation_versions": {
+    "python": "3.12.14",
+    "numpy": "2.3.5",
+    "osqp": "1.0.4",
+    "rdkit": "2026.03.4"
+  },
+  "cuda_check_scope": "Executed the saved RNG transfer expression with CPU-token mocks; no GPU resume or training run.",
+  "scientific_training_performed": false,
+  "frozen_predictions_recomputed": false
+}

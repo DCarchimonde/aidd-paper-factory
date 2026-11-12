@@ -10,24 +10,17 @@
 
 历史六测定面板的最弱类覆盖从 83.739% 升至 85.104%，但同预算的遗漏标签概率排序复现了这部分增益。因此本稿的贡献是解释覆盖增益和错误定位能力的关系，而不是宣称 TAME 在相同成本下独有优势。960 个预测器单元的正式回包、完整参照配置、额外测定家族与反向结果均保留。
 
-## 正式提交前的实际源码核对
+## 实际运行源码已补齐
 
-**当前状态：成稿及数值附件已完成；CoDrug 和 KMM-CP 两份实际运行源码尚待取回并核对。**
+两份实际运行源码已收到并与正式实验来源记录逐字节核对一致；其参考版本也已与 GitHub 的实验参考提交核对。此前的源码缺口已关闭，相关实现已同步到仓库的实际调用路径，并纳入本次完整数值附件。
 
-正式回包的来源记录显示，执行机上的两份源码相对参考提交发生过修改，但回包未附这两份实际文件。当前仓库中的旧实现不能冒充实际运行版本。请在产生正式 v3 结果的原电脑/服务器收集文件，不需要重训。
+- CoDrug：补入骨架提取遇到立体化学异常后的重试，以及恢复 CUDA 随机状态前转回 CPU 的处理。
+- KMM-CP：补入二次规划目标的正比例缩放，并将报告的目标值还原到原始尺度；SI 已说明该实现。
+- 修复前的 CoDrug 源码由参考版本和已识别的 CUDA 改动恢复，字节哈希与前一阶段正式记录一致，单独保存在 `runtime_sources/pre_scaffold_fix/`。
 
-1. 将本目录的 `collect_runtime_sources.py` 复制到原运行仓库根目录。
-2. 在该目录执行：
+原始回包源码、参考源码、差异补丁、收集记录和说明均在 `runtime_sources/`。核对结果见 `RUNTIME_SOURCE_VERIFICATION.json`，固定数值与图表的逐文件核对见 `FROZEN_CONTENT_VERIFICATION.json`。本次没有重新训练，也没有修改既有科学结果。
 
-   ```text
-   python collect_runtime_sources.py --repo . --output TAME_Runtime_Sources_20261112.zip
-   ```
-
-3. 回传生成的 `TAME_Runtime_Sources_20261112.zip`。脚本只读取两份源码、相关 Git 差异及可选来源记录，不切换分支、不覆盖源码、不启动训练。
-
-收集前请保持实际运行文件，不先执行分支切换或用新版本覆盖这两份文件。若脚本报告哈希不一致，仍回传 ZIP，由我们核对差异，不自行重跑实验。若另存有 scaffold 修复前的 `codrug.py`，可额外使用 `--pre-fix-codrug 文件路径`；已知结果目录可用 `--result-dir 目录路径`。
-
-核对后需要将实际实现及必要差异说明纳入最终复现附件，再进行正式提交。新修订稿沿用原稿的作者、单位和通讯信息；本交付不声称两位作者已重新批准新版本。
+本包为更新后的完整投稿准备材料，尚未向期刊提交。作者、单位和通讯信息沿用原稿。
 
 ## 投稿文件对应
 
@@ -62,6 +55,6 @@ python rebuild.py
 
 该命令读取固定聚合结果，重建表格和两张图，验证激活条件，然后将四份 LaTeX 文档分别编译两次。它不训练模型，也不重跑分子层 bootstrap。原回包不含模型权重和逐分子预测；这些操作须使用执行机保存的完整导出。
 
-核验文件：`NUMERICAL_VERIFICATION.json`（30 组 EPA 汇总、每组 7 项指标）、`ACTIVATION_IDENTITY_CHECK.json`（80,000 次成员条件对照与边界/排序检查）、`BUILD_VERIFICATION.json`（四份文档编译）、`COLLECTOR_VERIFICATION.json`（取件脚本）。
+核验文件：`NUMERICAL_VERIFICATION.json`（30 组 EPA 汇总、每组 7 项指标）、`ACTIVATION_IDENTITY_CHECK.json`（80,000 次成员条件对照与边界/排序检查）、`BUILD_VERIFICATION.json`（四份文档编译）、`COLLECTOR_VERIFICATION.json`（取件脚本）、`RUNTIME_SOURCE_VERIFICATION.json`（实际运行源码与相关行为检查）。
 
 GitHub 保留可重建本稿的精简固定输入；完整原始聚合 CSV 随数值附件交付。两者的用途和变换记录在来源清单中。

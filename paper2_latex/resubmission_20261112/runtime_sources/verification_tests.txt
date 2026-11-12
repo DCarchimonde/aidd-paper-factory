@@ -1,0 +1,26 @@
+test_constant_feature_bandwidth_is_explicit_not_nan (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_constant_feature_bandwidth_is_explicit_not_nan) ... ok
+test_empirical_quantile_does_not_silently_add_query_atom (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_empirical_quantile_does_not_silently_add_query_atom) ... ok
+test_full_fit_refits_on_selected_cohort_and_keeps_population_denominators (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_full_fit_refits_on_selected_cohort_and_keeps_population_denominators) ... ok
+test_joint_qp_matches_mass_and_filters_unsupported_targets (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_joint_qp_matches_mass_and_filters_unsupported_targets) ... ok
+test_literal_paper_threshold_and_candidate_threshold_remain_distinct (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_literal_paper_threshold_and_candidate_threshold_remain_distinct) ... ok
+test_missing_calibration_class_has_explicit_infinite_threshold (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_missing_calibration_class_has_explicit_infinite_threshold) ... ok
+test_mmd_statistic_matches_direct_pair_sums (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_mmd_statistic_matches_direct_pair_sums) ... ok
+test_outcome_changes_do_not_change_density_or_selection_fit (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_outcome_changes_do_not_change_density_or_selection_fit) ... ok
+test_permutation_bandwidth_selection_is_deterministic_and_auditable (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_permutation_bandwidth_selection_is_deterministic_and_auditable) ... ok
+test_solver_failure_and_caps_are_not_silent_fallbacks (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_solver_failure_and_caps_are_not_silent_fallbacks) ... ok
+test_standard_qp_identity_domain_recovers_uniform_solution (paper2_admet_benchmark.revision_2026.full_baselines.test_kmm_cp.KMMCPTests.test_standard_qp_identity_domain_recovers_uniform_solution) ... ok
+test_kde_domains_and_no_outcome_parameter (paper2_admet_benchmark.revision_2026.full_baselines.test_codrug.WeightedSetTests.test_kde_domains_and_no_outcome_parameter) ... ok
+test_pinned_auxiliary_rejects_bad_hash (paper2_admet_benchmark.revision_2026.full_baselines.test_codrug.WeightedSetTests.test_pinned_auxiliary_rejects_bad_hash) ... ok
+test_scale_invariance_and_candidate_class (paper2_admet_benchmark.revision_2026.full_baselines.test_codrug.WeightedSetTests.test_scale_invariance_and_candidate_class) ... ok
+test_test_atom_and_uniform_ratio (paper2_admet_benchmark.revision_2026.full_baselines.test_codrug.WeightedSetTests.test_test_atom_and_uniform_ratio) ... ok
+test_cuda_resume_expression_moves_each_rng_state_to_cpu (__main__.main.<locals>.RuntimeFixTests.test_cuda_resume_expression_moves_each_rng_state_to_cpu) ... ok
+test_qp_rescaling_preserves_known_optimum_and_objective_units (__main__.main.<locals>.RuntimeFixTests.test_qp_rescaling_preserves_known_optimum_and_objective_units) ... ok
+test_scaffold_retry_keeps_nonisomeric_scaffold (__main__.main.<locals>.RuntimeFixTests.test_scaffold_retry_keeps_nonisomeric_scaffold) ... ok
+test_auxiliary_filter_does_not_relax_empty_pool (__main__.main.<locals>.ChemistryOnlyTests.test_auxiliary_filter_does_not_relax_empty_pool) ... ok
+test_auxiliary_scaffold_error_is_excluded_and_counted (__main__.main.<locals>.ChemistryOnlyTests.test_auxiliary_scaffold_error_is_excluded_and_counted) ... ok
+test_auxiliary_string_cache_preserves_pool_counts_and_margin_reuse (__main__.main.<locals>.ChemistryOnlyTests.test_auxiliary_string_cache_preserves_pool_counts_and_margin_reuse) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 0.327s
+
+OK

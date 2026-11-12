@@ -183,8 +183,20 @@ def _solve_qp(P, q, A, lower, upper, initial, cfg):
         import osqp
     except ImportError as exc:
         raise KMMError("OSQP is required: install osqp==1.0.4 through the revision installer") from exc
+    # The KMM kernel matrix can be numerically singular (condition number >1e18)
+    # even though the QP is convex PSD. Scaling the objective by a positive
+    # constant leaves the minimizer unchanged and improves OSQP conditioning.
+    if sparse.issparse(P):
+        P = P.toarray()
+    P = np.asarray(P, dtype=float)
+    q = np.asarray(q, dtype=float)
+    scale = float(np.linalg.eigvalsh(P)[-1])
+    if not np.isfinite(scale) or scale <= 0:
+        raise KMMError(f"QP objective is not positive semidefinite: max eigenvalue={scale!r}")
+    P = P / scale
+    q = q / scale
     solver = osqp.OSQP()
-    solver.setup(P=sparse.csc_matrix(np.triu(P)), q=np.asarray(q, float),
+    solver.setup(P=sparse.csc_matrix(np.triu(P)), q=q,
                  A=sparse.csc_matrix(A), l=np.asarray(lower, float), u=np.asarray(upper, float),
                  eps_abs=cfg.solver_eps_abs, eps_rel=cfg.solver_eps_rel,
                  max_iter=cfg.solver_max_iter, polishing=True, verbose=False,
@@ -206,7 +218,8 @@ def _solve_qp(P, q, A, lower, upper, initial, cfg):
         "matches_locked_solver": osqp.__version__ == LOCKED_OSQP_VERSION, "status": result.info.status,
         "status_value": int(result.info.status_val), "iterations": int(result.info.iter),
         "primal_residual": float(result.info.prim_res), "dual_residual": float(result.info.dual_res),
-        "constraint_residual": residual, "objective": float(result.info.obj_val),
+        "constraint_residual": residual, "objective": float(result.info.obj_val * scale),
+        "objective_scale": scale, "objective_scaled": True,
         "objective_ridge": 0.0,
     }
 

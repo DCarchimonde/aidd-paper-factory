@@ -1,0 +1,38 @@
+{
+  "created_utc": "2026-11-12T11:47:25.833778+00:00",
+  "reference_commit": "ae9c3927f0e34f86f58005c4ccea9d50ff5a7376",
+  "sources": {
+    "codrug.py": {
+      "sha256": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44",
+      "normalized_lf_sha256": "797045b1ed028cc0e992e4ab1da7919bde577889a9fb71a5a2922081c259ee76",
+      "recorded_sha256": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44",
+      "matching_encoding": [
+        "raw",
+        "crlf"
+      ],
+      "matches_recorded_source": true
+    },
+    "kmm_cp.py": {
+      "sha256": "e57042e1121be80b49d3d26d63714af2b12cb6a720d69feb0d46c058f1fb7637",
+      "normalized_lf_sha256": "616439c69db14009f2014e744091697e68d4a923d737fc93a1e7b24491e7d775",
+      "recorded_sha256": "e57042e1121be80b49d3d26d63714af2b12cb6a720d69feb0d46c058f1fb7637",
+      "matching_encoding": [
+        "raw",
+        "crlf"
+      ],
+      "matches_recorded_source": true
+    }
+  },
+  "missing": [],
+  "current_git_head": "ae9c3927f0e34f86f58005c4ccea9d50ff5a7376",
+  "status": "MATCHED_RECORDED_SOURCES",
+  "scope": "Baseline source, scoped diffs and optional provenance only; no training or raw molecular rows.",
+  "files": {
+    "actual_sources/codrug.py": "dd0e16ff8c9d76ac797afc7637d23e2320e1d424229f430e3976bf5e49a76f44",
+    "reference_sources/codrug.py": "a333ca46ab8b6146a1da1c5841994b27699253d99fd48172430fb3a0298ae9ac",
+    "diff/codrug.py.patch": "f4d108b7a5931a852d35331a474269d8c2f8728b8017ec59762b9454a4a8595c",
+    "actual_sources/kmm_cp.py": "e57042e1121be80b49d3d26d63714af2b12cb6a720d69feb0d46c058f1fb7637",
+    "reference_sources/kmm_cp.py": "8893e0d0cbf1b2ddcee0fe91b548864c65fb3bc64013bacefb06c406dc449f09",
+    "diff/kmm_cp.py.patch": "bff4cf938254820f63d321af8d51e8faf525362a0bb4a4e5697dc434852197e3"
+  }
+}

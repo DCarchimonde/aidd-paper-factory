@@ -1,0 +1,40 @@
+diff --git a/paper2_admet_benchmark/revision_2026/full_baselines/codrug.py b/paper2_admet_benchmark/revision_2026/full_baselines/codrug.py
+index e08f4d9..ea31854 100644
+--- a/paper2_admet_benchmark/revision_2026/full_baselines/codrug.py
++++ b/paper2_admet_benchmark/revision_2026/full_baselines/codrug.py
+@@ -154,9 +154,22 @@ def _canonical(smiles: str) -> str:
+ 
+ @lru_cache(maxsize=300000)
+ def _scaffold_string(canonical: str) -> str:
+-    """Cache immutable text only; no RDKit Mol is retained by this cache."""
++    """Cache immutable text only; no RDKit Mol is retained by this cache.
++
++    Some otherwise-valid conjugated stereo structures trigger an RDKit
++    MolToSmiles precondition failure inside the Murcko transform. Murcko
++    scaffolds are not isomeric, so a stereo-stripped retry is equivalent for
++    this OOD rule and avoids dropping the molecule.
++    """
+     Chem, Murcko = _rdkit()
+-    return Murcko.MurckoScaffoldSmiles(mol=Chem.MolFromSmiles(canonical))
++    mol = Chem.MolFromSmiles(canonical)
++    if mol is None:
++        raise ValueError(f"Invalid molecular SMILES: {canonical!r}")
++    try:
++        return Murcko.MurckoScaffoldSmiles(mol=mol)
++    except RuntimeError:
++        Chem.RemoveStereochemistry(mol)
++        return Murcko.MurckoScaffoldSmiles(mol=mol)
+ 
+ 
+ def filter_auxiliary_smiles(auxiliary_smiles, source_smiles, config=None, seed=0):
+@@ -409,7 +422,9 @@ def _train(train, train_y, tuning, tuning_y, auxiliary, cfg, seed,device,jobs,mo
+             generator.bit_generator.state=saved["numpy_rng"]
+             torch.set_rng_state(saved["torch_rng"].cpu())
+             if str(device).startswith("cuda") and saved.get("cuda_rng") is not None:
+-                torch.cuda.set_rng_state_all(saved["cuda_rng"])
++                # map_location=device may have moved the saved RNG states to CUDA;
++                # set_rng_state_all requires CPU ByteTensors.
++                torch.cuda.set_rng_state_all([state.cpu() for state in saved["cuda_rng"]])
+     for epoch in range(start,cfg["max_epochs"]):
+         if completed: break
+         model.train(); permutation=generator.permutation(len(train)); totals=np.zeros(3); count=0

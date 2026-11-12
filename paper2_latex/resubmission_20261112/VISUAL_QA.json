@@ -6,5 +6,17 @@
     "cover_letter": 1
   },
   "visual_review": "All pages inspected from rendered contact sheets; final float placement, expanded supplementary table typography and references checked after recompilation.",
-  "status": "PASS"
+  "status": "PASS",
+  "runtime_source_update": {
+    "recompiled_document": "supplementary.pdf",
+    "reviewed_pages": [
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "result": "PASS",
+    "notes": "Objective-scaling paragraph, tables, following sections and references fit within margins; no clipped or overlapping text."
+  }
 }
