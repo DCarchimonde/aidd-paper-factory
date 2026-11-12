@@ -1,0 +1,39 @@
+{
+  "status": "PASS",
+  "baseline_commit": "a086f9d2e177e81d20fdf06ca2d2cbce1cb996eb",
+  "authors": [
+    {
+      "name": "Siyuan Tong",
+      "order": 1,
+      "equal_first_author": true,
+      "corresponding_author": true
+    },
+    {
+      "name": "Yuechen Wang",
+      "order": 2,
+      "equal_first_author": true,
+      "corresponding_author": false
+    }
+  ],
+  "equal_contribution_statement_verified_in": [
+    "manuscript.pdf",
+    "supplementary.pdf",
+    "response.pdf",
+    "cover_letter.pdf"
+  ],
+  "credit_roles_unchanged": true,
+  "frozen_numerical_and_figure_files_unchanged": 35,
+  "runtime_source_snapshots_unchanged": 3,
+  "scientific_training_performed": false,
+  "new_experiments": false,
+  "new_statistical_significance_claims": false,
+  "highlights_character_counts": [
+    70,
+    72,
+    79,
+    76,
+    79
+  ],
+  "build_warnings": 0,
+  "visual_review": "PASS"
+}

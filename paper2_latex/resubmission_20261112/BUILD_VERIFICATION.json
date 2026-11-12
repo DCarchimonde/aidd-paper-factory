@@ -7,18 +7,11 @@
   ],
   "warnings": {
     "manuscript": [],
-    "supplementary": [
-      "Three underfull hbox warnings in the CoDrug bibliography entry; rendered text is legible and within margins."
-    ],
+    "supplementary": [],
     "response": [],
     "cover_letter": []
   },
   "scientific_training_performed": false,
-  "runtime_source_update": {
-    "supplementary_compilation_passes": 2,
-    "errors": 0,
-    "undefined_references": 0,
-    "overfull_boxes": 0,
-    "page_count": 8
-  }
+  "revision": "Shared-first authorship, contribution-led text, and readable bibliography spacing",
+  "compilation_passes_per_document": 2
 }

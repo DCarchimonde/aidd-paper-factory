@@ -29,4 +29,4 @@ From a full repository checkout, with its baseline dependencies installed, run:
 python paper2_latex/resubmission_20261112/verify_runtime_sources.py
 ```
 
-The full repository test modules are required for this command. The numerical supplement includes the source snapshots for inspection and the manuscript's fixed-input rebuild separately. No model was retrained and no frozen prediction was recomputed during this reconciliation. `../FROZEN_CONTENT_VERIFICATION.json` records the unchanged numerical inputs, tables, figures, and three unchanged PDFs. The supporting-information PDF adds the objective-scaling description.
+The full repository test modules are required for this command. The numerical supplement includes the source snapshots for inspection and the manuscript's fixed-input rebuild separately. No model was retrained and no frozen prediction was recomputed during this reconciliation. `../FROZEN_CONTENT_VERIFICATION.json` records the unchanged numerical inputs, tables, and figures. The supporting information documents the objective scaling; later authorship and editorial changes are recorded in `../EDITORIAL_REVIEW.md`.

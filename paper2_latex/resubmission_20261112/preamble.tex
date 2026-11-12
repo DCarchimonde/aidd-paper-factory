@@ -9,10 +9,13 @@
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \setstretch{1.18}
 \raggedbottom
+\AtBeginDocument{\lefthyphenmin=2\righthyphenmin=3}
 \renewcommand{\topfraction}{0.9}
 \renewcommand{\textfraction}{0.05}
 \renewcommand{\floatpagefraction}{0.85}
 \setlength{\emergencystretch}{2em}
 \newcommand{\ind}{\mathbf{1}}
+\newcommand{\equalcontribution}{Siyuan Tong and Yuechen Wang contributed equally to this work and share first authorship.}
+\newcommand{\jointauthors}{\begin{minipage}{0.96\textwidth}\centering Siyuan Tong$^\dagger$ and Yuechen Wang$^\dagger$\\[0.3em]\small $^\dagger$\equalcontribution\end{minipage}}
 \newcommand{\papertitle}{Separating coverage gains from error targeting in molecular prediction sets}
 \hypersetup{pdftitle={Separating coverage gains from error targeting in molecular prediction sets},pdfauthor={Siyuan Tong and Yuechen Wang}}

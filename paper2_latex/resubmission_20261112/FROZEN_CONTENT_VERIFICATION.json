@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "previous_delivery_sha256": "b8e4c1e1ffe4312772713e8563f993df870bc061b05a4ece45120a849cbf7a3b",
+  "previous_delivery_sha256": "b26513a75b547ee9f8531f90e0ab07be7034f67d9f706b33150a6ec270883a55",
   "unchanged_files": [
     {
       "path": "evidence/all_cell_metrics.csv.gz",
@@ -143,9 +143,12 @@
       "sha256": "dee5b9555619bdda947e4ee6d917cf9b7622a8ec09fad8385a3661299210b222"
     }
   ],
-  "unchanged_documents": [
+  "baseline_commit": "a086f9d2e177e81d20fdf06ca2d2cbce1cb996eb",
+  "revised_documents": [
     "manuscript.pdf",
+    "supplementary.pdf",
     "response.pdf",
     "cover_letter.pdf"
-  ]
+  ],
+  "revision_scope": "Shared-first authorship and editorial emphasis; numerical inputs, tables, figures and scientific code unchanged."
 }
