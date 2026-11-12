@@ -3,8 +3,12 @@
     "manuscript": 12,
     "supplementary": 7,
     "response": 3,
-    "cover_letter": 1
+    "cover_letter": 2
   },
-  "visual_review": "All 23 final pages inspected after recompilation. Shared-first-author notes, tables, figures, page breaks, references and correspondence details are legible and within margins. Bibliography spacing and English hyphenation corrected.",
-  "status": "PASS"
+  "visual_review": "The unchanged manuscript (12 pages), supporting information (7 pages), and reviewer response (3 pages) retain their completed visual inspection. The updated cover letter (2 pages) and editable highlights and declaration (1 rendered page each) were inspected for layout and legibility.",
+  "status": "PASS",
+  "reviewed_docx_pages": {
+    "Highlights.docx": 1,
+    "Declaration-of-Interest.docx": 1
+  }
 }

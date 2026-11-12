@@ -26,19 +26,26 @@
 
 本包为更新后的完整投稿准备材料，尚未向期刊提交。作者顺序、单位和通讯信息沿用原稿；两位作者新增共同第一作者说明。
 
-## 投稿文件对应
+## 拒稿重投与交付文件
+
+本稿按编辑邮件允许的 **New Submission** 路径提交。投稿信列出旧稿号 CHEMOLAB-D-26-01118、原题目和新题目，并逐项说明五类审稿意见对应的实质修改。三页逐点回复另附具体位置。给投稿部的作者信息、文件对应和操作说明见 `Submission-Instructions.txt`。
+
+- `TAME-Complete.zip`：作者保留的完整总包，包含投稿文件包、完整工程、交接说明、编辑决定节选和交付回执。
+- `TAME-Submission.zip`：交给期刊上传的文件集合，解压后按实际页面类别分别上传。
 
 | 文件 | 用途 |
 |---|---|
-| `manuscript.pdf` | 主稿阅读版 |
-| `supplementary.pdf` | 补充材料 |
-| `response.pdf` | 对原审稿意见的逐点回复，按意见主题标明摘要 |
-| `cover_letter.pdf` | 投稿信 |
-| `highlights.txt` | 五条 Highlights |
-| `TAME_LaTeX_Source.zip`（完整交付包内） | LaTeX 源文件、图表及四份文档编译入口 |
-| `TAME_Numerical_Supplement.zip`（完整交付包内） | 原始返回聚合结果、来源记录、重建代码及固定输入 |
+| `Manuscript.pdf` | 主稿阅读版 |
+| `Manuscript-Source.zip` | 仅主稿 LaTeX 源文件及所需图表；入口 manuscript.tex |
+| `Supporting-Information.pdf` | 补充材料 |
+| `Supporting-Data.zip` | 完整数值附件、固定输入重建脚本与实际运行源码 |
+| `Cover-Letter.pdf` | 两页投稿信，详细说明如何回应旧稿审稿意见 |
+| `Response-to-Reviewer.pdf` | 三页逐点回复 |
+| `Highlights.docx` | 可编辑的五条 Highlights |
+| `Declaration-of-Interest.docx` | 利益冲突声明 |
+| `Figure-1.pdf` / `Figure-2.pdf` | 与主稿一致的独立矢量图 |
 
-系统的具体上传分类以实际投稿页面为准；不将整份内部交付 ZIP 当作主稿上传。
+系统的具体上传分类以实际投稿页面为准。总包内的 `Manuscript-Project.zip` 保存四份文档的全部 LaTeX 源文件、数值输入和内部交付记录。
 
 ## 数据与版本来源
 
@@ -62,3 +69,13 @@ python rebuild.py
 核验文件：`NUMERICAL_VERIFICATION.json`（30 组 EPA 汇总、每组 7 项指标）、`ACTIVATION_IDENTITY_CHECK.json`（80,000 次成员条件对照与边界/排序检查）、`BUILD_VERIFICATION.json`（四份文档编译）、`COLLECTOR_VERIFICATION.json`（取件脚本）、`RUNTIME_SOURCE_VERIFICATION.json`（实际运行源码与相关行为检查）。
 
 GitHub 保留可重建本稿的精简固定输入；完整原始聚合 CSV 随数值附件交付。两者的用途和变换记录在来源清单中。
+
+## 重新生成交付包
+
+先用 `python build_submission_documents.py` 生成两份 Word 上传文件（需安装 python-docx）。编译文档后，在工程目录外指定输出路径，运行：
+
+```text
+python package_delivery.py --output-dir /path/to/output --commit <published-commit>
+```
+
+交付回执记录真实发布提交、两位共同第一作者信息和上传文件哈希。

@@ -1,0 +1,50 @@
+{
+  "status": "PASS",
+  "decision_reference": "CHEMOLAB-D-26-01118",
+  "route": "NEW_SUBMISSION_AFTER_REJECTION",
+  "cover_letter_pages": 2,
+  "detailed_response_topics": 5,
+  "reviewer_response_pages": 3,
+  "equal_first_authorship": [
+    "Siyuan Tong",
+    "Yuechen Wang"
+  ],
+  "unchanged_manuscript_si_response_and_scientific_source_files": [
+    "manuscript.pdf",
+    "supplementary.pdf",
+    "response.pdf",
+    "manuscript.tex",
+    "results_discussion.tex",
+    "supplementary.tex",
+    "response.tex",
+    "preamble.tex",
+    "references.tex",
+    "build_results.py",
+    "check_activation_identity.py"
+  ],
+  "unchanged_frozen_scientific_files": 35,
+  "editable_highlights_count": 5,
+  "highlight_max_characters": 79,
+  "journal_submission_performed": false,
+  "scope": "Editor email requirements and handoff contents; final form fields follow the journal system.",
+  "package_validation": {
+    "source_archive_compiles": true,
+    "compiled_manuscript_text_matches": true,
+    "supporting_data_rebuilds": true,
+    "rebuilt_numerical_tables_and_report_match": true,
+    "upload_file_count": 10,
+    "upload_files": [
+      "Cover-Letter.pdf",
+      "Declaration-of-Interest.docx",
+      "Figure-1.pdf",
+      "Figure-2.pdf",
+      "Highlights.docx",
+      "Manuscript-Source.zip",
+      "Manuscript.pdf",
+      "Response-to-Reviewer.pdf",
+      "Supporting-Data.zip",
+      "Supporting-Information.pdf"
+    ],
+    "nested_submission_archive_identical": true
+  }
+}

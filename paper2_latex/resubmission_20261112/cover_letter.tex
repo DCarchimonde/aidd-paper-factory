@@ -2,19 +2,30 @@
 \begin{document}
 \noindent 12 November 2026
 
-\noindent Dear Editor,
+\noindent Dear Dr. Park,
 
-Please consider our manuscript, \emph{\papertitle}, as an original research article in \emph{Chemometrics and Intelligent Laboratory Systems}. This is a substantially revised new submission following the decision on CHEMOLAB-D-26-01118.
+Following your decision on \textbf{CHEMOLAB-D-26-01118}, we submit a substantially revised version as a \textbf{new original research article} in \emph{Chemometrics and Intelligent Laboratory Systems}. The previous title was \emph{Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope}. The revised title is \emph{\papertitle}.
 
-The study introduces a framework for measuring the decision value of molecular prediction sets. Class-budget matching fixes the predictor and expansion count within each original singleton class, isolating error targeting from the amount and class allocation of deferral. An exact weighted-rank condition links transport weights to label addition and identifies when expansion reduces to probability ranking.
+The revised study introduces class-budget matching to isolate the error-targeting value of molecular prediction-set expansion and an exact weighted-rank condition connecting transport weights to label addition. In response to the reviewer's comments, we have made the following substantive changes.
 
-Across 960 predictor units spanning twelve Tox21 assays and random/scaffold holdouts from four additional assay families, the framework identifies a useful decision-aligned reference. On the historical six-assay panel, omitted-label probability ranking achieves 85.10\% minimum-class coverage and 46.57\% macro correct-singleton yield, compared with 84.75\% and 44.61\% for generic uncertainty at the same workload. It also reproduces the historical TAME coverage gain of 1.3649 percentage points. The activation analysis explains why transport-gate passage can coexist with zero intervention, connecting the mathematical rule to its observed molecular decisions.
+\begin{enumerate}
+\item \textbf{Contribution and the earlier Stage I examples.} The distinction between marginal and class-conditional coverage now serves as established background. The contribution centers on matching expansion counts within each original singleton class, decomposing recovered errors and withheld correct decisions, and characterizing activation. The new experiments use the corrected finite-sample quantile rule, with an infinite threshold when the required rank exceeds the calibration sample size. The earlier Stage I numerical examples and figures have been replaced by the newly executed evidence.
 
-The revised study combines these results with complete reference-system comparisons, paired molecular inference, and executable manuscript reconstruction. A point-by-point response details the changes from the earlier submission. The comparison framework and molecular evidence address chemometric prediction, uncertainty assessment, and the practical value of model complexity.
+\item \textbf{Set expansion and transport gates.} We distinguish view eligibility, actual label addition, and error recovery. The exact activation inequality and constant-query-weight ranking identity explain how the weighted rule operates. In the primary active-label comparison, both views pass in all 30 assay--seed cells but produce no additional deferrals; these results are now explained through the activation mechanism.
+
+\item \textbf{Chemical decision objective.} Historical label-0 protection and the prespecified label-1 objective are reported separately. The revised text defines the measured assay outcomes, false-inactive and false-active exposure, correct-singleton yield, and operational deferral. It also accounts for missing assay outcomes through their corresponding labeled denominators.
+
+\item \textbf{Comparator strength and robustness.} The completed evaluation contains 960 predictor units across twelve Tox21 assays and fixed random/scaffold holdouts from four additional assay families. It adds shared-predictor, class-budget comparisons; complete CoDrug and KMM-CP reference systems; predictor and score sensitivities; component and gate ablations; and paired molecular bootstrap intervals. Omitted-label probability ranking reproduces the historical 1.3649-point coverage gain at the same class-specific workload and achieves higher observed coverage and yield than generic uncertainty. The revised paper reports the gain together with its deferral cost and the corresponding paired contrast.
+
+\newpage
+\item \textbf{Algorithm presentation and reproducibility.} The methods now proceed from cohort roles and set construction to activation, matched budgets, decision metrics, and inference. An activation table replaces repeated zero-difference graphics, and the supporting information specifies gate settings and reference configurations. The submission includes the full numerical supplement, frozen-input rebuilding scripts, and the verified executed CoDrug and KMM-CP sources. The accompanying response maps each review topic to the revised sections, tables, and figures.
+\end{enumerate}
+
+These changes provide a practical framework for assessing the information gained from molecular uncertainty procedures at a specified decision workload. We believe this contribution is relevant to the journal's readership in chemometric prediction and uncertainty assessment.
 
 \equalcontribution\ Siyuan Tong remains the corresponding author.
 
-Thank you for considering our manuscript.
+Thank you for considering this substantially revised new submission.
 
 \noindent Sincerely,\\
 Siyuan Tong\\

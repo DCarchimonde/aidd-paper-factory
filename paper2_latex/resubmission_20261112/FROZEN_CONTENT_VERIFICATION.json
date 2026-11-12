@@ -1,6 +1,6 @@
 {
   "status": "PASS",
-  "previous_delivery_sha256": "b26513a75b547ee9f8531f90e0ab07be7034f67d9f706b33150a6ec270883a55",
+  "previous_delivery_sha256": "49545be1738b165b8bd568211e4514a3ffd4e672bdee7c718734bfcf839546d9",
   "unchanged_files": [
     {
       "path": "evidence/all_cell_metrics.csv.gz",
@@ -143,12 +143,9 @@
       "sha256": "dee5b9555619bdda947e4ee6d917cf9b7622a8ec09fad8385a3661299210b222"
     }
   ],
-  "baseline_commit": "a086f9d2e177e81d20fdf06ca2d2cbce1cb996eb",
+  "baseline_commit": "2420f6fff7e5eb7b96b30b1f00629e48899d5f4b",
   "revised_documents": [
-    "manuscript.pdf",
-    "supplementary.pdf",
-    "response.pdf",
     "cover_letter.pdf"
   ],
-  "revision_scope": "Shared-first authorship and editorial emphasis; numerical inputs, tables, figures and scientific code unchanged."
+  "revision_scope": "Expanded resubmission cover letter and clean submission packaging. Manuscript, SI, reviewer response, scientific inputs, tables, figures and scientific code unchanged."
 }

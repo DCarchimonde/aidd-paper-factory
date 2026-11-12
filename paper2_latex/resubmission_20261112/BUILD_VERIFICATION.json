@@ -12,6 +12,12 @@
     "cover_letter": []
   },
   "scientific_training_performed": false,
-  "revision": "Shared-first authorship, contribution-led text, and readable bibliography spacing",
-  "compilation_passes_per_document": 2
+  "revision": "Detailed cover letter for rejected-paper resubmission; manuscript, SI and reviewer response unchanged",
+  "compilation_passes_per_document": 2,
+  "document_pages": {
+    "manuscript": 12,
+    "supplementary": 7,
+    "response": 3,
+    "cover_letter": 2
+  }
 }

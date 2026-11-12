@@ -1,0 +1,58 @@
+TAME 拒稿重投交接说明
+
+本次性质：原稿被拒后，经编辑明确允许，大幅修改并作为新稿提交。
+在投稿系统走 New Submission，不进入旧稿的普通返修流程。
+
+期刊：Chemometrics and Intelligent Laboratory Systems
+投稿入口：https://www.editorialmanager.com/chemolab/
+旧稿号：CHEMOLAB-D-26-01118
+旧题目：Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope
+新题目：Separating coverage gains from error targeting in molecular prediction sets
+文章性质：Original research article；页面类型按实际提供的研究论文选项填写。
+
+一、编辑邮件要求的落实
+
+1. 本稿按大幅修改后的新稿准备。投稿信首段明确说明 new original research article。
+2. 投稿信首段列出 CHEMOLAB-D-26-01118、原题目和新题目。
+3. 投稿信逐项说明五类审稿意见对应的实质修改；另附三页逐点回复，列出正文与补充材料的位置。
+4. 五类修改包括：贡献与旧示例、集合扩展及门槛、化学决策目标、比较方法与稳健性、方法呈现及可复现材料。
+
+二、文件上传对应
+
+解压 TAME-Submission.zip 后按文件逐项上传；不要把完整交付包作为主稿上传。
+
+Manuscript.pdf — 主稿，供编辑和审稿人阅读。
+Manuscript-Source.zip — 主稿 LaTeX 源文件；编译入口为 manuscript.tex。
+Supporting-Information.pdf — 补充说明、表格和参考配置。
+Supporting-Data.zip — 完整数值附件、固定输入重建脚本和实际运行源码。
+Cover-Letter.pdf — 投稿信；包含旧稿号及详细修改说明。
+Response-to-Reviewer.pdf — 对旧稿审稿意见的逐点回复。
+Highlights.docx — 可编辑的五条 Highlights。
+Declaration-of-Interest.docx — 利益冲突声明。
+Figure-1.pdf / Figure-2.pdf — 独立矢量图，与主稿内嵌图片相同；系统要求单独上传图片时使用。
+
+上传类别以当前系统页面为准。如果新投稿页面没有单独的审稿回复类别，使用供编辑查阅的附加文件类别，并保留清晰的文件说明。
+若系统要求在文本框填写投稿信，将 Cover-Letter.pdf 的正文完整复制到文本框；若要求 Highlights 文本，复制 Highlights.docx 的五条内容。
+如果系统询问是否曾向本刊投稿，选择“是”并填写旧稿号。页面新增必填字段按期刊系统要求处理。
+
+三、作者信息
+
+第一顺位：Siyuan Tong；共同第一作者；通讯作者。
+单位：Department of Artificial Intelligence, Faculty of Computer Science and Information Technology, University of Malaya, 50603 Kuala Lumpur, Malaysia
+通讯邮箱：25064241@siswa.um.edu.my
+
+第二顺位：Yuechen Wang；共同第一作者。
+单位：Faculty of Data Science, City University of Macau, Macau SAR, China
+邮箱：D25091100346@cityu.edu.mo
+
+共同第一作者原文：Siyuan Tong and Yuechen Wang contributed equally to this work and share first authorship.
+保持上述作者顺序；共同第一作者已经在主稿、补充材料和回复中标注，投稿信也已说明。
+无特定经费资助、无利益冲突，声明已载于主稿。CRediT 分工沿用稿件已有记录。
+
+四、给投稿部的工作指令
+
+请以本包为唯一上传版本，按编辑允许的拒稿后新稿重投路径操作。保留投稿信中的旧稿号和五项修改说明，不将其删成普通首次投稿信。完成元数据和文件上传后，核对系统生成的合并 PDF 中作者顺序、共一说明、图表及附件是否完整，再由作者完成最终提交。
+
+TAME-Complete.zip 供作者保留，包含投稿包、完整 LaTeX 工程、重建脚本、交接说明、编辑决定节选和文件回执。
+TAME-Submission.zip 为给期刊上传文件的集合。
+本交付状态为“可交给投稿部执行”，尚未在期刊系统提交。

@@ -1,0 +1,30 @@
+Editor decision — relevant excerpt supplied by the author
+
+Ref.: Ms. No. CHEMOLAB-D-26-01118
+Beyond Aggregate Reliability in ADMET Prediction: Protecting Weakest-Class Coverage under Molecular Distribution Shift with a Transport-Audited Multi-View Envelope
+Chemometrics and Intelligent Laboratory Systems
+
+Dear Mr. Tong,
+
+Thank you for submitting your manuscript to Chemometrics and Intelligent Laboratory Systems.
+
+I apologize for the slow turnaround on your manuscript. I have had significant trouble receiving the review from the second reviewer. Despite numerous reminders, he/she never submitted a review. Rather than extending the process through another cycle, I have decided to make a decision based on the single review.
+
+Unfortunately, the reviewer has advised against publishing your manuscript, and I must therefore reject it at this time.
+
+To view your reviewer feedback, please log in as an author at https://www.editorialmanager.com/chemolab/ and navigate to your manuscript in the "Submissions with a Decision" folder under the Author Main Menu.
+
+You have the option of resubmitting a substantially revised version of your paper, which would be considered a new submission. If you decide to do this, you should refer to the reference number of the current paper and include a cover letter explaining in detail how the paper has been changed in response to the reviewer’s comments.
+
+Thank you for giving us the opportunity to consider your work.
+
+Kind regards,
+
+Eun Sug Park, PhD
+Editor
+Chemometrics and Intelligent Laboratory Systems
+
+Comments from the editors and reviewers:
+Read your reviewers’ comments in our peer review platform.
+
+This file preserves the decision and resubmission instructions. The service and anti-fraud footer is omitted.
